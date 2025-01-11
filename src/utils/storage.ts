@@ -1,5 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { PDFDocument, ReadingProgress } from '../types/pdf';
+import {PDFDocument, ReadingProgress} from '../types/pdf';
 
 export const StorageKeys = {
   READING_PROGRESS: 'reading_progress',
@@ -29,4 +29,4 @@ export const getReadingProgress = async (documentId: string): Promise<ReadingPro
     console.error('Error getting reading progress:', error);
     return null;
   }
-}; 
+};
