@@ -3,8 +3,8 @@ import {View, Text, FlatList, StyleSheet, TouchableOpacity, ActivityIndicator} f
 import {useTranslation} from 'react-i18next';
 import {PDFDocument} from '../types/pdf';
 import {useNavigation} from '@react-navigation/native';
-import {fetchPDFsFromChannel} from '../services/telegramAPI';
-import {usePDFDocument} from '../hooks/usePDFDocument';
+import {useAppDispatch, useAppSelector} from '../hooks/useAppDispatch';
+import {fetchDocuments, downloadDocument} from '../store/documentsSlice';
 
 const pdfs: PDFDocument[] = [
   {
@@ -24,49 +24,40 @@ const pdfs: PDFDocument[] = [
 const LibraryScreen = () => {
   const {t} = useTranslation();
   const navigation = useNavigation();
-  const [documents, setDocuments] = React.useState<PDFDocument[]>([]);
-  const [isLoading, setIsLoading] = React.useState(true);
-  const [error, setError] = React.useState<string | null>(null);
+  const dispatch = useAppDispatch();
 
-  const {isDownloading, download} = usePDFDocument();
-
-  const loadDocuments = async () => {
-    try {
-      setIsLoading(true);
-      const docs = await fetchPDFsFromChannel();
-      setDocuments(docs);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Unknown error');
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const {items: documents, status, error, currentDownloading} = useAppSelector(state => state.documents);
 
   useEffect(() => {
-    loadDocuments();
-  }, []);
-
+    if (status === 'idle') {
+      dispatch(fetchDocuments());
+    }
+  }, [dispatch, status]);
+  const store = useAppSelector(state => state.documents);
+  console.log('store', store);
   const renderItem = ({item}: {item: PDFDocument}) => {
+    const pdfDoc = {...item, ...store.progressData[item.id]};
     const handlePress = async () => {
-      if (!item.localPath) {
-        const path = await download(item);
-        item.localPath = path;
+      if (!pdfDoc.localPath) {
+        await dispatch(downloadDocument(pdfDoc));
       }
-      navigation.navigate('PDFViewer', {document: item});
+      navigation.navigate('PDFViewer', {document: pdfDoc});
     };
+
+    const isDownloading = currentDownloading === pdfDoc.id;
 
     return (
       <TouchableOpacity style={styles.documentItem} onPress={handlePress}>
-        <Text style={styles.title}>{item.title}</Text>
+        <Text style={styles.title}>{pdfDoc.title}</Text>
         <Text style={styles.progress}>
-          {t('currentPage')}: {item.lastReadPage}/{item.totalPages}
+          {t('currentPage')}: {pdfDoc.currentPage}/{pdfDoc.totalPages}
         </Text>
         {isDownloading && <ActivityIndicator style={styles.loader} />}
       </TouchableOpacity>
     );
   };
 
-  if (isLoading) {
+  if (status === 'loading') {
     return (
       <View style={styles.centerContainer}>
         <ActivityIndicator size="large" />
@@ -74,11 +65,11 @@ const LibraryScreen = () => {
     );
   }
 
-  if (error) {
+  if (status === 'failed') {
     return (
       <View style={styles.centerContainer}>
         <Text style={styles.error}>{error}</Text>
-        <TouchableOpacity onPress={loadDocuments}>
+        <TouchableOpacity onPress={() => dispatch(fetchDocuments())}>
           <Text style={styles.retry}>{t('retry')}</Text>
         </TouchableOpacity>
       </View>

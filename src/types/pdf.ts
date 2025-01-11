@@ -3,7 +3,7 @@ export interface PDFDocument {
   title: string;
   url: string;
   localPath?: string;
-  lastReadPage?: number;
+  currentPage?: number;
   totalPages?: number;
   language: 'en' | 'ar';
 }

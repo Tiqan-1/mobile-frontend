@@ -3,16 +3,18 @@ import {View, StyleSheet, Dimensions, ActivityIndicator} from 'react-native';
 import Pdf from 'react-native-pdf';
 import {useRoute} from '@react-navigation/native';
 import {PDFDocument} from '../types/pdf';
-import {saveReadingProgress} from '../utils/storage';
 import {getFileUrl} from '../services/telegramAPI';
+import {setCurrentPage} from '../store/documentsSlice';
+import {useAppDispatch} from '../hooks/useAppDispatch';
 
 const PDFViewerScreen = () => {
   const route = useRoute();
   const {document} = route.params as {document: PDFDocument};
   const [fileUrl, setFileUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
-  console.log('document', document,fileUrl);
-  
+  console.log('document', document, fileUrl);
+  const dispatch = useAppDispatch();
+
   useEffect(() => {
     const loadFile = async () => {
       try {
@@ -32,14 +34,16 @@ const PDFViewerScreen = () => {
     loadFile();
   }, [document]);
 
-  const onPageChanged = (page: number) => {
-    
-    saveReadingProgress({
-      documentId: document.id,
-      currentPage: page,
-      lastReadDate: new Date().toISOString(),
-      bookmarks: [],
-    });
+  const onPageChanged = (page: number, numberOfPages: number) => {
+    dispatch(
+      setCurrentPage({
+        documentId: document.id,
+        currentPage: page,
+        lastReadDate: new Date().toISOString(),
+        totalPages: numberOfPages,
+        bookmarks: [],
+      }),
+    );
   };
 
   if (loading || !fileUrl) {
@@ -55,7 +59,7 @@ const PDFViewerScreen = () => {
       <Pdf
         source={{uri: fileUrl}}
         style={styles.pdf}
-        page={document.lastReadPage|| 0}
+        page={document.currentPage || 1}
         onPageChanged={onPageChanged}
         enablePaging={true}
       />
