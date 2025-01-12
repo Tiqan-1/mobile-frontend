@@ -1,7 +1,7 @@
 import {PDFDocument} from '../types/pdf';
 
-const NOTION_API_KEY = 'YOUR_NOTION_API_KEY';
-const DATABASE_ID = 'YOUR_DATABASE_ID';
+const NOTION_API_KEY = 'secret_7w7J3TaNbs90gYWAxpSd1rn9VYjO9jddoFwgLrASGOy';
+const DATABASE_ID = '14f72625e9a4812e86ebe21834c39bab';
 
 export const fetchPDFsFromNotion = async (): Promise<PDFDocument[]> => {
   try {
@@ -22,10 +22,10 @@ export const fetchPDFsFromNotion = async (): Promise<PDFDocument[]> => {
     return data.results.map((page: any) => ({
       id: page.id,
       title: page.properties.Title.title[0].plain_text,
-      url: page.properties.URL.url,
+      url: page.properties.Link.url,
       lastReadPage: 1,
       totalPages: 0,
-      language: page.properties.Language.select.name,
+      language: 'en',
     }));
   } catch (error) {
     console.error('Error fetching PDFs from Notion:', error);

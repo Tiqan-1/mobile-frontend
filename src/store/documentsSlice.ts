@@ -3,6 +3,7 @@ import {PDFDocument} from '../types/pdf';
 import {fetchPDFsFromChannel, getFileUrl} from '../services/telegramAPI';
 import {ReadingProgress} from '../types/pdf';
 import {REHYDRATE} from 'redux-persist';
+import { fetchPDFsFromNotion } from '../services/notionAPI';
 
 interface DocumentsState {
   items: PDFDocument[];
@@ -34,7 +35,8 @@ export const fetchDocuments = createAsyncThunk('documents/fetchDocuments', async
   if (!shouldRefreshData(state.documents.lastUpdated)) {
     return state.documents.items;
   }
-  const documents = await fetchPDFsFromChannel();
+  // const documents = await fetchPDFsFromChannel();
+  const documents = await fetchPDFsFromNotion();
   return documents;
 });
 

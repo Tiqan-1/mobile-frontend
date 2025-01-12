@@ -18,7 +18,14 @@ const PDFViewerScreen = () => {
   useEffect(() => {
     const loadFile = async () => {
       try {
-        if (document.localPath) {
+        if (document.url.includes('drive.google.com')) {
+          const fileId = document.url.match(/[-\w]{25,}/);
+          if (fileId) {
+            setFileUrl(`https://drive.google.com/uc?export=download&id=${fileId[0]}`);
+          } else {
+            setFileUrl(document.url);
+          }
+        } else if (document.localPath) {
           setFileUrl(document.localPath);
         } else {
           // const url = await getFileUrl(document.id);
