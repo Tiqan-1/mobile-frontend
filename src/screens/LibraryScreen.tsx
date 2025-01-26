@@ -1,10 +1,10 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import {View, Text, FlatList, StyleSheet, TouchableOpacity, ActivityIndicator} from 'react-native';
 import {useTranslation} from 'react-i18next';
 import {PDFDocument} from '../types/pdf';
 import {useNavigation} from '@react-navigation/native';
 import {useAppDispatch, useAppSelector} from '../hooks/useAppDispatch';
-import {fetchDocuments, downloadDocument} from '../store/documentsSlice';
+import {fetchDocuments, downloadDocument, loadMoreDocuments} from '../store/documentsSlice';
 import YoutubePlayer from 'react-native-youtube-iframe';
 // import YouTube from 'react-native-youtube';
 
@@ -38,15 +38,37 @@ const LibraryScreen = () => {
   const navigation = useNavigation();
   const dispatch = useAppDispatch();
 
-  const {items: documents, status, error, currentDownloading} = useAppSelector(state => state.documents);
+  const {items: documents, status, error, currentDownloading, hasMore} = useAppSelector(state => state.documents);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
 
+  const handleLoadMore = async () => {
+    if (!hasMore || isLoadingMore) return;
+
+    setIsLoadingMore(true);
+    try {
+      await dispatch(loadMoreDocuments()).unwrap();
+    } finally {
+      setIsLoadingMore(false);
+    }
+  };
+
+  const renderFooter = () => {
+    if (!hasMore) return null;
+
+    return (
+      <View style={styles.footer}>
+        <ActivityIndicator size="small" />
+      </View>
+    );
+  };
   useEffect(() => {
     if (status === 'idle') {
       dispatch(fetchDocuments());
     }
   }, [dispatch, status]);
   const store = useAppSelector(state => state.documents);
-  console.log('store', store);
+  console.log('store###', store);
+
   const renderItem = ({item}: {item: PDFDocument}) => {
     const fType = (url: string) => {
       if (!url) {
@@ -152,6 +174,11 @@ const LibraryScreen = () => {
         renderItem={renderItem}
         keyExtractor={item => item.id}
         ListEmptyComponent={() => <Text style={styles.emptyText}>{t('noDocuments')}</Text>}
+        onEndReached={handleLoadMore}
+        onEndReachedThreshold={0.5}
+        ListFooterComponent={renderFooter}
+        refreshing={status === 'loading'}
+        onRefresh={() => dispatch(fetchDocuments({forceRefresh: true}))}
       />
     </View>
   );
@@ -203,6 +230,10 @@ const styles = StyleSheet.create({
   },
   loader: {
     marginLeft: 10,
+  },
+  footer: {
+    padding: 16,
+    alignItems: 'center',
   },
 });
 
