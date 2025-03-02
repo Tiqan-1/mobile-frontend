@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
-import { downloadPDF, deletePDF } from '../utils/pdfManager';
-import { PDFDocument } from '../types/pdf';
+import { downloadPDF, deletePDF } from 'utils/pdfManager';
+import { PDFDocument } from 'types/pdf';
 
 export const usePDFDocument = (document: PDFDocument) => {
   const [isDownloading, setIsDownloading] = useState(false);
@@ -12,7 +12,7 @@ export const usePDFDocument = (document: PDFDocument) => {
       setError(null);
       const localPath = await downloadPDF(document);
       return localPath;
-    } catch (err) {
+    } catch (err: any) {
       setError(err.message);
       throw err;
     } finally {

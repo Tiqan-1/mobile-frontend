@@ -1,6 +1,6 @@
 import RNFS from 'react-native-fs';
 import RNFetchBlob from 'react-native-blob-util';
-import {PDFDocument} from '../types/pdf';
+import {PDFDocument} from 'types/pdf';
 
 export const downloadPDF = async (document: PDFDocument): Promise<string> => {
   const localPath = `${RNFS.DocumentDirectoryPath}/${document.id}.pdf`;

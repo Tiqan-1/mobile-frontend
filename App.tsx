@@ -9,13 +9,13 @@ import React from 'react';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {I18nextProvider} from 'react-i18next';
-import i18n from './src/localization/i18n';
-import LibraryScreen from './src/screens/LibraryScreen';
-import PDFViewerScreen from './src/screens/PDFViewerScreen';
+import i18n from 'localization/i18n';
+import LibraryScreen from 'screens/LibraryScreen';
+import PDFViewerScreen from 'screens/PDFViewerScreen';
 import {Provider} from 'react-redux';
 import {PersistGate} from 'redux-persist/integration/react';
 
-import {store, persistor} from './src/store';
+import {store, persistor} from 'store';
 import {ActivityIndicator, View} from 'react-native';
 
 const Stack = createNativeStackNavigator();

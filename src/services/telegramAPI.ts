@@ -1,5 +1,5 @@
-import {PDFDocument} from '../types/pdf';
-import {TELEGRAM_CONFIG} from '../config/telegram';
+import {PDFDocument} from 'types/pdf';
+import {TELEGRAM_CONFIG} from 'config/telegram';
 
 interface TelegramDocument {
   file_id: string;
@@ -67,20 +67,33 @@ export const fetchPDFsFromChannel = async (): Promise<PDFDocument[]> => {
 };
 
 // Helper function to get the actual file path
-export const getFileUrl = async (fileId: string): Promise<string> => {
-  try {
-    const response = await fetch(`https://api.telegram.org/bot${TELEGRAM_CONFIG.BOT_TOKEN}/getFile?file_id=${fileId}`);
-
-    const data = await response.json();
-
-    if (!data.ok) {
-      throw new Error(`File path error: ${data.description}`);
+export const getFileUrl = async (document: PDFDocument): Promise<string> => {
+  if (document.url.includes('drive.google.com')) {
+    const fileId = document.url.match(/[-\w]{25,}/);
+    if (fileId) {
+      return `https://drive.google.com/uc?export=download&id=${fileId[0]}`;
+    } else {
+      return document.url;
     }
+  } else if (document.url.includes('telegram.me')) {
+    try {
+      const response = await fetch(
+        `https://api.telegram.org/bot${TELEGRAM_CONFIG.BOT_TOKEN}/getFile?file_id=${document.id}`,
+      );
 
-    return `https://api.telegram.org/file/bot${TELEGRAM_CONFIG.BOT_TOKEN}/${data.result.file_path}`;
-  } catch (error) {
-    console.error('Error getting file URL:', error);
-    throw error;
+      const data = await response.json();
+
+      if (!data.ok) {
+        return document.url;
+      }
+
+      return `https://api.telegram.org/file/bot${TELEGRAM_CONFIG.BOT_TOKEN}/${data.result.file_path}`;
+    } catch (error) {
+      console.error('Error getting file URL:', error);
+      return document.url;
+    }
+  } else {
+    return document.url;
   }
 };
 

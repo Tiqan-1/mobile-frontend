@@ -1,4 +1,4 @@
-import {PDFDocument} from '../types/pdf';
+import {PDFDocument} from 'types/pdf';
 
 const NOTION_API_KEY = 'secret_7w7J3TaNbs90gYWAxpSd1rn9VYjO9jddoFwgLrASGOy';
 const DATABASE_ID = '14f72625e9a4812e86ebe21834c39bab';

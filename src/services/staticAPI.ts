@@ -1,4 +1,4 @@
-import {PDFDocument} from '../types/pdf';
+import {PDFDocument} from 'types/pdf';
 
 // Host this JSON file on GitHub or any static hosting
 const PDF_LIST_URL = 'https://raw.githubusercontent.com/YOUR_USERNAME/YOUR_REPO/main/pdfs.json';

@@ -1,4 +1,4 @@
-import {PDFDocument} from '../types/pdf';
+import {PDFDocument} from 'types/pdf';
 
 const FOLDER_ID = 'YOUR_PUBLIC_FOLDER_ID';
 

@@ -1,3 +1,36 @@
 {
-  "extends": "@react-native/typescript-config/tsconfig.json"
+  "extends": "@react-native/typescript-config/tsconfig.json",
+  "compilerOptions": {
+
+    "baseUrl": "./",
+    "typeRoots": ["*/*.d.ts", "./src/*/*.d.ts", "./node_modules/@types"],
+    "types": ["jest", "react-native"],
+    "paths": {
+      "*": ["src/*"],
+      "assets/*": ["./src/assets/*"],
+      "components/*": ["./src/components/*"],
+      "navigations/*": ["./src/navigations/*"],
+      "containers/*": ["./src/containers/*"],
+      "styles/*": ["./src/styles/*"],
+      "utils/*": ["./src/utils/*"],
+      "api": ["./src/api/*"],
+      "screens": ["./src/screens/*"],
+    }
+  },
+  "include": [
+    "src/**/*",
+    "index.d.ts",
+    "types.ts",
+    "types.t.ts",
+    "index.js",
+    "index.ts",
+    "App.tsx",
+    "app",
+    "types",
+    "plugins",
+    "app.config.ts",
+    "types/global.d.ts",
+    "types/declaration.d.ts"
+  ],
+  "exclude": ["node_modules", "test/**/*", "build"]
 }

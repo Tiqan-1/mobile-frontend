@@ -1,7 +1,8 @@
 import {createSlice, createAsyncThunk} from '@reduxjs/toolkit';
-import {Document} from '../types/pdf';
+import {Document} from 'types/pdf';
 import {REHYDRATE} from 'redux-persist';
-import {fetchPDFsFromNotion} from '../services/notionAPI';
+import {fetchPDFsFromNotion} from 'services/notionAPI';
+import {getFileUrl} from 'services/telegramAPI';
 
 interface DocumentsState {
   items: Document[];
@@ -34,24 +35,27 @@ const shouldRefreshData = (lastUpdated: number | null): boolean => {
   return Date.now() - lastUpdated > ONE_HOUR;
 };
 
-export const fetchDocuments = createAsyncThunk('documents/fetchDocuments', async ({forceRefresh = false}: {forceRefresh: boolean}, {getState}) => {
-  const state = getState() as {documents: DocumentsState};  
-  // If data is fresh enough, return current items
-  if (!shouldRefreshData(state.documents.lastUpdated) && !forceRefresh) {
-    return {
-      items: state.documents.items,
-      nextCursor: state.documents.nextCursor,
-      hasMore: state.documents.hasMore,
-    };
-  }
+export const fetchDocuments = createAsyncThunk(
+  'documents/fetchDocuments',
+  async ({forceRefresh = false}: {forceRefresh?: boolean}, {getState}) => {
+    const state = getState() as {documents: DocumentsState};
+    // If data is fresh enough, return current items
+    if (!shouldRefreshData(state.documents.lastUpdated) && !forceRefresh) {
+      return {
+        items: state.documents.items,
+        nextCursor: state.documents.nextCursor,
+        hasMore: state.documents.hasMore,
+      };
+    }
 
-  const response = await fetchPDFsFromNotion({
-    pageSize: PAGE_SIZE,
-    cursor: undefined,
-  });
+    const response = await fetchPDFsFromNotion({
+      pageSize: PAGE_SIZE,
+      cursor: undefined,
+    });
 
-  return response;
-});
+    return response;
+  },
+);
 
 export const loadMoreDocuments = createAsyncThunk('documents/loadMoreDocuments', async (_, {getState}) => {
   const state = getState() as {documents: DocumentsState};
@@ -69,7 +73,7 @@ export const loadMoreDocuments = createAsyncThunk('documents/loadMoreDocuments',
 
 export const downloadDocument = createAsyncThunk('documents/downloadDocument', async (document: Document) => {
   // Your existing download logic here
-  const fileUrl = await getFileUrl(document.id);
+  const fileUrl = await getFileUrl(document);
   return {
     id: document.id,
     localPath: fileUrl,

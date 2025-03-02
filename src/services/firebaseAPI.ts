@@ -1,6 +1,6 @@
 import storage from '@react-native-firebase/storage';
 import firestore from '@react-native-firebase/firestore';
-import {PDFDocument} from '../types/pdf';
+import {PDFDocument} from 'types/pdf';
 
 export const fetchPDFsFromFirebase = async (): Promise<PDFDocument[]> => {
   try {
