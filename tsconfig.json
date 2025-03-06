@@ -1,36 +1,39 @@
 {
   "extends": "@react-native/typescript-config/tsconfig.json",
   "compilerOptions": {
-
+    "types": ["jest", "node"],
     "baseUrl": "./",
-    "typeRoots": ["*/*.d.ts", "./src/*/*.d.ts", "./node_modules/@types"],
-    "types": ["jest", "react-native"],
     "paths": {
-      "*": ["src/*"],
+      "@/*": ["./src/*"],
+      "*": ["./src/*"],
       "assets/*": ["./src/assets/*"],
       "components/*": ["./src/components/*"],
       "navigations/*": ["./src/navigations/*"],
       "containers/*": ["./src/containers/*"],
       "styles/*": ["./src/styles/*"],
       "utils/*": ["./src/utils/*"],
-      "api": ["./src/api/*"],
-      "screens": ["./src/screens/*"],
-    }
+      "api/*": ["./src/api/*"],
+      "screens/*": ["./src/screens/*"],
+      "services/*": ["./src/services/*"],
+      "store/*": ["./src/store/*"],
+      "hooks/*": ["./src/hooks/*"],
+    },
+    "allowImportingTsExtensions": false,
+    "module": "esnext",
+    "skipLibCheck": true,
+    "noUnusedLocals": true
   },
   "include": [
-    "src/**/*",
+    "__mocks__/**/*",
+    "./src/**/*",
     "index.d.ts",
-    "types.ts",
-    "types.t.ts",
+    ".eslint.config.js",
+    "jest.setup.js",
+    "jest.config.js",
+    "babel.config.js",
     "index.js",
-    "index.ts",
-    "App.tsx",
-    "app",
-    "types",
-    "plugins",
-    "app.config.ts",
-    "types/global.d.ts",
-    "types/declaration.d.ts"
+    "react-native.config.js",
+    "jest.setup.ts"
   ],
-  "exclude": ["node_modules", "test/**/*", "build"]
+  "exclude": ["node_modules", "_", "android", "ios"]
 }

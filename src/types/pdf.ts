@@ -2,18 +2,18 @@ export type MediaType = 'pdf' | 'youtube';
 
 export interface BaseDocument {
   id: string;
-  title: string;
-  url: string;
   language: string;
+  title: string;
   type: MediaType;
+  url: string;
 }
 
 export interface PDFDocument extends BaseDocument {
-  type: 'pdf';
   currentPage?: number;
-  totalPages?: number;
+  language: 'ar' | 'en';
   localPath?: string;
-  language: 'en' | 'ar';
+  totalPages?: number;
+  type: 'pdf';
 }
 
 export interface ReadingProgress {

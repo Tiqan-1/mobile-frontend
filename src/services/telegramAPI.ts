@@ -1,5 +1,5 @@
-import {PDFDocument} from 'types/pdf';
-import {TELEGRAM_CONFIG} from 'config/telegram';
+import {PDFDocument} from '@/types/pdf';
+import {TELEGRAM_CONFIG} from '@/config/telegram';
 
 interface TelegramDocument {
   file_id: string;

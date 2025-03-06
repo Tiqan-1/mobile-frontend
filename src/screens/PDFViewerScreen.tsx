@@ -2,10 +2,9 @@ import React, {useEffect, useState} from 'react';
 import {View, StyleSheet, Dimensions, ActivityIndicator} from 'react-native';
 import Pdf from 'react-native-pdf';
 import {useRoute} from '@react-navigation/native';
-import {PDFDocument} from 'types/pdf';
-import {getFileUrl} from 'services/telegramAPI';
-import {setCurrentPage} from 'store/documentsSlice';
-import {useAppDispatch} from 'hooks/useAppDispatch';
+import {PDFDocument} from '@/types/pdf';
+import {setCurrentPage} from '@/store/documentsSlice';
+import {useAppDispatch} from '@/hooks/useAppDispatch';
 
 const PDFViewerScreen = () => {
   const route = useRoute();

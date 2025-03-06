@@ -1,8 +1,8 @@
 import {createSlice, createAsyncThunk} from '@reduxjs/toolkit';
-import {Document} from 'types/pdf';
+import {Document} from '@/types/pdf';
 import {REHYDRATE} from 'redux-persist';
-import {fetchPDFsFromNotion} from 'services/notionAPI';
-import {getFileUrl} from 'services/telegramAPI';
+import {fetchPDFsFromNotion} from '@/services/notionAPI';
+import {getFileUrl} from '@/services/telegramAPI';
 
 interface DocumentsState {
   items: Document[];

@@ -26,6 +26,4 @@ module.exports = {
   plugins: ['@ianvs/prettier-plugin-sort-imports'],
   bracketSameLine: true,
   singleQuote: true,
-  trailingComma: 'all',
-  printWidth: 120,
 };

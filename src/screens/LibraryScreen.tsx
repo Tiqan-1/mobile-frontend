@@ -3,8 +3,8 @@ import {View, Text, FlatList, StyleSheet, TouchableOpacity, ActivityIndicator} f
 import {useTranslation} from 'react-i18next';
 import {PDFDocument} from 'types/pdf';
 import {useNavigation} from '@react-navigation/native';
-import {useAppDispatch, useAppSelector} from 'hooks/useAppDispatch';
-import {fetchDocuments, downloadDocument, loadMoreDocuments} from 'store/documentsSlice';
+import {useAppDispatch, useAppSelector} from '@/hooks/useAppDispatch';
+import {fetchDocuments, downloadDocument, loadMoreDocuments} from '@/store/documentsSlice';
 import YoutubePlayer from 'react-native-youtube-iframe';
 // import YouTube from 'react-native-youtube';
 

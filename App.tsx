@@ -7,23 +7,25 @@
 
 import React from 'react';
 import {NavigationContainer} from '@react-navigation/native';
-import {createNativeStackNavigator} from '@react-navigation/native-stack';
+// import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {I18nextProvider} from 'react-i18next';
-import i18n from 'localization/i18n';
-import LibraryScreen from 'screens/LibraryScreen';
-import PDFViewerScreen from 'screens/PDFViewerScreen';
+import i18n from '@/localization/i18n';
+import LibraryScreen from '@/screens/LibraryScreen';
+import PDFViewerScreen from '@/screens/PDFViewerScreen';
 import {Provider} from 'react-redux';
 import {PersistGate} from 'redux-persist/integration/react';
+import { createStackNavigator } from '@react-navigation/stack';
 
-import {store, persistor} from 'store';
+import {store, persistor} from '@/store';
 import {ActivityIndicator, View} from 'react-native';
 
-const Stack = createNativeStackNavigator();
+// const Stack = createNativeStackNavigator();
 const LoadingComponent = () => (
   <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
     <ActivityIndicator size="large" />
   </View>
 );
+const Stack = createStackNavigator<RootStackParamList>();
 
 const App = () => {
   return (
