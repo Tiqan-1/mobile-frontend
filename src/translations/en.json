@@ -15,5 +15,20 @@
       "description": "We are sorry for the inconvenience. Please try again later.",
       "cta": "Reload the screen"
     }
-  }
+  },
+  "translation": {
+    "myLibrary": "My Library",
+    "downloadedBooks": "Downloaded Books",
+    "currentPage": "Current Page",
+    "bookmark": "Bookmark",
+    "loading": "Loading...",
+    "error": "Error",
+    "retry": "Retry",
+    "noDocuments": "No documents available",
+    "pageOf": "Page {{current}} of {{total}}",
+    "downloadComplete": "Download complete",
+    "downloadError": "Error downloading file",
+    "openDocument": "Open Document",
+    "deleteDocument": "Delete Document",
+  },
 }
