@@ -14,8 +14,8 @@ import { SupportedLanguages } from './schema';
 const LANGUAGE_STORAGE_KEY = 'app_language';
 
 // Define language constants to avoid using enum directly
-const LANG_AR = SupportedLanguages.AR;
-const LANG_EN = SupportedLanguages.EN;
+export const LANG_AR = SupportedLanguages.AR;
+export const LANG_EN = SupportedLanguages.EN;
 
 const initializeRTL = (isRTL: boolean) => {
   I18nManager.forceRTL(isRTL);

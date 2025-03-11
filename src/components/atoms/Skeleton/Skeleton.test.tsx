@@ -3,7 +3,7 @@ import { Text } from 'react-native';
 
 import TestAppWrapper from '@/../__mocks__/TestAppWrapper';
 
-import SkeletonLoader from './Skeleton';
+import SkeletonLoader from '.';
 
 describe('SkeletonLoader', () => {
   beforeAll(() => {

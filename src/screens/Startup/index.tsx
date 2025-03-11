@@ -1,7 +1,7 @@
 import type { RootScreenProps } from '@/navigation/types';
 
 import { useQuery } from '@tanstack/react-query';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, Text, View } from 'react-native';
 
@@ -10,26 +10,21 @@ import { Paths } from '@/navigation/paths';
 
 import { AssetByVariant } from '@/components/atoms';
 import { SafeScreen } from '@/components/templates';
+import { GET, initStateAPIState } from '@/utils/API';
 
 function Startup({ navigation }: RootScreenProps<Paths.Startup>) {
   const { fonts, gutters, layout } = useTheme();
   const { t } = useTranslation();
-
-  const { isError, isFetching, isSuccess } = useQuery({
-    queryFn: () => {
-      return Promise.resolve(true);
-    },
-    queryKey: ['startup'],
-  });
-
+  const [apiState, setapiState] = useState<APISTATE>(initStateAPIState)
+  
   useEffect(() => {
-    if (isSuccess) {
+    GET('/app', setapiState).then(() => {
       navigation.reset({
         index: 0,
-        routes: [{ name: Paths.Example }],
+        routes: [{ name: Paths.Login }],
       });
-    }
-  }, [isSuccess, navigation]);
+    });
+  }, []);
 
   return (
     <SafeScreen>
@@ -46,10 +41,10 @@ function Startup({ navigation }: RootScreenProps<Paths.Startup>) {
           resizeMode={'contain'}
           style={{ height: 300, width: 300 }}
         />
-        {isFetching && (
+        {apiState.loading && (
           <ActivityIndicator size="large" style={[gutters.marginVertical_24]} />
         )}
-        {isError && (
+        {apiState.error && (
           <Text style={[fonts.size_16, fonts.red500]}>{t('common_error')}</Text>
         )}
       </View>

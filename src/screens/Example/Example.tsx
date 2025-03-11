@@ -3,14 +3,13 @@ import { useTranslation } from 'react-i18next';
 import { Alert, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 
 import { useTheme } from '@/theme';
-import { useI18n, useUser } from '@/hooks';
+import { useI18n } from '@/hooks';
 
 import { AssetByVariant, IconByVariant, Skeleton } from '@/components/atoms';
 import { SafeScreen } from '@/components/templates';
 
 function Example() {
   const { t } = useTranslation();
-  const { useFetchOneQuery } = useUser();
   const { toggleLanguage } = useI18n();
 
   const {

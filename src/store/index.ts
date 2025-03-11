@@ -10,10 +10,10 @@ import {
   REGISTER,
 } from 'redux-persist';
 
-import { Storage } from 'redux-persist'
 import { MMKV } from "react-native-mmkv"
+import type { Storage } from 'redux-persist'
 
-const storage = new MMKV()
+export const storage = new MMKV()
 
 export const reduxStorage: Storage = {
   getItem: (key) => {

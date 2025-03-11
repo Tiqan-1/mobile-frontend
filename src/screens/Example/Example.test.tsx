@@ -43,13 +43,13 @@ describe('Example screen should render correctly', () => {
 
     render(component);
 
-    expect(i18n.language).toBe(SupportedLanguages.FR_FR);
+    expect(i18n.language).toBe(SupportedLanguages.AR);
 
     const button = screen.getByTestId('change-language-button');
     expect(button).toBeDefined();
     fireEvent.press(button);
 
-    expect(i18n.language).toBe(SupportedLanguages.EN_EN);
+    expect(i18n.language).toBe(SupportedLanguages.EN);
   });
 
   test('the user change the theme', () => {

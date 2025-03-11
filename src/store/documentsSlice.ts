@@ -1,18 +1,18 @@
-import {createSlice, createAsyncThunk} from '@reduxjs/toolkit';
-import {Document} from '@/types/pdf';
+import {createAsyncThunk, createSlice} from '@reduxjs/toolkit';
+import type {Document} from '@/types/pdf';
 import {REHYDRATE} from 'redux-persist';
 import {fetchPDFsFromNotion} from '@/services/notionAPI';
 import {getFileUrl} from '@/services/telegramAPI';
 
 interface DocumentsState {
-  items: Document[];
-  status: 'idle' | 'loading' | 'succeeded' | 'failed';
-  error: string | null;
-  currentDownloading: string | null;
-  progressData: Record<string, {currentPage?: number; totalPages?: number}>;
-  nextCursor: string | undefined;
+  currentDownloading: null | string;
+  error: null | string;
   hasMore: boolean;
-  lastUpdated: number | null;
+  items: Document[];
+  lastUpdated: null | number;
+  nextCursor: string | undefined;
+  progressData: Record<string, {currentPage?: number; totalPages?: number}>;
+  status: 'failed' | 'idle' | 'loading' | 'succeeded';
 }
 
 const initialState: DocumentsState = {
@@ -29,8 +29,8 @@ const initialState: DocumentsState = {
 const PAGE_SIZE = 50;
 
 // Add a function to check if we need to refresh the data
-const shouldRefreshData = (lastUpdated: number | null): boolean => {
-  if (!lastUpdated) return true;
+const shouldRefreshData = (lastUpdated: null | number): boolean => {
+  if (!lastUpdated) {return true;}
   const ONE_HOUR = 60 * 60 * 1000; // in milliseconds
   return Date.now() - lastUpdated > ONE_HOUR;
 };
@@ -61,7 +61,7 @@ export const loadMoreDocuments = createAsyncThunk('documents/loadMoreDocuments',
   const state = getState() as {documents: DocumentsState};
   const {nextCursor} = state.documents;
 
-  if (!nextCursor) return null;
+  if (!nextCursor) {return null;}
 
   const response = await fetchPDFsFromNotion({
     pageSize: PAGE_SIZE,
