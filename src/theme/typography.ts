@@ -1,28 +1,30 @@
-import {StyleSheet} from 'react-native';
-import {colorForBG, sizeAdaptivity} from 'utils/helpers';
-import {isRTL, PALETTE} from 'utils/constants';
-import {defaultSystemFonts} from 'react-native-render-html';
+import { StyleSheet } from 'react-native';
+import { defaultSystemFonts } from 'react-native-render-html';
 
-export const getFonts = isRtl =>
+import { isRTL, PALETTE } from '@/utils/constants';
+
+export const getFonts = () =>
   StyleSheet.create({
     regular: {
-      fontFamily: !isRtl ? 'SFProText-Regular' : 'DINNextLTArabic-Regular', //400
+      fontFamily: 'Cairo-Light',
     },
     medium: {
-      fontFamily: !isRtl ? 'SFProText-Medium' : 'DINNextLTArabic-Medium', //500
+      fontFamily: 'Cairo-Regular',
     },
     semibold: {
-      fontFamily: !isRtl ? 'SFProText-SemiBold' : 'DINNextLTArabic-Bold', //600
+      fontFamily: 'Cairo-SemiBold',
     },
     bold: {
-      fontFamily: !isRtl ? 'SFProText-Bold' : 'DINNextLTArabic-Bold', //700
+      fontFamily: 'Cairo-Bold',
     },
     extrabold: {
-      fontFamily: !isRtl ? 'SFProText-Heavy' : 'DINNextLTArabic-Heavy', //800
+      fontFamily: 'Cairo-Black',
     },
   });
 
-export const fonts = getFonts(isRTL);
+export const fonts = getFonts();
+
+const sizeAdaptivity = (x: number) => x;
 
 const St = StyleSheet.create({
   title: {
@@ -30,90 +32,82 @@ const St = StyleSheet.create({
     fontSize: sizeAdaptivity(28),
     color: '#000',
     overflow: 'visible',
-    paddingBottom: isRTL ? 2 : undefined,
     textAlignVertical: 'center',
+    textAlign:'left'
   },
   smallTitle: {
     ...fonts.semibold,
-    fontSize: sizeAdaptivity(16),
+    fontSize: sizeAdaptivity(18),
     color: '#000',
     overflow: 'visible',
-    paddingBottom: isRTL ? 2 : undefined,
     textAlignVertical: 'center',
+    textAlign:'left'
   },
   text: {
     ...fonts.medium,
-    fontSize: sizeAdaptivity(14),
+    fontSize: sizeAdaptivity(16),
     color: '#000',
     overflow: 'visible',
-    paddingBottom: isRTL ? 2 : undefined,
     textAlignVertical: 'center',
+    textAlign:'left'
   },
   largeText: {
     ...fonts.medium,
-    fontSize: sizeAdaptivity(15),
+    fontSize: sizeAdaptivity(18),
     color: '#000',
     overflow: 'visible',
     textAlignVertical: 'center',
+    textAlign:'left'
   },
   smallText: {
     ...fonts.regular,
     fontSize: sizeAdaptivity(13),
     color: '#000',
     overflow: 'visible',
-    paddingBottom: isRTL ? 2 : undefined,
     textAlignVertical: 'center',
+    textAlign:'left'
   },
   extraSmallText: {
     ...fonts.regular,
     fontSize: sizeAdaptivity(12),
     color: '#000',
     overflow: 'visible',
-    paddingBottom: isRTL ? 2 : undefined,
     textAlignVertical: 'center',
+    textAlign:'left'
   },
   superSmallText: {
     ...fonts.regular,
     fontSize: sizeAdaptivity(10),
     color: '#000',
     overflow: 'visible',
-    paddingBottom: isRTL ? 2 : undefined,
     textAlignVertical: 'center',
+    textAlign:'left'
   },
 });
 
 export const systemFonts = [
   ...defaultSystemFonts,
-  'SFProText-Regular',
-  'DINNextLTArabic-Regular',
-  'SFProText-Medium',
-  'DINNextLTArabic-Medium',
-  'SFProText-SemiBold',
-  'DINNextLTArabic-Bold',
-  'SFProText-Bold',
-  'DINNextLTArabic-Bold',
-  'SFProText-Heavy',
-  'DINNextLTArabic-Heavy',
+  'Cairo-Regular',
+  'Cairo-Black',
+  'Cairo-SemiBold',
+  'Cairo-Bold',
+  'Cairo-Heavy',
 ];
 
 export const tagsStylesHTML = {
   p: {
-    fontFamily: !isRTL ? 'SFProText-Regular' : 'DINNextLTArabic-Regular',
     textAlign: 'left',
     ...St.smallText,
   },
   a: {
-    fontFamily: !isRTL ? 'SFProText-Regular' : 'DINNextLTArabic-Regular',
     textAlign: 'left',
     ...St.smallText,
   },
   li: {
-    fontFamily: !isRTL ? 'SFProText-Regular' : 'DINNextLTArabic-Regular',
     textAlign: 'left',
     ...St.smallText,
   },
   strong: {
-    fontFamily: !isRTL ? 'SFProText-Heavy' : 'DINNextLTArabic-Heavy',
     ...St.smallText,
   },
   div: {
@@ -123,25 +117,21 @@ export const tagsStylesHTML = {
 
 export const tagsStylesHTMLWhite = {
   p: {
-    fontFamily: !isRTL ? 'SFProText-Regular' : 'DINNextLTArabic-Regular',
     textAlign: 'left',
     ...St.smallText,
     color: PALETTE.WHITE,
   },
   a: {
-    fontFamily: !isRTL ? 'SFProText-Regular' : 'DINNextLTArabic-Regular',
     textAlign: 'left',
     ...St.smallText,
     color: PALETTE.WHITE,
   },
   li: {
-    fontFamily: !isRTL ? 'SFProText-Regular' : 'DINNextLTArabic-Regular',
     textAlign: 'left',
     ...St.smallText,
     color: PALETTE.WHITE,
   },
   strong: {
-    fontFamily: !isRTL ? 'SFProText-Heavy' : 'DINNextLTArabic-Heavy',
     ...St.smallText,
     color: PALETTE.WHITE,
   },
@@ -153,26 +143,22 @@ export const tagsStylesHTMLWhite = {
 
 export const tagsStylesHTMLBrand = {
   p: {
-    fontFamily: !isRTL ? 'SFProText-Regular' : 'DINNextLTArabic-Regular',
     textAlign: 'left',
     ...St.smallText,
     ...fonts.bold,
     lineHeight: isRTL ? sizeAdaptivity(24) : sizeAdaptivity(22),
   },
   a: {
-    fontFamily: !isRTL ? 'SFProText-Regular' : 'DINNextLTArabic-Regular',
     textAlign: 'left',
     ...St.smallText,
     lineHeight: isRTL ? sizeAdaptivity(24) : sizeAdaptivity(22),
   },
   li: {
-    fontFamily: !isRTL ? 'SFProText-Regular' : 'DINNextLTArabic-Regular',
     textAlign: 'left',
     ...St.smallText,
     lineHeight: isRTL ? sizeAdaptivity(24) : sizeAdaptivity(22),
   },
   strong: {
-    fontFamily: !isRTL ? 'SFProText-Heavy' : 'DINNextLTArabic-Heavy',
     ...St.smallText,
     lineHeight: isRTL ? sizeAdaptivity(24) : sizeAdaptivity(22),
   },

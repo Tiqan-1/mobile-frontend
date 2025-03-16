@@ -59,7 +59,7 @@ export default [
       'perfectionist/sort-imports': 0,
       'perfectionist/sort-interfaces': 'error',
       'perfectionist/sort-intersection-types': 'error',
-      'perfectionist/sort-jsx-props': 'error',
+      // 'perfectionist/sort-jsx-props': 'warn',
       'perfectionist/sort-maps': 'error',
       'perfectionist/sort-named-exports': 'error',
       'perfectionist/sort-named-imports': 'error',
@@ -75,13 +75,13 @@ export default [
       'react/jsx-sort-props': 0, // Handled by perfectionist
       'react/prop-types': 2,
       'react/react-in-jsx-scope': 0,
-      'react/require-default-props': [
-        2,
-        {
-          forbidDefaultForRequired: true,
-          functions: 'defaultArguments',
-        },
-      ],
+      // 'react/require-default-props': [
+      //   2,
+      //   {
+      //     forbidDefaultForRequired: true,
+      //     functions: 'defaultArguments',
+      //   },
+      // ],
       'unicorn/better-regex': 2,
       'unicorn/catch-error-name': 2,
       'unicorn/consistent-empty-array-spread': 2,

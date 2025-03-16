@@ -1,17 +1,21 @@
-import {configureStore, combineReducers} from '@reduxjs/toolkit';
+import type { Middleware} from '@reduxjs/toolkit';
+import {combineReducers, configureStore} from '@reduxjs/toolkit';
 import {
-  persistStore,
-  persistReducer,
   FLUSH,
-  REHYDRATE,
   PAUSE,
   PERSIST,
+  persistReducer,
+  persistStore,
   PURGE,
   REGISTER,
+  REHYDRATE,
 } from 'redux-persist';
 
 import { MMKV } from "react-native-mmkv"
 import type { Storage } from 'redux-persist'
+
+import documentsReducer from './documentsSlice';
+import authReducer from './auth';
 
 export const storage = new MMKV()
 
@@ -31,7 +35,6 @@ export const reduxStorage: Storage = {
 }
 
 
-import documentsReducer from './documentsSlice';
 const persistConfig = {
   key: 'root',
   storage: reduxStorage,
@@ -41,10 +44,11 @@ const persistConfig = {
 
 const rootReducer = combineReducers({
   documents: documentsReducer,
+  auth: authReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
-const middlewares = [];
+const middlewares: Middleware[] = [];
 
 if (process.env.NODE_ENV === 'development') {
   const {createLogger} = require('redux-logger');

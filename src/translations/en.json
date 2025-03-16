@@ -1,7 +1,7 @@
 {
   "boilerplate": {
     "common_appName": {
-      "full": "React Native boilerplate",
+      "full": "Mobadrat",
       "initials": "RNB"
     },
     "common_error": "Oops! Something went wrong.",
@@ -14,6 +14,20 @@
       "title": "Oops! Something went wrong.",
       "description": "We are sorry for the inconvenience. Please try again later.",
       "cta": "Reload the screen"
+  },
+  "auth": {
+    "change_language": "Change Language",
+    "login": "Login",
+    "email": "Email",
+    "password": "Password",
+    "forgot_password": "Forgot password?",
+      "enter_email": "Enter Email",
+      "enter_password": "Enter Password",
+      "dont_have_account":"Don't have an Account?",
+      "sign_up": "Sign Up",
+      "have_account": "Have an Account?",
+      "sign_in": "Sign In",
+      "sign_out": "Sign out"
     }
   },
   "translation": {

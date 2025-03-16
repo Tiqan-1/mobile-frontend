@@ -15,4 +15,22 @@ module.exports = {
     'react-native-reanimated/plugin', // needs to be last
   ],
   presets: ['module:@react-native/babel-preset'],
+  "env": {
+    "development": {
+      "compact": false
+    },
+    "production": {
+      "plugins": [
+        [
+          "transform-remove-console",
+          {
+            "exclude": [
+              "error",
+              "warn"
+            ]
+          }
+        ]
+      ]
+    }
+  },
 };

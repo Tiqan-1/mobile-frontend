@@ -1,28 +1,36 @@
 import type { RootScreenProps } from '@/navigation/types';
 
-import { useQuery } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, Text, View } from 'react-native';
 
 import { useTheme } from '@/theme';
+import { useAppSelector } from '@/hooks/useAppDispatch';
 import { Paths } from '@/navigation/paths';
 
-import { AssetByVariant } from '@/components/atoms';
 import { SafeScreen } from '@/components/templates';
+
+import MainLogo from '@/assets/logo/main-logo.svg';
 import { GET, initStateAPIState } from '@/utils/API';
 
 function Startup({ navigation }: RootScreenProps<Paths.Startup>) {
   const { fonts, gutters, layout } = useTheme();
   const { t } = useTranslation();
-  const [apiState, setapiState] = useState<APISTATE>(initStateAPIState)
-  
+  const [apiState, setapiState] = useState<APISTATE>(initStateAPIState);
+
+  const auth = useAppSelector((store) => store.auth);
+
   useEffect(() => {
     GET('/app', setapiState).then(() => {
-      navigation.reset({
-        index: 0,
-        routes: [{ name: Paths.Login }],
-      });
+      if (auth.isAuth) {
+      } else {
+        navigation.reset({
+          index: 0,
+          routes: [
+            { name: Paths.Auth },
+          ],
+        });
+      }
     });
   }, []);
 
@@ -34,13 +42,8 @@ function Startup({ navigation }: RootScreenProps<Paths.Startup>) {
           layout.col,
           layout.itemsCenter,
           layout.justifyCenter,
-        ]}
-      >
-        <AssetByVariant
-          path={'tom'}
-          resizeMode={'contain'}
-          style={{ height: 300, width: 300 }}
-        />
+        ]}>
+        <MainLogo />
         {apiState.loading && (
           <ActivityIndicator size="large" style={[gutters.marginVertical_24]} />
         )}

@@ -1,7 +1,7 @@
 {
-  "boilerplate": {
+  "common": {
     "common_appName": {
-      "full": "تجربة",
+      "full": "مبادرات",
       "initials": "RNB"
     },
     "common_error": "Oops! Something went wrong.",
@@ -14,6 +14,20 @@
       "title": "Oops! Something went wrong.",
       "description": "We are sorry for the inconvenience. Please try again later.",
       "cta": "Reload the screen"
+    },
+    "auth": {
+      "change_language": "تغيير اللغة",
+      "login": "تسجيل الدخول",
+      "email": "البريد الإلكتروني",
+      "password": "كلمة المرور",
+      "forgot_password": "هل نسيت كلمة المرور؟",
+      "enter_email": "أدخل بريدك الإلكتروني",
+      "enter_password": "أدخل كلمة المرور",
+      "dont_have_account":"ليس لديك حساب؟",
+      "sign_up": "سجل حساب",
+      "have_account": "هل لديك حساب؟",
+      "sign_in": "تسجيل الدخول",
+      "sign_out": "تسجيل الخروج"
     }
   },
   "translation": {
@@ -30,5 +44,5 @@
     "downloadError": "خطأ في تحميل الملف",
     "openDocument": "فتح المستند",
     "deleteDocument": "حذف المستند"
-  },
+  }
 }

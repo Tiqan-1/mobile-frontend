@@ -22,11 +22,13 @@ const initializeRTL = (isRTL: boolean) => {
   I18nManager.allowRTL(isRTL);
 };
 
-const changeLanguage = (lang: Language) => {
+const changeLanguage = (lang: Language) => {  
   // Store the selected language
   storage.set(LANGUAGE_STORAGE_KEY, lang);
   const restart = i18next.language !== lang;
   i18next.changeLanguage(lang);
+  i18next.dir(lang === LANG_AR ? 'rtl' : 'ltr');
+  translate.cache.clear();
   initializeRTL(lang === LANG_AR);
   if (restart) {
     setTimeout(() => {

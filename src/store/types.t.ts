@@ -1,4 +1,4 @@
-import {RootState as documentsSlice} from './documentsSlice';
+import type {RootState as documentsSlice} from './documentsSlice';
 
 
 export interface AppStates {

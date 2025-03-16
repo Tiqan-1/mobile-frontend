@@ -1,25 +1,47 @@
+import type { StyleProp, TextProps, TextStyle } from 'react-native';
+import type { Text as RNText } from 'react-native';
+
 import React from 'react';
-import type { TextProps} from 'react-native';
 import { Text as RNTXT } from 'react-native';
+import { useTranslation } from 'react-i18next';
 
-import { useTheme } from '@react-navigation/native';
-import { isRTL } from '@/utils/helpers';
+import typography from '@/theme/typography';
 
-export type TextTypes = 'extraSmallText' | 'smallText' | 'smallTitle' | 'superSmallText' | 'text' | 'title' | undefined;
+import { isRTL } from '@/utils/constants';
+
+export type TextTypes =
+  | 'extraSmallText'
+  | 'smallText'
+  | 'smallTitle'
+  | 'superSmallText'
+  | 'text'
+  | 'title'
+  | undefined;
 
 interface Txt extends TextProps {
-  dotted: boolean | undefined;
-  type: TextTypes  | undefined;
+  dotted?: boolean;
+  style?: StyleProp<TextStyle>;
+  type?: TextTypes;
 }
-export type Ref = React.LegacyRef<any> | undefined;
 
-const TextBlock = React.forwardRef<Ref, Txt>(
-  ({ children, type = FONT_SIZES.SMALL_TITLE, dotted = false, style, onPress, numberOfLines, ...rest }, ref) => {
-    const { locale, showToast } = useTheme();
+const TextBlock = React.forwardRef<RNText, Txt>(
+  (
+    {
+      children,
+      type = 'text',
+      style,
+      onPress,
+      numberOfLines,
+      dotted = false,
+      ...rest
+    },
+    ref
+  ) => {
+    const { i18n } = useTranslation();
+    
     const textContent = () => {
       if (Array.isArray(children)) {
-        //map over children and check if react element
-        children = children.map((child, index) => {
+        children = children.map((child) => {
           return React.isValidElement(child) ? child : child?.toString();
         });
         return children;
@@ -28,38 +50,47 @@ const TextBlock = React.forwardRef<Ref, Txt>(
           if (React.isValidElement(children)) {
             return children;
           }
-          if (children?.[locale]) {
-            return children?.[locale];
+          if (children && typeof children === 'object' && i18n.language in children) {
+            return children[i18n.language as keyof typeof children];
           }
-          return JSON.stringify(children)?.toString();
-        } catch (error) {
-          console.log('error', error, children);
-          return children;
+          return JSON.stringify(children)?.toString().trim();
+        } catch {
+          return children?.toString()?.trim() || '';
         }
       }
-
-
-      return isRTL ? '\u2067' : '' + children?.toString() + isRTL ? '\u2069' : '';
+      return children?.toString()?.trim() || '';
     };
 
     const styleArray = Array.isArray(style) ? style : [style];
-    const override = styleArray.reduce((result, style) => {
-      return { ...result, ...style };
+    const override = styleArray.reduce<TextStyle>((result, currentStyle) => {
+      if (currentStyle) {
+        return { ...result, ...(currentStyle as TextStyle) };
+      }
+      return result;
     }, {});
 
     return (
       <RNTXT
+        ref={ref}
         ellipsizeMode={dotted ? 'tail' : undefined}
         numberOfLines={numberOfLines ? numberOfLines : dotted ? 1 : undefined}
         onPress={onPress}
-        ref={ref}
         {...rest}
-        style={style}>
+        style={[typography[type], override]}>
+        {isRTL ? '\u2067' : ''}
         {textContent()}
+        {isRTL ? '\u2069' : ''}
       </RNTXT>
     );
-  },
+  }
 );
+
+TextBlock.defaultProps = {
+  dotted: false,
+  style: undefined,
+  type: 'text',
+};
+
 export default TextBlock;
 
 export function Title(params: Txt) {

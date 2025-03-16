@@ -4,23 +4,23 @@ import type { ApiResponse} from 'apisauce';
 import { create } from 'apisauce';
 
 import type { Dispatch, SetStateAction } from 'react';
-import { IsIOS } from '@/utils/helpers';
+import { IsIOS } from '@/utils/constants';
 
 // import * as DataBase from './AsyncStorage';
 // import {isTestAPI} from './constants';
-export const baseURLProd = Config.API_URL; 
+export const baseURLProd = "https://officially-together-joey.ngrok-free.app"; 
+// export const baseURLProd = Config.API_URL; 
 
 export type PARAMS = {
   Append?: boolean;
-  cancelToken?: any;
+  cancelToken?: string;
   debounce?: boolean;
-  forceData?: any;
+  forceData?: object;
   header?: object;
   headerP?: Record<string, string>;
   isForm?: boolean;
   retry?: number;
   showLoading?: boolean;
-  silentCall?: any;
   usePagination?: boolean;
 };
 
@@ -30,7 +30,7 @@ export type APISTATE = {
   loading: boolean;
   message?: string;
   pagination?: object;
-  results: any;
+  results: object;
   token?: any;
 };
 export const initStateAPIState: APISTATE = { results: [], error: '', loading: false, isRequesting: false };
