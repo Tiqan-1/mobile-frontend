@@ -2,14 +2,15 @@ import type { MMKV } from 'react-native-mmkv';
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { useColorScheme } from 'react-native';
-import { PALETTE, PALETTEDARK } from '../colors';
 
+import { PALETTEDARK, PALETTELIGHT, usePALETTE } from '../colors';
 
-type ThemeColors = typeof PALETTE | typeof PALETTEDARK;
+type ThemeColors = typeof PALETTEDARK | typeof PALETTELIGHT;
 
 type ThemeContextType = {
   colors: ThemeColors;
   isDark: boolean;
+  PALETTE: ThemeColors;
   toggleTheme: () => void;
 };
 
@@ -20,7 +21,7 @@ export const ThemeProvider: React.FC<{
   storage: MMKV;
 }> = ({ children, storage }) => {
   const systemColorScheme = useColorScheme();
-
+  const { PALETTE, toLight, toDark } = usePALETTE();
   const [isDark, setIsDark] = useState(() => {
     const savedTheme = storage.getString('theme');
     if (savedTheme) {
@@ -35,12 +36,18 @@ export const ThemeProvider: React.FC<{
 
   const toggleTheme = () => {
     setIsDark((prev) => !prev);
+    if (isDark) {
+      toLight();
+    } else {
+      toDark();
+    }
   };
 
-  const colors = isDark ? PALETTEDARK : PALETTE;
+  const colors = isDark ? PALETTEDARK : PALETTELIGHT;
+
 
   return (
-    <ThemeContext.Provider value={{ colors, isDark, toggleTheme }}>
+    <ThemeContext.Provider value={{ colors, isDark, toggleTheme, PALETTE }}>
       {children}
     </ThemeContext.Provider>
   );

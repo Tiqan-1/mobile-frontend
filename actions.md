@@ -1,6 +1,7 @@
 ## Actions
 
-- [ ]
+- [ ] adding Dark and Light support
+- [ ] adding for visual 
 
 
 ### bot

@@ -24,13 +24,15 @@ import IconDown from '@/assets/svg/icon-down.svg';
 import api, { initStateAPIState, POST } from '@/services/API';
 import { useAppDispatch } from '@/hooks/useAppDispatch';
 import { login } from '@/store/auth';
+import Switch from '@/components/atoms/Switch';
+import { PALETTE } from '@/theme/colors';
 
 function onChangeLocale(nextlocale: string) {
   api.setHeader('X-localization', nextlocale);
 }
 
 function Login({ navigation }: RootScreenProps<Paths.Login>) {
-  const { fonts, gutters, layout } = useTheme();
+  const { fonts, isDark, colors, toggleTheme } = useTheme();
   const { t, i18n } = useTranslation();
   const sheet = useRef(null);
 
@@ -58,12 +60,12 @@ function Login({ navigation }: RootScreenProps<Paths.Login>) {
   const handleSubmit = (vlaues) => {
     POST('/api/authentication/login', vlaues, setapiState).then((res) => {
       dispatch(login(res))
-      navigation.navigate(Paths.Home);
+      navigation.navigate(Paths.Main);
     });
   };
   return (
     <SafeScreen>
-      <View style={{ flex: 1, paddingHorizontal: '20' }}>
+      <View style={{ flex: 1, paddingHorizontal: '20', backgroundColor: PALETTE.APP_BG }}>
         <Pressable
           onPress={() => {
             sheet.current?.show();
@@ -72,7 +74,10 @@ function Login({ navigation }: RootScreenProps<Paths.Login>) {
           <Text>{currentLanguage}</Text>
           <IconDown />
         </Pressable>
-
+        <Switch 
+              onValueChange={()=>{toggleTheme()}}
+              value={isDark}
+              />
         <View style={style.header}>
           <MainLogo />
 

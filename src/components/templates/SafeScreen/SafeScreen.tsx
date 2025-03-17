@@ -4,10 +4,10 @@ import type { SafeAreaViewProps } from 'react-native-safe-area-context';
 import { StatusBar } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { useTheme } from '@/theme/context/ThemeContext';
+
 import { DefaultError } from '@/components/molecules';
 import { ErrorBoundary } from '@/components/organisms';
-
-import { useTheme } from '@/theme/context/ThemeContext';
 
 type Props = PropsWithChildren<
   {
@@ -26,7 +26,10 @@ function SafeScreen({
   const { isDark, colors } = useTheme();
 
   return (
-    <SafeAreaView {...props} mode="padding" style={[{ flex: 1 }, style]}>
+    <SafeAreaView
+      {...props}
+      mode="padding"
+      style={[{ flex: 1, backgroundColor: colors.APP_BG }, style]}>
       <StatusBar
         backgroundColor={colors.APP_BG}
         barStyle={isDark ? 'light-content' : 'dark-content'}

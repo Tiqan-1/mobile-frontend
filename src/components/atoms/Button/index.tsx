@@ -230,6 +230,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     flexDirection: 'row',
+    paddingHorizontal:2,
+    paddingVertical:5,
   },
   activity: {
     marginRight: 8,
