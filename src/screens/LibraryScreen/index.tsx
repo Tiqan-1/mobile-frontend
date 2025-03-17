@@ -6,7 +6,7 @@ import {useNavigation} from '@react-navigation/native';
 import {useAppDispatch, useAppSelector} from '@/hooks/useAppDispatch';
 import {downloadDocument, fetchDocuments, loadMoreDocuments} from '@/store/documentsSlice';
 import YoutubePlayer from 'react-native-youtube-iframe';
-import { initStateAPIState } from '@/utils/API';
+import { initStateAPIState } from '@/services/API';
 import { fetchPDFsFromNotion } from '@/services/notionAPI';
 // import YouTube from 'react-native-youtube';
 

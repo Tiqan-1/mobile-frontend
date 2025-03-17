@@ -2,8 +2,8 @@ import type { MMKV } from 'react-native-mmkv';
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { useColorScheme } from 'react-native';
+import { PALETTE, PALETTEDARK } from '../colors';
 
-import { PALETTE, PALETTEDARK } from '@/utils/constants';
 
 type ThemeColors = typeof PALETTE | typeof PALETTEDARK;
 

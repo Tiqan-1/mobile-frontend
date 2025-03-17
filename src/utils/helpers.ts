@@ -1,5 +1,6 @@
-import { I18nManager, PixelRatio, Platform } from "react-native";
-import { DEVICE_HEIGHT, DEVICE_WIDTH, IsIOS, PALETTE } from "./constants";
+import { PixelRatio } from "react-native";
+import { DEVICE_HEIGHT, DEVICE_WIDTH, IsIOS } from "./constants";
+import { PALETTE } from "@/theme/colors";
 
 
 const IPHONE11_DEVICE_WIDTH = 375;
@@ -31,12 +32,12 @@ export const sizeY = (height: number) => PixelRatio.roundToNearestPixel(scaleHei
 
 
 export const Brightness = (color: string): number => {
-  const hexRegex = /^#([A-Fa-f0-9]{6})$/;
+  const hexRegex = /^#([\dA-Fa-f]{6})$/;
   if (hexRegex.test(color)) {
     const hex = color.replace('#', '');
-    const c_r = parseInt(hex.substr(0, 2), 16);
-    const c_g = parseInt(hex.substr(2, 2), 16);
-    const c_b = parseInt(hex.substr(4, 2), 16);
+    const c_r = Number.parseInt(hex.slice(0, 2), 16);
+    const c_g = Number.parseInt(hex.slice(2, 4), 16);
+    const c_b = Number.parseInt(hex.slice(4, 6), 16);
     const brightness = (c_r * 299 + c_g * 587 + c_b * 114) / 1000;
     return brightness;
   }
@@ -44,20 +45,20 @@ export const Brightness = (color: string): number => {
   const rgbRegex = /^rgb\((\d{1,3}),(\d{1,3}),(\d{1,3})\)$/;
   if (rgbRegex.test(color)) {
     const rgb = color.replace('rgb(', '').replace(')', '').split(',');
-    const c_r = parseInt(rgb[0]);
-    const c_g = parseInt(rgb[1]);
-    const c_b = parseInt(rgb[2]);
+    const c_r = Number.parseInt(rgb[0]);
+    const c_g = Number.parseInt(rgb[1]);
+    const c_b = Number.parseInt(rgb[2]);
     const brightness = (c_r * 299 + c_g * 587 + c_b * 114) / 1000;
     return brightness;
   }
 
   //handle if color is 3 digit hex
-  const threeHexRegex = /^#([A-Fa-f0-9]{3})$/;
+  const threeHexRegex = /^#([\dA-Fa-f]{3})$/;
   if (threeHexRegex.test(color)) {
     const hex = color.replace('#', '');
-    const c_r = parseInt(hex.charAt(0) + hex.charAt(0), 16);
-    const c_g = parseInt(hex.charAt(1) + hex.charAt(1), 16);
-    const c_b = parseInt(hex.charAt(2) + hex.charAt(2), 16);
+    const c_r = Number.parseInt(hex.charAt(0) + hex.charAt(0), 16);
+    const c_g = Number.parseInt(hex.charAt(1) + hex.charAt(1), 16);
+    const c_b = Number.parseInt(hex.charAt(2) + hex.charAt(2), 16);
     const brightness = (c_r * 299 + c_g * 587 + c_b * 114) / 1000;
     return brightness;
   }

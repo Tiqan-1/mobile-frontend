@@ -8,12 +8,13 @@ import {
   ViewStyle,
 } from 'react-native';
 
+// Use require for modules without type declarations
+
+import { PALETTE } from '@/theme/colors';
+
 // Import Text component and its types
 import Text from '@/components/atoms/Text';
 
-// Use require for modules without type declarations
-
-import { PALETTE } from '@/utils/constants';
 import { bestButtonColor, isLight } from '@/utils/helpers';
 
 export type ButtonTypes = 'icon' | 'main' | 'outline' | 'underline';

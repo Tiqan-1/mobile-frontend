@@ -3,7 +3,7 @@ import type { MMKV } from 'react-native-mmkv';
 import type {
   FulfilledThemeConfiguration,
   Variant,
-} from '@/theme/types/config';
+} from '@/theme/OldThem/types/config';
 import type { ComponentTheme, Theme } from '@/theme/types/theme';
 
 import {
@@ -17,21 +17,21 @@ import {
 import {
   generateBackgrounds,
   staticBackgroundStyles,
-} from '@/theme/backgrounds';
+} from '@/theme/OldThem/backgrounds';
 import {
   generateBorderColors,
   generateBorderRadius,
   generateBorderWidths,
   staticBorderStyles,
-} from '@/theme/borders';
-import componentsGenerator from '@/theme/components';
+} from '@/theme/OldThem/borders';
+import componentsGenerator from '@/theme/OldThem/components';
 import {
   generateFontColors,
   generateFontSizes,
   staticFontStyles,
-} from '@/theme/fonts';
-import { generateGutters, staticGutterStyles } from '@/theme/gutters';
-import layout from '@/theme/layout';
+} from '@/theme/OldThem/fonts';
+import { generateGutters, staticGutterStyles } from '@/theme/OldThem/gutters';
+import layout from '@/theme/OldThem/layout';
 import generateConfig from '@/theme/ThemeProvider/generateConfig';
 
 type Context = {

@@ -3,7 +3,6 @@ import { StyleSheet, View } from 'react-native';
 import { Switch as RNSwitch } from 'react-native';
 import { Text } from './Text';
 import { useTheme } from '@/theme';
-import { PALETTE } from '@/utils/constants';
 
 interface SwitchProps {
   disabled?: boolean;

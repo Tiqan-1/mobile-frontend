@@ -21,7 +21,7 @@ import { SafeScreen } from '@/components/templates';
 
 import MainLogo from '@/assets/logo/main-logo.svg';
 import IconDown from '@/assets/svg/icon-down.svg';
-import api, { initStateAPIState, POST } from '@/utils/API';
+import api, { initStateAPIState, POST } from '@/services/API';
 import { useAppDispatch } from '@/hooks/useAppDispatch';
 import { login } from '@/store/auth';
 

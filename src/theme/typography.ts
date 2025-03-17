@@ -1,7 +1,8 @@
 import { StyleSheet } from 'react-native';
 import { defaultSystemFonts } from 'react-native-render-html';
 
-import { isRTL, PALETTE } from '@/utils/constants';
+import { isRTL } from '@/utils/constants';
+import { PALETTE } from './colors';
 
 export const getFonts = () =>
   StyleSheet.create({

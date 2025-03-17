@@ -10,7 +10,7 @@ import { Paths } from '@/navigation/paths';
 import { SafeScreen } from '@/components/templates';
 
 import MainLogo from '@/assets/logo/main-logo.svg';
-import { GET, initStateAPIState } from '@/utils/API';
+import { GET, initStateAPIState } from '@/services/API';
 
 function Startup({ navigation }: RootScreenProps<Paths.Startup>) {
   // const { fonts, gutters, layout } = useTheme();

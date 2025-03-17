@@ -6,9 +6,9 @@ import type {
   BorderTopRadius,
   BorderWidths,
 } from '@/theme/types/borders';
-import type { UnionConfiguration } from '@/theme/types/config';
+import type { UnionConfiguration } from '@/theme/OldThem/types/config';
 
-import { config } from '@/theme/_config';
+import { config } from '@/theme/OldThem/_config';
 
 /**
  * Generates border color styles from configuration

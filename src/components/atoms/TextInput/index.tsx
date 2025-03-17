@@ -18,10 +18,10 @@ import Clear from '@/assets/svg/input-clear.svg';
 import {
   DEVICE_WIDTH,
   isRTL,
-  PALETTE,
-  SHADOWINPUT,
 } from '@/utils/constants';
 import { sizeY } from '@/utils/helpers';
+import { PALETTE } from '@/theme/colors';
+import { SHADOWINPUT } from '@/theme/styles';
 
 const isIOS = Platform.OS === 'ios';
 

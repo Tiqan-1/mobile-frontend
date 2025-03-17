@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import { Text } from './Text';
-import { PALETTE } from '@/utils/constants';
+import { PALETTE } from '@/theme/colors';
 
 interface RadioButtonProps {
   disabled?: boolean;

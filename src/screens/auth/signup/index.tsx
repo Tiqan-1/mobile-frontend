@@ -18,7 +18,7 @@ import { SmallTitle, Text } from '@/components/atoms/Text';
 import TextInput from '@/components/atoms/TextInput';
 import { SafeScreen } from '@/components/templates';
 
-import { initStateAPIState, POST } from '@/utils/API';
+import { initStateAPIState, POST } from '@/services/API';
 
 function SignUp({ navigation }: RootScreenProps<Paths.SignUp>) {
   const { fonts } = useTheme();
