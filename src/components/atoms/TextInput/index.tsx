@@ -17,7 +17,6 @@ import Text, { ExSmallText } from '@/components/atoms/Text';
 import Clear from '@/assets/svg/input-clear.svg';
 import {
   DEVICE_WIDTH,
-  FONT_SIZES,
   isRTL,
   PALETTE,
   SHADOWINPUT,

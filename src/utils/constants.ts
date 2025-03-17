@@ -27,6 +27,34 @@ export const largeScreen = 768;
 
 export const LANGUAGES = ['English', 'عربي'];
 
+
+const colorsLight = {
+  gray100: '#DFDFDF',
+  gray200: '#A1A1A1',
+  gray400: '#4D4D4D',
+  gray50: '#EFEFEF',
+  gray800: '#303030',
+  purple100: '#E1E1EF',
+  purple50: '#1B1A23',
+  purple500: '#44427D',
+  red500: '#C13333',
+  skeleton: '#A1A1A1',
+} as const;
+
+const colorsDark = {
+  gray100: '#000000',
+  gray200: '#BABABA',
+  gray400: '#969696',
+  gray50: '#EFEFEF',
+  gray800: '#E0E0E0',
+  purple100: '#252732',
+  purple50: '#1B1A23',
+  purple500: '#A6A4F0',
+  red500: '#C13333',
+  skeleton: '#303030',
+} as const;
+
+
 export const PALETTE = {
   WHITE: '#FFFFFF',
   BLACK: '#120703',
@@ -37,30 +65,52 @@ export const PALETTE = {
   YELLOW: '#FEDB1D',
   PURPLE: '#B8AFF9',
   ORANGE: '#F15A29',
-  GREY_BACKGROUND: '#F5F8FB',
-  NOTE_BACKGROUND: '#F2F2F2',
   GREY_BORDER: 'rgba(151, 151, 151, 0.12)',
   TRANSPARENT: 'transparent',
-  PRIMARY_COLOR: '#F15A29', // Titles, icons
-  PURPLE_BG: '#FFFFFF40', // Titles, icons
-  SECONDARY_COLOR: '#1b0c75', // Titles, text
-  TERTIARY_COLOR: '#7C8995', // Text, default
-  BG_PRIMARY_COLOR: '#FB565A', // Buttons
-  BG_SECONDARY_COLOR: '#1b0c75', // background color fot the app
-  BG_TERTIARY_COLOR: '#c6c6c6', //PURPLE FAQ, SUBSCRIPTION
+  PRIMARY_COLOR: '#F15A29',
+  SECONDARY_COLOR: '#1b0c75',
+  TERTIARY_COLOR: '#7C8995',
+  BG_PRIMARY_COLOR: '#FB565A',
+  BG_SECONDARY_COLOR: '#1b0c75',
+  BG_TERTIARY_COLOR: '#c6c6c6',
   LINE: '#E9ECEE',
   BUTTON_MAIN_COLOR: '#0D6EFD',
   BUTTON_SECONDARY_COLOR: '#F15A29',
-  IntroColor: '#958CBE',
-  colorForBG: '#F5F5F5',
   bestBW: '#120703',
-
   LOGOColor: '#1b0c75',
   BG_WITH_LOGO: '#F2F2F2',
-  LOGOColor_INVERT: '#F2F2F2',
-  BG_WITH_LOGO_INVERT: '#1b0c75',
-};
+  APP_BG: colorsLight.gray50,
 
+  ...colorsLight,
+} as const;
+
+export const PALETTEDARK = {
+  WHITE: '#1B1A23',
+  BLACK: '#FFFFFF',
+  GREEN: 'green',
+  BLUE: '#A6A4F0',
+  GREY: '#969696',
+  RED: '#FB565A',
+  YELLOW: '#FEDB1D',
+  PURPLE: '#B8AFF9',
+  ORANGE: '#F15A29',
+  GREY_BORDER: 'rgba(151, 151, 151, 0.3)',
+  TRANSPARENT: 'transparent',
+  PRIMARY_COLOR: '#A6A4F0',
+  SECONDARY_COLOR: '#A6A4F0',
+  TERTIARY_COLOR: '#969696',
+  BG_PRIMARY_COLOR: '#FB565A',
+  BG_SECONDARY_COLOR: '#252732',
+  BG_TERTIARY_COLOR: '#303030',
+  LINE: '#303030',
+  BUTTON_MAIN_COLOR: '#0D6EFD',
+  BUTTON_SECONDARY_COLOR: '#F15A29',
+  bestBW: '#FFFFFF',
+  LOGOColor: '#A6A4F0',
+  BG_WITH_LOGO: '#252732',
+  APP_BG: colorsDark.gray50,
+  ...colorsDark,
+} as const;
 export const SHADOW = {
   shadowColor: PALETTE.GREY,
   shadowOffset: { width: 0, height: 0 },
@@ -77,24 +127,6 @@ export const SHADOWINPUT = {
   elevation: 5,
 };
 
-export const FONT_SIZES = {
-  TITLE: 'title',
-  SMALL_TITLE: 'smallTitle',
-  TEXT: 'text',
-  LARGE_TEXT: 'largeText',
-  SMALL_TEXT: 'smallText',
-  EXTRA_SMALL_TEXT: 'extraSmallText',
-  SUPER_SMALL_TEXT: 'superSmallText',
-};
-
 export const BUTTONS = {
   BUTTON_MAIN: 'normal',
-};
-
-export const SIZES = {
-  DEVICE_WIDTH: device.width,
-  DEVICE_HEIGHT: device.height,
-  HEADER_HEIGHT: device.height > largeScreen ? 60 : 50,
-  BOTTOM_BAR_HEIGHT: 55,
-  DRAWER: 280,
 };

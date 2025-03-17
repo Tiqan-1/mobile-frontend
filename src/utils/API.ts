@@ -46,7 +46,7 @@ export type PROTO = {
 export const headers = {
   Accept: 'application/json',
   'Content-Type': 'application/json',
-  'Cache-Control': 'no-cache',
+  // 'Cache-Control': 'no-cache',
   Connection: 'keep-alive',
 };
 

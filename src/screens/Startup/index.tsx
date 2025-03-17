@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, Text, View } from 'react-native';
 
-import { useTheme } from '@/theme';
 import { useAppSelector } from '@/hooks/useAppDispatch';
 import { Paths } from '@/navigation/paths';
 
@@ -14,8 +13,7 @@ import MainLogo from '@/assets/logo/main-logo.svg';
 import { GET, initStateAPIState } from '@/utils/API';
 
 function Startup({ navigation }: RootScreenProps<Paths.Startup>) {
-  const { fonts, gutters, layout } = useTheme();
-  const { t } = useTranslation();
+  // const { fonts, gutters, layout } = useTheme();
   const [apiState, setapiState] = useState<APISTATE>(initStateAPIState);
 
   const auth = useAppSelector((store) => store.auth);
@@ -23,12 +21,14 @@ function Startup({ navigation }: RootScreenProps<Paths.Startup>) {
   useEffect(() => {
     GET('/app', setapiState).then(() => {
       if (auth.isAuth) {
+        navigation.reset({
+          index: 0,
+          routes: [{ name: Paths.Main }],
+        });
       } else {
         navigation.reset({
           index: 0,
-          routes: [
-            { name: Paths.Auth },
-          ],
+          routes: [{ name: Paths.Auth }],
         });
       }
     });
@@ -37,18 +37,15 @@ function Startup({ navigation }: RootScreenProps<Paths.Startup>) {
   return (
     <SafeScreen>
       <View
-        style={[
-          layout.flex_1,
-          layout.col,
-          layout.itemsCenter,
-          layout.justifyCenter,
-        ]}>
+        style={{
+          flex: 1,
+          alignContent: 'center',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}>
         <MainLogo />
         {apiState.loading && (
-          <ActivityIndicator size="large" style={[gutters.marginVertical_24]} />
-        )}
-        {apiState.error && (
-          <Text style={[fonts.size_16, fonts.red500]}>{t('common_error')}</Text>
+          <ActivityIndicator size="large" style={{ marginVertical: 24 }} />
         )}
       </View>
     </SafeScreen>

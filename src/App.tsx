@@ -5,10 +5,9 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
 
-import { ThemeProvider } from '@/theme';
 import ApplicationNavigator from '@/navigation/Application';
-
 import { persistor, storage, store } from '@/store';
+import { ThemeProvider } from '@/theme/context/ThemeContext';
 
 import '@/translations';
 
@@ -20,7 +19,7 @@ const LoadingComponent = () => (
 
 function App() {
   return (
-    <GestureHandlerRootView>
+    <GestureHandlerRootView style={{ flex: 1 }}>
       <Provider store={store}>
         <PersistGate loading={<LoadingComponent />} persistor={persistor}>
           <ThemeProvider storage={storage}>

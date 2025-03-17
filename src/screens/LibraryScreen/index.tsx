@@ -1,11 +1,13 @@
 import React, {useEffect, useState} from 'react';
-import {View, Text, FlatList, StyleSheet, TouchableOpacity, ActivityIndicator} from 'react-native';
+import {ActivityIndicator, FlatList, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import {useTranslation} from 'react-i18next';
-import {PDFDocument} from 'types/pdf';
+import type {PDFDocument} from '@/types/pdf';
 import {useNavigation} from '@react-navigation/native';
 import {useAppDispatch, useAppSelector} from '@/hooks/useAppDispatch';
-import {fetchDocuments, downloadDocument, loadMoreDocuments} from '@/store/documentsSlice';
+import {downloadDocument, fetchDocuments, loadMoreDocuments} from '@/store/documentsSlice';
 import YoutubePlayer from 'react-native-youtube-iframe';
+import { initStateAPIState } from '@/utils/API';
+import { fetchPDFsFromNotion } from '@/services/notionAPI';
 // import YouTube from 'react-native-youtube';
 
 const items: Document[] = [
@@ -40,9 +42,10 @@ const LibraryScreen = () => {
 
   const {items: documents, status, error, currentDownloading, hasMore} = useAppSelector(state => state.documents);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [apiState, setapiState] = useState<APISTATE>(initStateAPIState);
 
   const handleLoadMore = async () => {
-    if (!hasMore || isLoadingMore) return;
+    if (!hasMore || isLoadingMore) {return;}
 
     setIsLoadingMore(true);
     try {
@@ -53,7 +56,7 @@ const LibraryScreen = () => {
   };
 
   const renderFooter = () => {
-    if (!hasMore) return null;
+    if (!hasMore) {return null;}
 
     return (
       <View style={styles.footer}>
@@ -62,10 +65,8 @@ const LibraryScreen = () => {
     );
   };
   useEffect(() => {
-    if (status === 'idle') {
-      dispatch(fetchDocuments());
-    }
-  }, [dispatch, status]);
+    fetchPDFsFromNotion()
+  }, []);
   const store = useAppSelector(state => state.documents);
   console.log('store###', store);
 
@@ -170,14 +171,14 @@ const LibraryScreen = () => {
   return (
     <View style={styles.container}>
       <FlatList
-        data={documents}
+        data={apiState.results}
         renderItem={renderItem}
         keyExtractor={item => item.id}
         ListEmptyComponent={() => <Text style={styles.emptyText}>{t('noDocuments')}</Text>}
         onEndReached={handleLoadMore}
         onEndReachedThreshold={0.5}
         ListFooterComponent={renderFooter}
-        refreshing={status === 'loading'}
+        refreshing={apiState.loading}
         onRefresh={() => dispatch(fetchDocuments({forceRefresh: true}))}
       />
     </View>

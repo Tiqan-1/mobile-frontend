@@ -1,6 +1,10 @@
 import type { RootStackParamList } from '@/navigation/types';
 
-import { NavigationContainer } from '@react-navigation/native';
+import {
+  DarkTheme,
+  DefaultTheme,
+  NavigationContainer,
+} from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
@@ -9,6 +13,8 @@ import { Paths } from '@/navigation/paths';
 
 import { Example, Login, Startup } from '@/screens';
 import SignUp from '@/screens/auth/signup';
+
+import BottomTabNavigation from './BottomTabNavigation';
 
 // import BottomTabNavigation from './BottomTabNavigation';
 
@@ -26,12 +32,22 @@ function AuthNavigation() {
 }
 
 function ApplicationNavigator() {
-  const { navigationTheme, variant } = useTheme();
+  const { colors, isDark } = useTheme();
+  const navigationTheme = {
+    dark: isDark,
 
+    colors: {
+      ...(isDark ? DarkTheme.colors : DefaultTheme.colors),
+      background: colors.gray50,
+      card: colors.gray50,
+    },
+  };
   return (
     <SafeAreaProvider>
       <NavigationContainer theme={navigationTheme}>
-        <Stack.Navigator key={variant} screenOptions={{ headerShown: false }}>
+        <Stack.Navigator
+          key={isDark ? 'dark' : 'light'}
+          screenOptions={{ headerShown: false }}>
           <Stack.Screen
             component={Startup}
             name={Paths.Startup}
@@ -48,11 +64,11 @@ function ApplicationNavigator() {
             options={NAVIGATION_OPTIONS}
           />
 
-          {/* <Stack.Screen
+          <Stack.Screen
             component={BottomTabNavigation}
             name={Paths.Main}
             options={NAVIGATION_OPTIONS}
-          /> */}
+          />
         </Stack.Navigator>
       </NavigationContainer>
     </SafeAreaProvider>

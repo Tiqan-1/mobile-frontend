@@ -1,5 +1,5 @@
 import type {AppStates as AppStatesType} from '@/store/types.t';
-import type {APISTATE as APISTATEType} from '@/api/API';
+import type {APISTATE as APISTATEType} from '@/utils/API';
 declare global {
   type AppStates = AppStatesType;
   type APISTATE = APISTATEType;

@@ -1,8 +1,9 @@
 export const enum Paths {
-  Example = 'example',
-  Login = 'login',
   Auth = 'auth',
+  Example = 'example',
+  LIBRARY_SCREEN='LIBRARY_SCREEN',
+  Login = 'login',
   Main = 'Main',
   SignUp = 'SignUp',
-  Startup = 'startup',
+  Startup = 'startup'
 }

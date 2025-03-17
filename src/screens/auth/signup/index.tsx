@@ -12,6 +12,8 @@ import * as yup from 'yup';
 import { useTheme } from '@/theme';
 
 import Button from '@/components/atoms/Button';
+import RadioButton from '@/components/atoms/RadioButton';
+
 import { SmallTitle, Text } from '@/components/atoms/Text';
 import TextInput from '@/components/atoms/TextInput';
 import { SafeScreen } from '@/components/templates';
@@ -29,7 +31,7 @@ function SignUp({ navigation }: RootScreenProps<Paths.SignUp>) {
   const initialValues = {
     name: '',
     email: '',
-    gender: '',
+    gender: 'MALE',
     password: '',
   };
 
@@ -38,12 +40,12 @@ function SignUp({ navigation }: RootScreenProps<Paths.SignUp>) {
     password: yup.string().required('Password is required'),
   });
 
-  const handleSubmit = (vlaues) => {
-    POST('/api/authentication/sign-up', vlaues, setapiState);
+  const handleSubmit = (values: typeof initialValues) => {
+    POST('/api/students/sign-up', values, setapiState);
   };
   return (
     <SafeScreen>
-      <View style={{ flex: 1, paddingHorizontal: '20' }}>
+      <View style={{ flex: 1, paddingHorizontal: 20 }}>
         <View style={style.header}>
           <SmallTitle>{t('screen_example.title')}</SmallTitle>
         </View>
@@ -60,6 +62,7 @@ function SignUp({ navigation }: RootScreenProps<Paths.SignUp>) {
             touched,
             handleSubmit,
             isValid,
+            setFieldValue,
           }) => (
             <>
               <View style={style.inputGroup}>
@@ -70,7 +73,7 @@ function SignUp({ navigation }: RootScreenProps<Paths.SignUp>) {
                   placeholder="أدخل بريدك الإلكتروني"
                   value={values.name}
                   keyboardType="email-address"
-                  errors={touched.name ? [errors.name] : undefined}
+                  errors={touched.name ? errors.name : undefined}
                 />
               </View>
 
@@ -82,13 +85,31 @@ function SignUp({ navigation }: RootScreenProps<Paths.SignUp>) {
                   placeholder={t('auth.enter_email')}
                   value={values.email}
                   keyboardType="email-address"
-                  errors={touched.email ? [errors.email] : undefined}
+                  errors={touched.email ? errors.email : undefined}
                 />
               </View>
 
               <View style={style.inputGroup}>
-              <Text>{t('auth.password')}</Text>
-              <TextInput
+                <View style={style.genderContainer}>
+
+                  <View style={style.genderRadio}>
+                    <RadioButton
+                      label="MALE"
+                      selected={values.gender === 'MALE'}
+                      onPress={() => setFieldValue('gender', 'MALE')}
+                    />
+                    <RadioButton
+                      label="FEMALE"
+                      selected={values.gender  === 'FEMALE'}
+                      onPress={() => setFieldValue('gender', 'FEMALE')}
+                    />
+                  </View>
+                </View>
+              </View>
+
+              <View style={style.inputGroup}>
+                <Text>{t('auth.password')}</Text>
+                <TextInput
                   onChangeText={handleChange('password')}
                   onBlur={handleBlur('password')}
                   secureTextEntry={secure}
@@ -96,19 +117,19 @@ function SignUp({ navigation }: RootScreenProps<Paths.SignUp>) {
                   value={values.password}
                   Icon={secure ? Eye : EyeClose}
                   onPressIcon={() => setsecure(!secure)}
-                  errors={touched.password ? [errors.password] : undefined}
+                  errors={touched.password ? errors.password : undefined}
                 />
               </View>
 
               {apiState.error && (
                 <Text style={[fonts.size_16, fonts.red500]}>
-                  {t('common_error')}
+                  {t('common:common_error')}
                 </Text>
               )}
 
               <Button
                 type="main"
-                title={ t('auth.sign_up')}
+                title={t('auth.sign_up')}
                 isLoading={apiState.loading}
                 disabled={!isValid || apiState.loading}
                 onPress={handleSubmit}
@@ -150,5 +171,18 @@ const style = StyleSheet.create({
     alignItems: 'center',
     padding: 0,
     marginTop: 10,
+  },
+  genderContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  genderSwitch: {
+    flex: 1,
+  },
+  genderRadio: {
+    flex: 2,
+    flexDirection: 'row',
+    justifyContent: 'space-around',
   },
 });

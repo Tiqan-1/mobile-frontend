@@ -96,15 +96,12 @@ export const systemFonts = [
 
 export const tagsStylesHTML = {
   p: {
-    textAlign: 'left',
     ...St.smallText,
   },
   a: {
-    textAlign: 'left',
     ...St.smallText,
   },
   li: {
-    textAlign: 'left',
     ...St.smallText,
   },
   strong: {
@@ -117,17 +114,14 @@ export const tagsStylesHTML = {
 
 export const tagsStylesHTMLWhite = {
   p: {
-    textAlign: 'left',
     ...St.smallText,
     color: PALETTE.WHITE,
   },
   a: {
-    textAlign: 'left',
     ...St.smallText,
     color: PALETTE.WHITE,
   },
   li: {
-    textAlign: 'left',
     ...St.smallText,
     color: PALETTE.WHITE,
   },
@@ -143,18 +137,15 @@ export const tagsStylesHTMLWhite = {
 
 export const tagsStylesHTMLBrand = {
   p: {
-    textAlign: 'left',
     ...St.smallText,
     ...fonts.bold,
     lineHeight: isRTL ? sizeAdaptivity(24) : sizeAdaptivity(22),
   },
   a: {
-    textAlign: 'left',
     ...St.smallText,
     lineHeight: isRTL ? sizeAdaptivity(24) : sizeAdaptivity(22),
   },
   li: {
-    textAlign: 'left',
     ...St.smallText,
     lineHeight: isRTL ? sizeAdaptivity(24) : sizeAdaptivity(22),
   },

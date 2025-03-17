@@ -22,6 +22,8 @@ import { SafeScreen } from '@/components/templates';
 import MainLogo from '@/assets/logo/main-logo.svg';
 import IconDown from '@/assets/svg/icon-down.svg';
 import api, { initStateAPIState, POST } from '@/utils/API';
+import { useAppDispatch } from '@/hooks/useAppDispatch';
+import { login } from '@/store/auth';
 
 function onChangeLocale(nextlocale: string) {
   api.setHeader('X-localization', nextlocale);
@@ -35,7 +37,7 @@ function Login({ navigation }: RootScreenProps<Paths.Login>) {
   const [apiState, setapiState] = useState<APISTATE>(initStateAPIState);
   const { translate, changeLanguage } = useI18n();
   const [secure, setsecure] = useState(true);
-
+ const dispatch = useAppDispatch();
   const currentLanguage = i18n.language;
 
   const changeLang = (index) => {
@@ -49,12 +51,15 @@ function Login({ navigation }: RootScreenProps<Paths.Login>) {
   };
 
   const loginValidationSchema = yup.object().shape({
-    name: yup.string().required('Name is required'),
+    email: yup.string().email('Invalid email').required('Name is required'),
     password: yup.string().required('Password is required'),
   });
 
   const handleSubmit = (vlaues) => {
-    POST('/api/authentication/login', vlaues, setapiState);
+    POST('/api/authentication/login', vlaues, setapiState).then((res) => {
+      dispatch(login(res))
+      navigation.navigate(Paths.Home);
+    });
   };
   return (
     <SafeScreen>
@@ -75,7 +80,7 @@ function Login({ navigation }: RootScreenProps<Paths.Login>) {
         </View>
 
         <Formik
-          initialValues={{ name: '', password: '' }}
+          initialValues={{ email: '', password: '' }}
           onSubmit={handleSubmit}
           validationSchema={loginValidationSchema}>
           {({
@@ -91,12 +96,12 @@ function Login({ navigation }: RootScreenProps<Paths.Login>) {
               <View style={style.inputGroup}>
                 <Text>{t('auth.email')}</Text>
                 <TextInput
-                  onChangeText={handleChange('name')}
-                  onBlur={handleBlur('name')}
+                  onChangeText={handleChange('email')}
+                  onBlur={handleBlur('email')}
                   placeholder={t('auth.enter_email')}
-                  value={values.name}
+                  value={values.email}
                   keyboardType="email-address"
-                  errors={touched.name ? [errors.name] : undefined}
+                  errors={touched.email ? [errors.email] : undefined}
                 />
               </View>
               <View style={style.inputGroup}>
