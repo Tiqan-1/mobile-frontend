@@ -27,6 +27,7 @@ export type PARAMS = {
 export type APISTATE = {
   error: string;
   isRequesting?: boolean;
+  length: any;
   loading: boolean;
   message?: string;
   pagination?: object;

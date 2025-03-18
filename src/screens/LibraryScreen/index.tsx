@@ -1,13 +1,29 @@
-import React, {useEffect, useState} from 'react';
-import {ActivityIndicator, FlatList, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
-import {useTranslation} from 'react-i18next';
-import type {PDFDocument} from '@/types/pdf';
-import {useNavigation} from '@react-navigation/native';
-import {useAppDispatch, useAppSelector} from '@/hooks/useAppDispatch';
-import {downloadDocument, fetchDocuments, loadMoreDocuments} from '@/store/documentsSlice';
+import type { PDFDocument } from '@/types/pdf';
+
+import { useNavigation } from '@react-navigation/native';
+import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import {
+  ActivityIndicator,
+  FlatList,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import YoutubePlayer from 'react-native-youtube-iframe';
+
+import { useAppDispatch, useAppSelector } from '@/hooks/useAppDispatch';
+
 import { initStateAPIState } from '@/services/API';
+import { createDocumentService } from '@/services/documentService';
 import { fetchPDFsFromNotion } from '@/services/notionAPI';
+import {
+  downloadDocument,
+  fetchDocuments,
+  loadMoreDocuments,
+} from '@/store/documentsSlice';
+
 // import YouTube from 'react-native-youtube';
 
 const items: Document[] = [
@@ -36,16 +52,34 @@ const items: Document[] = [
 ];
 
 const LibraryScreen = () => {
-  const {t} = useTranslation();
+  const { t } = useTranslation();
   const navigation = useNavigation();
   const dispatch = useAppDispatch();
 
-  const {items: documents, status, error, currentDownloading, hasMore} = useAppSelector(state => state.documents);
+  const {
+    items: documents,
+    status,
+    error,
+    currentDownloading,
+    hasMore,
+  } = useAppSelector((state) => state.documents);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [apiState, setapiState] = useState<APISTATE>(initStateAPIState);
 
+  const documentService = createDocumentService({
+    source: 'notion',
+    pagination: {
+      usePagination: true,
+      page: 1,
+      limit: 50,
+    },
+    setState: setapiState,
+  });
+
   const handleLoadMore = async () => {
-    if (!hasMore || isLoadingMore) {return;}
+    if (!hasMore || isLoadingMore) {
+      return;
+    }
 
     setIsLoadingMore(true);
     try {
@@ -56,7 +90,9 @@ const LibraryScreen = () => {
   };
 
   const renderFooter = () => {
-    if (!hasMore) {return null;}
+    if (!hasMore) {
+      return null;
+    }
 
     return (
       <View style={styles.footer}>
@@ -65,12 +101,14 @@ const LibraryScreen = () => {
     );
   };
   useEffect(() => {
-    fetchPDFsFromNotion(setapiState)
+    // fetchPDFsFromNotion(setapiState)
+    documentService.fetchDocuments();
   }, []);
-  const store = useAppSelector(state => state.documents);
+
+  const store = useAppSelector((state) => state.documents);
   console.log('store###', store);
 
-  const renderItem = ({item}: {item: PDFDocument}) => {
+  const renderItem = ({ item }: { item: PDFDocument }) => {
     const fType = (url: string) => {
       if (!url) {
         return '';
@@ -85,12 +123,12 @@ const LibraryScreen = () => {
     };
     const type = fType(item.url);
     if (type === 'pdf') {
-      const pdfDoc = {...item, ...store.progressData[item.id]};
+      const pdfDoc = { ...item, ...store.progressData[item.id] };
       const handlePress = async () => {
         if (!pdfDoc.localPath) {
           await dispatch(downloadDocument(pdfDoc));
         }
-        navigation.navigate('PDFViewer', {document: pdfDoc});
+        navigation.navigate('PDFViewer', { document: pdfDoc });
       };
 
       const isDownloading = currentDownloading === pdfDoc.id;
@@ -125,7 +163,7 @@ const LibraryScreen = () => {
             webViewProps={{
               androidLayerType: 'hardware',
             }}
-            onChangeState={state => console.log({state})}
+            onChangeState={(state) => console.log({ state })}
           />
 
           {/* <YouTube
@@ -167,19 +205,22 @@ const LibraryScreen = () => {
       </View>
     );
   }
+  console.log(apiState);
 
   return (
     <View style={styles.container}>
       <FlatList
         data={apiState.results}
         renderItem={renderItem}
-        keyExtractor={item => item.id}
-        ListEmptyComponent={() => <Text style={styles.emptyText}>{t('noDocuments')}</Text>}
+        keyExtractor={(item) => item.id}
+        ListEmptyComponent={() => (
+          <Text style={styles.emptyText}>{t('noDocuments')}</Text>
+        )}
         onEndReached={handleLoadMore}
         onEndReachedThreshold={0.5}
         ListFooterComponent={renderFooter}
         refreshing={apiState.loading}
-        onRefresh={() => dispatch(fetchDocuments({forceRefresh: true}))}
+        // onRefresh={() => dispatch(fetchDocuments({ forceRefresh: true }))}
       />
     </View>
   );
