@@ -216,6 +216,9 @@ const ThemeToggle = () => {
 
 ## Development Guidelines
 
+### Page Templates
+- use the `rnscreen` for quick page start
+
 ### Code Style
 - Follow the established ESLint and Prettier configurations
 - Use TypeScript for all new files

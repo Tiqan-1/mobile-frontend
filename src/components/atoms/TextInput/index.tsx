@@ -335,7 +335,7 @@ const styles = StyleSheet.create({
   },
   errorText: {
     writingDirection: isRTL ? 'rtl' : 'auto',
-    color: PALETTE.RED,
+    color: PALETTE.ERROR,
     maxWidth: '95%',
   },
   iconButton: {

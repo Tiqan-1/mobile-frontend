@@ -10,6 +10,7 @@ export const fetchPDFsFromNotion = async ({
   cursor: string | undefined;
   pageSize: number;
 }): Promise<APISTATE> => {
+  
   try {
     const response = await fetch(
       `https://api.notion.com/v1/databases/${DATABASE_ID}/query`,
@@ -45,3 +46,5 @@ export const fetchPDFsFromNotion = async ({
     throw error;
   }
 };
+
+

@@ -10,7 +10,7 @@ import { Paths } from '@/navigation/paths';
 import { SafeScreen } from '@/components/templates';
 
 import MainLogo from '@/assets/logo/main-logo.svg';
-import { GET, initStateAPIState } from '@/services/API';
+import api, { GET, initStateAPIState } from '@/services/API';
 
 function Startup({ navigation }: RootScreenProps<Paths.Startup>) {
   // const { fonts, gutters, layout } = useTheme();
@@ -21,10 +21,13 @@ function Startup({ navigation }: RootScreenProps<Paths.Startup>) {
   useEffect(() => {
     GET('/app', setapiState).then(() => {
       if (auth.isAuth) {
+        const token = auth.token;
+        api.setHeader('Authorization', `bearer ${token}`);
         navigation.reset({
           index: 0,
-          routes: [{ name: Paths.Main }],
+          routes: [{ name: Paths.TabNav }],
         });
+
       } else {
         navigation.reset({
           index: 0,

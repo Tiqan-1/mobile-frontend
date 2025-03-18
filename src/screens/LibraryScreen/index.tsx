@@ -65,7 +65,7 @@ const LibraryScreen = () => {
     );
   };
   useEffect(() => {
-    fetchPDFsFromNotion()
+    fetchPDFsFromNotion(setapiState)
   }, []);
   const store = useAppSelector(state => state.documents);
   console.log('store###', store);

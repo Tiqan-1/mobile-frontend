@@ -74,7 +74,7 @@ function ApplicationNavigator() {
           />
           <Stack.Screen
             component={BottomTabNavigation}
-            name={Paths.Main}
+            name={Paths.TabNav}
             options={NAVIGATION_OPTIONS}
           />
         </Stack.Navigator>

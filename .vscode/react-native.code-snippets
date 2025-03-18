@@ -1,0 +1,74 @@
+{
+  "React Native Screen Template": {
+    "prefix": "rnscreen",
+    "body": [
+      "import React, { useState } from 'react';",
+      "import { useTranslation } from 'react-i18next';",
+      "import { StyleSheet, View } from 'react-native';",
+
+      "import { useTheme } from '@/theme';",
+      "import { useAppDispatch } from '@/hooks/useAppDispatch';",
+      "import type { Paths } from '@/navigation/paths';",
+      "import type { RootScreenProps } from '@/navigation/types';",
+
+      "import { Text } from '@/components/atoms/Text';",
+      "import { SafeScreen } from '@/components/templates';",
+
+      "import { initStateAPIState } from '@/services/API';",
+
+      "function ${1:ScreenName}({ navigation }: RootScreenProps<Paths.${1:ScreenName}>) {",
+      "  const { isDark, colors, toggleTheme } = useTheme();",
+      "  const { t, i18n } = useTranslation();",
+      "  const [apiState, setapiState] = useState<APISTATE>(initStateAPIState);",
+      "  const dispatch = useAppDispatch();",
+
+      "  return (",
+      "    <SafeScreen>",
+      "      <View style={styles.container}>",
+      "        <Text>${1:ScreenName}</Text>",
+      "      </View>",
+      "    </SafeScreen>",
+      "  );",
+      "}",
+
+      "export default ${1:ScreenName};",
+
+      "const styles = StyleSheet.create({",
+      "  container: {",
+      "    flex: 1,",
+      "    padding: 16,",
+      "  },",
+      "  title: {",
+      "    fontSize: 24,",
+      "    fontWeight: 'bold',",
+      "    marginBottom: 16,",
+      "  },",
+      "});"
+
+    ],
+    "description": "Creates a new React Native screen using the template"
+  },
+  "React Native Screen with Types": {
+    "prefix": "rnscreentypes",
+    "body": [
+      "import React from 'react';",
+      "import { StyleSheet } from 'react-native';",
+      "",
+      "import ScreenTemplate from '../templates/ScreenTemplate';",
+      "import { ${1:ScreenName}Props } from './types';",
+      "",
+      "const ${1:ScreenName}: React.FC<${1:ScreenName}Props> = (props) => {",
+      "  return (",
+      "    <ScreenTemplate title=\"${1:ScreenName}\">",
+      "      {/* Add your screen content here */}",
+      "    </ScreenTemplate>",
+      "  );",
+      "};",
+      "",
+      "export default ${1:ScreenName};",
+      "",
+      "const styles = StyleSheet.create({});"
+    ],
+    "description": "Creates a new React Native screen with TypeScript props"
+  }
+} 

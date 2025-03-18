@@ -32,7 +32,7 @@ function onChangeLocale(nextlocale: string) {
 }
 
 function Login({ navigation }: RootScreenProps<Paths.Login>) {
-  const { fonts, isDark, colors, toggleTheme } = useTheme();
+  const { isDark, colors, toggleTheme } = useTheme();
   const { t, i18n } = useTranslation();
   const sheet = useRef(null);
 
@@ -59,8 +59,10 @@ function Login({ navigation }: RootScreenProps<Paths.Login>) {
 
   const handleSubmit = (vlaues) => {
     POST('/api/authentication/login', vlaues, setapiState).then((res) => {
+      const token = res.accessToken;
+      api.setHeader('Authorization', `bearer ${token}`);
       dispatch(login(res));
-      navigation.navigate(Paths.Main);
+      navigation.navigate(Paths.TabNav);
     });
   };
   return (
@@ -131,7 +133,7 @@ function Login({ navigation }: RootScreenProps<Paths.Login>) {
               </View>
 
               {apiState.error && (
-                <Text style={[fonts.size_16, fonts.red500]}>
+                <Text style={{color: colors.ERROR}}>
                   {t('common_error')}
                 </Text>
               )}

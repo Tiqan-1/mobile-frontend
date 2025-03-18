@@ -1,4 +1,3 @@
-import { Paths } from '@/navigation/paths';
 import type { RootScreenProps } from '@/navigation/types';
 
 import EyeClose from 'assets/svg/input-eye-close.svg';
@@ -10,38 +9,57 @@ import { StyleSheet, View } from 'react-native';
 import * as yup from 'yup';
 
 import { useTheme } from '@/theme';
+import { Paths } from '@/navigation/paths';
 
 import Button from '@/components/atoms/Button';
 import RadioButton from '@/components/atoms/RadioButton';
-
 import { SmallTitle, Text } from '@/components/atoms/Text';
 import TextInput from '@/components/atoms/TextInput';
 import { SafeScreen } from '@/components/templates';
 
-import { initStateAPIState, POST } from '@/services/API';
+import api, { initStateAPIState, POST } from '@/services/API';
+import { login } from '@/store/auth';
+import { useAppDispatch } from '@/hooks/useAppDispatch';
 
 function SignUp({ navigation }: RootScreenProps<Paths.SignUp>) {
-  const { fonts } = useTheme();
+  const { colors } = useTheme();
   const { t } = useTranslation();
 
   const [apiState, setapiState] = useState<APISTATE>(initStateAPIState);
 
   const [secure, setsecure] = useState(true);
+  const dispatch = useAppDispatch();
 
   const initialValues = {
     name: '',
     email: '',
-    gender: 'MALE',
+    gender: 'male',
     password: '',
   };
 
   const SignUpValidationSchema = yup.object().shape({
     name: yup.string().required('Name is required'),
-    password: yup.string().required('Password is required'),
+    email: yup.string().email('Invalid email').required('Email is required'),
+    password: yup
+      .string()
+      .matches(/\w*[a-z]\w*/, 'Password must have a small letter')
+      .matches(/\w*[A-Z]\w*/, 'Password must have a capital letter')
+      .matches(/\d/, 'Password must have a number')
+      .matches(
+        /[!@#$%^&*()\-_"=+{}; :,<.>]/,
+        'Password must have a special character'
+      )
+      .min(8, ({ min }) => `Password must be at least ${min} characters`)
+      .required('Password is required'),
   });
 
   const handleSubmit = (values: typeof initialValues) => {
-    POST('/api/students/sign-up', values, setapiState);
+    POST('/api/students/sign-up', values, setapiState).then((res) => {
+      const token = res.accessToken;
+        api.setHeader('Authorization', `bearer ${token}`);
+      dispatch(login(res));
+      navigation.navigate(Paths.TabNav);
+    });
   };
   return (
     <SafeScreen>
@@ -66,13 +84,12 @@ function SignUp({ navigation }: RootScreenProps<Paths.SignUp>) {
           }) => (
             <>
               <View style={style.inputGroup}>
-                <Text>البريد الإلكتروني</Text>
+                <Text>{t('auth.name')}</Text>
                 <TextInput
                   onChangeText={handleChange('name')}
                   onBlur={handleBlur('name')}
-                  placeholder="أدخل بريدك الإلكتروني"
+                  placeholder={t('auth.enter_name')}
                   value={values.name}
-                  keyboardType="email-address"
                   errors={touched.name ? errors.name : undefined}
                 />
               </View>
@@ -91,17 +108,16 @@ function SignUp({ navigation }: RootScreenProps<Paths.SignUp>) {
 
               <View style={style.inputGroup}>
                 <View style={style.genderContainer}>
-
                   <View style={style.genderRadio}>
                     <RadioButton
-                      label="MALE"
-                      selected={values.gender === 'MALE'}
-                      onPress={() => setFieldValue('gender', 'MALE')}
+                      label="male"
+                      selected={values.gender === 'male'}
+                      onPress={() => setFieldValue('gender', 'male')}
                     />
                     <RadioButton
-                      label="FEMALE"
-                      selected={values.gender  === 'FEMALE'}
-                      onPress={() => setFieldValue('gender', 'FEMALE')}
+                      label="female"
+                      selected={values.gender === 'female'}
+                      onPress={() => setFieldValue('gender', 'female')}
                     />
                   </View>
                 </View>
@@ -122,7 +138,7 @@ function SignUp({ navigation }: RootScreenProps<Paths.SignUp>) {
               </View>
 
               {apiState.error && (
-                <Text style={[fonts.size_16, fonts.red500]}>
+                <Text style={{ color: colors.ERROR }}>
                   {t('common:common_error')}
                 </Text>
               )}
@@ -144,7 +160,9 @@ function SignUp({ navigation }: RootScreenProps<Paths.SignUp>) {
           <Button
             type="underline"
             title={t('auth.login')}
-            onPress={() => {navigation.navigate(Paths.Login)}}
+            onPress={() => {
+              navigation.navigate(Paths.Login);
+            }}
           />
         </View>
       </View>

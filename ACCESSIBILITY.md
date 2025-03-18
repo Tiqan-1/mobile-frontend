@@ -10,6 +10,10 @@ This document provides guidelines for making the app accessible to all users, in
 4. [Testing](#testing)
 5. [Resources](#resources)
 
+### ref
+
+[Accessibility for Visually Impaired People](https://www.whitesmith.co/blog/react-native-a11y/)
+
 ## Introduction
 
 Accessibility is an important aspect of mobile app development. It ensures that all users, including those with disabilities, can use the app effectively. This document provides guidelines for making the app accessible.

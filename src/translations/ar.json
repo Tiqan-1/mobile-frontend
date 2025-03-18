@@ -27,7 +27,10 @@
       "sign_up": "سجل حساب",
       "have_account": "هل لديك حساب؟",
       "sign_in": "تسجيل الدخول",
-      "sign_out": "تسجيل الخروج"
+      "sign_out": "تسجيل الخروج",
+      "name": "الاسم",
+      "enter_name": "أدخل اسمك"
+      
     }
   },
   "translation": {
