@@ -13,6 +13,7 @@ import { Paths } from '@/navigation/paths';
 
 import { Example, Login, Startup } from '@/screens';
 import SignUp from '@/screens/auth/signup';
+import AccessibilitySettings from '@/screens/AccessibilitySettings';
 
 import BottomTabNavigation from './BottomTabNavigation';
 
@@ -63,7 +64,14 @@ function ApplicationNavigator() {
             name={Paths.Example}
             options={NAVIGATION_OPTIONS}
           />
-
+          <Stack.Screen
+            component={AccessibilitySettings}
+            name={Paths.AccessibilitySettings}
+            options={{
+              headerShown: true,
+              title: 'Accessibility',
+            }}
+          />
           <Stack.Screen
             component={BottomTabNavigation}
             name={Paths.Main}

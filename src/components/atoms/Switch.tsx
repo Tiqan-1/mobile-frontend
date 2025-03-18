@@ -20,7 +20,7 @@ const Switch: React.FC<SwitchProps> = ({ disabled = false, label, onValueChange,
       <RNSwitch
         disabled={disabled}
         onValueChange={onValueChange}
-        thumbColor={colors.APP_BG}
+        thumbColor={colors.APP_BACKGROUND}
         trackColor={{ false: colors.gray200, true: colors.BUTTON_MAIN_COLOR }}
         value={value}
       />

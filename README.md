@@ -189,7 +189,30 @@ const ThemeToggle = () => {
 };
 ```
 
+### Color Usage Guidelines
 
+1. **Brand Colors**
+   - Use `primary` for main actions and key UI elements
+   - Use `secondary` for supporting actions and accents
+
+2. **Background Colors**
+   - Use `background` for main app background
+   - Use `surface` for cards, modals, and elevated surfaces
+
+3. **Text Colors**
+   - Use `text.primary` for main content
+   - Use `text.secondary` for supporting text
+   - Use `text.disabled` for disabled states
+
+4. **Status Colors**
+   - Use `success` for positive actions and states
+   - Use `error` for errors and destructive actions
+   - Use `warning` for cautionary states
+   - Use `info` for informational states
+
+5. **Border Colors**
+   - Use `border` for dividers and borders
+   - Use `overlay` for modal backgrounds and overlays
 
 ## Development Guidelines
 

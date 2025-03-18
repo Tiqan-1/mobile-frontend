@@ -29,9 +29,9 @@ function SafeScreen({
     <SafeAreaView
       {...props}
       mode="padding"
-      style={[{ flex: 1, backgroundColor: colors.APP_BG }, style]}>
+      style={[{ flex: 1, backgroundColor: colors.APP_BACKGROUND }, style]}>
       <StatusBar
-        backgroundColor={colors.APP_BG}
+        backgroundColor={colors.APP_BACKGROUND}
         barStyle={isDark ? 'light-content' : 'dark-content'}
       />
       <ErrorBoundary onReset={onResetError}>

@@ -19,6 +19,17 @@ export type TextTypes =
   | undefined;
 
 interface Txt extends TextProps {
+  accessibilityHint?: string;
+  accessibilityLabel?: string;
+  accessibilityRole?: 'adjustable' | 'button' | 'header' | 'image' | 'imagebutton' | 'keyboardkey' | 'link' | 'none' | 'search' | 'summary' | 'text';
+  accessibilityState?: {
+    busy?: boolean;
+    checked?: 'mixed' | boolean;
+    disabled?: boolean;
+    expanded?: boolean;
+    selected?: boolean;
+  };
+  accessible?: boolean;
   dotted?: boolean;
   style?: StyleProp<TextStyle>;
   type?: TextTypes;
@@ -33,6 +44,11 @@ const TextBlock = React.forwardRef<RNText, Txt>(
       onPress,
       numberOfLines,
       dotted = false,
+      accessible = true,
+      accessibilityLabel,
+      accessibilityHint,
+      accessibilityRole,
+      accessibilityState,
       ...rest
     },
     ref
@@ -69,12 +85,22 @@ const TextBlock = React.forwardRef<RNText, Txt>(
       return result;
     }, {});
 
+    // Set default accessibility role based on text type if not provided
+    const defaultAccessibilityRole = !accessibilityRole && (type === 'title' || type === 'smallTitle') 
+      ? 'header' 
+      : accessibilityRole;
+
     return (
       <RNTXT
         ref={ref}
         ellipsizeMode={dotted ? 'tail' : undefined}
         numberOfLines={numberOfLines ? numberOfLines : dotted ? 1 : undefined}
         onPress={onPress}
+        accessible={accessible}
+        accessibilityLabel={accessibilityLabel}
+        accessibilityHint={accessibilityHint}
+        accessibilityRole={defaultAccessibilityRole}
+        accessibilityState={accessibilityState}
         {...rest}
         style={[typography[type], override]}>
         {isRTL ? '\u2067' : ''}

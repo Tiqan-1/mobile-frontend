@@ -16,6 +16,7 @@ import type { Storage } from 'redux-persist'
 
 import documentsReducer from './documentsSlice';
 import authReducer from './auth';
+import accessibilityReducer from './slices/accessibilitySlice';
 
 export const storage = new MMKV()
 
@@ -39,12 +40,13 @@ const persistConfig = {
   key: 'root',
   storage: reduxStorage,
   // Optionally blacklist some state that you don't want to persist
-  blacklist: ['currentDownloading'], 
+  blacklist: ['currentDownloading', 'accessibility'], // Don't persist accessibility state
 };
 
 const rootReducer = combineReducers({
   documents: documentsReducer,
   auth: authReducer,
+  accessibility: accessibilityReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

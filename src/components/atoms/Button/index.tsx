@@ -1,11 +1,12 @@
 import React from 'react';
+import type {
+  TextStyle,
+  ViewStyle} from 'react-native';
 import {
   ActivityIndicator,
   StyleSheet,
-  TextStyle,
   TouchableOpacity,
-  View,
-  ViewStyle,
+  View
 } from 'react-native';
 
 // Use require for modules without type declarations
@@ -76,6 +77,28 @@ export interface ButtonProps {
    * Whether to support right-to-left text
    */
   withRTL?: boolean;
+  /**
+   * Accessibility label for screen readers
+   */
+  accessibilityLabel?: string;
+  /**
+   * Accessibility hint provides additional context
+   */
+  accessibilityHint?: string;
+  /**
+   * Whether the element is currently active or selected
+   */
+  accessibilityState?: {
+    busy?: boolean;
+    checked?: 'mixed' | boolean;
+    disabled?: boolean;
+    expanded?: boolean;
+    selected?: boolean;
+  };
+  /**
+   * Tells screen reader the type of element
+   */
+  accessibilityRole?: 'button' | 'link' | 'none';
 }
 
 /**
@@ -96,6 +119,10 @@ const Button: React.FC<ButtonProps> = ({
   loadingColor,
   bgColor,
   withRTL = false,
+  accessibilityLabel,
+  accessibilityHint,
+  accessibilityState,
+  accessibilityRole = 'button',
 }) => {
   // Simplified color handling without external helpers
   const buttonStyles = React.useMemo(() => {
@@ -215,7 +242,16 @@ const Button: React.FC<ButtonProps> = ({
           disabled && styles.disabled,
           buttonStyle,
         ]}
-        testID={testID}>
+        testID={testID}
+        accessible={true}
+        accessibilityLabel={accessibilityLabel || title}
+        accessibilityHint={accessibilityHint}
+        accessibilityRole={accessibilityRole}
+        accessibilityState={{
+          disabled: disabled || isLoading,
+          busy: isLoading,
+          ...accessibilityState,
+        }}>
         {renderButtonContent()}
       </TouchableOpacity>
     </View>

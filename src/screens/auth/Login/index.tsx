@@ -10,11 +10,14 @@ import ActionSheet from 'react-native-actionsheet';
 import * as yup from 'yup';
 
 import { useTheme } from '@/theme';
+import { PALETTE } from '@/theme/colors';
 import { useI18n } from '@/hooks';
 import { LANG_AR, LANG_EN } from '@/hooks/language/useI18n';
+import { useAppDispatch } from '@/hooks/useAppDispatch';
 import { Paths } from '@/navigation/paths';
 
 import Button from '@/components/atoms/Button';
+import Switch from '@/components/atoms/Switch';
 import { SmallTitle, Text } from '@/components/atoms/Text';
 import TextInput from '@/components/atoms/TextInput';
 import { SafeScreen } from '@/components/templates';
@@ -22,10 +25,7 @@ import { SafeScreen } from '@/components/templates';
 import MainLogo from '@/assets/logo/main-logo.svg';
 import IconDown from '@/assets/svg/icon-down.svg';
 import api, { initStateAPIState, POST } from '@/services/API';
-import { useAppDispatch } from '@/hooks/useAppDispatch';
 import { login } from '@/store/auth';
-import Switch from '@/components/atoms/Switch';
-import { PALETTE } from '@/theme/colors';
 
 function onChangeLocale(nextlocale: string) {
   api.setHeader('X-localization', nextlocale);
@@ -39,7 +39,7 @@ function Login({ navigation }: RootScreenProps<Paths.Login>) {
   const [apiState, setapiState] = useState<APISTATE>(initStateAPIState);
   const { translate, changeLanguage } = useI18n();
   const [secure, setsecure] = useState(true);
- const dispatch = useAppDispatch();
+  const dispatch = useAppDispatch();
   const currentLanguage = i18n.language;
 
   const changeLang = (index) => {
@@ -59,13 +59,18 @@ function Login({ navigation }: RootScreenProps<Paths.Login>) {
 
   const handleSubmit = (vlaues) => {
     POST('/api/authentication/login', vlaues, setapiState).then((res) => {
-      dispatch(login(res))
+      dispatch(login(res));
       navigation.navigate(Paths.Main);
     });
   };
   return (
     <SafeScreen>
-      <View style={{ flex: 1, paddingHorizontal: '20', backgroundColor: PALETTE.APP_BG }}>
+      <View
+        style={{
+          flex: 1,
+          paddingHorizontal: '20',
+          backgroundColor: PALETTE.APP_BACKGROUND,
+        }}>
         <Pressable
           onPress={() => {
             sheet.current?.show();
@@ -74,10 +79,12 @@ function Login({ navigation }: RootScreenProps<Paths.Login>) {
           <Text>{currentLanguage}</Text>
           <IconDown />
         </Pressable>
-        <Switch 
-              onValueChange={()=>{toggleTheme()}}
-              value={isDark}
-              />
+        <Switch
+          onValueChange={() => {
+            toggleTheme();
+          }}
+          value={isDark}
+        />
         <View style={style.header}>
           <MainLogo />
 
@@ -152,7 +159,7 @@ function Login({ navigation }: RootScreenProps<Paths.Login>) {
           <Text>{t('auth.dont_have_account')}</Text>
           <Button
             type="underline"
-            title={ t('auth.sign_up')}
+            title={t('auth.sign_up')}
             onPress={() => {
               navigation.navigate(Paths.SignUp);
             }}
@@ -160,6 +167,13 @@ function Login({ navigation }: RootScreenProps<Paths.Login>) {
         </View>
       </View>
 
+      <Button
+        type="underline"
+        title={t('auth.sign_up')}
+        onPress={() => {
+          navigation.navigate(Paths.AccessibilitySettings);
+        }}
+      />
       <ActionSheet
         ref={sheet}
         title={t('change_language')}

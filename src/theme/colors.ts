@@ -1,5 +1,3 @@
-import React from "react";
-import { View } from "react-native";
 
 const colorsLight = {
   gray100: '#DFDFDF',
@@ -54,15 +52,15 @@ export const PALETTELIGHT = {
   bestBW: '#120703',
   LOGOColor: '#1b0c75',
   BG_WITH_LOGO: '#F2F2F2',
-  APP_BG: colorsLight.gray50,
+  APP_BACKGROUND: colorsLight.gray50,
   SURFACE: colorsLight.gray100,
 
   ...colorsLight,
 } as const;
 
 export const PALETTEDARK = {
-  WHITE: colorsDark.gray50,
-  BLACK: colorsDark.gray800,
+  WHITE: colorsDark.gray800,
+  BLACK: colorsDark.gray50,
   GREEN: '#10B981',
   BLUE: '#3B82F6',
   GREY: '#969696',
@@ -84,7 +82,7 @@ export const PALETTEDARK = {
   bestBW: '#FFFFFF',
   LOGOColor: '#A6A4F0',
   BG_WITH_LOGO: '#252732',
-  APP_BG: colorsDark.gray200,
+  APP_BACKGROUND: colorsDark.gray200,
   SURFACE: colorsLight.gray800,
   ...colorsDark,
 } as const;

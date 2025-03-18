@@ -31,7 +31,7 @@ const St = StyleSheet.create({
   title: {
     ...fonts.bold,
     fontSize: sizeAdaptivity(28),
-    color: '#000',
+    color: PALETTE.BLACK,
     overflow: 'visible',
     textAlignVertical: 'center',
     textAlign:'left'
@@ -39,7 +39,7 @@ const St = StyleSheet.create({
   smallTitle: {
     ...fonts.semibold,
     fontSize: sizeAdaptivity(18),
-    color: '#000',
+    color: PALETTE.BLACK,
     overflow: 'visible',
     textAlignVertical: 'center',
     textAlign:'left'
@@ -47,7 +47,7 @@ const St = StyleSheet.create({
   text: {
     ...fonts.medium,
     fontSize: sizeAdaptivity(16),
-    color: '#000',
+    color: PALETTE.BLACK,
     overflow: 'visible',
     textAlignVertical: 'center',
     textAlign:'left'
@@ -55,7 +55,7 @@ const St = StyleSheet.create({
   largeText: {
     ...fonts.medium,
     fontSize: sizeAdaptivity(18),
-    color: '#000',
+    color: PALETTE.BLACK,
     overflow: 'visible',
     textAlignVertical: 'center',
     textAlign:'left'
@@ -63,7 +63,7 @@ const St = StyleSheet.create({
   smallText: {
     ...fonts.regular,
     fontSize: sizeAdaptivity(13),
-    color: '#000',
+    color: PALETTE.BLACK,
     overflow: 'visible',
     textAlignVertical: 'center',
     textAlign:'left'
@@ -71,7 +71,7 @@ const St = StyleSheet.create({
   extraSmallText: {
     ...fonts.regular,
     fontSize: sizeAdaptivity(12),
-    color: '#000',
+    color: PALETTE.BLACK,
     overflow: 'visible',
     textAlignVertical: 'center',
     textAlign:'left'
@@ -79,7 +79,7 @@ const St = StyleSheet.create({
   superSmallText: {
     ...fonts.regular,
     fontSize: sizeAdaptivity(10),
-    color: '#000',
+    color: PALETTE.BLACK,
     overflow: 'visible',
     textAlignVertical: 'center',
     textAlign:'left'

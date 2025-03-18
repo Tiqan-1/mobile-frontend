@@ -6,6 +6,7 @@ import {createBottomTabNavigator} from "@react-navigation/bottom-tabs";
 import { useI18n } from "@/hooks";
 import LibraryScreen from "@/screens/LibraryScreen";
 import { Paths } from "./paths";
+import { useNavigation } from "@react-navigation/native";
 
 const Tab = createBottomTabNavigator();
 
@@ -14,20 +15,41 @@ const TAB_SCREEN_OPTIONS = {
 	headerLeft: () => false,
 };
 
-interface HomeIconProps {
+interface IconProps {
 	color: string;
 	size: number;
-  }
+}
 
-const HomeIcon: React.FC<HomeIconProps> = ({ color, size }) => (
+const HomeIcon: React.FC<IconProps> = ({ color, size }) => (
 	<Icon name="home" color={color} size={size} />
 );
+
+const AccessibilityIcon: React.FC<IconProps> = ({ color, size }) => (
+	<Icon name="accessibility" color={color} size={size} />
+);
+
+// Placeholder component for the Accessibility tab
+const AccessibilityTab = () => {
+  const navigation = useNavigation();
+  
+  React.useEffect(() => {
+    // Navigate to the AccessibilitySettings screen when this tab is selected
+    navigation.navigate(Paths.AccessibilitySettings);
+  }, [navigation]);
+  
+  return null;
+};
 
 const BottomTabNavigation = () => {
 	const {translate} = useI18n();
 
 	return (
-		<Tab.Navigator screenOptions={TAB_SCREEN_OPTIONS}>
+		<Tab.Navigator 
+			screenOptions={{
+				...TAB_SCREEN_OPTIONS,
+				tabBarAccessibilityLabel: "Bottom navigation tabs",
+			}}
+		>
 			<Tab.Screen
 				component={LibraryScreen}
 				name={Paths.LIBRARY_SCREEN}
@@ -35,11 +57,20 @@ const BottomTabNavigation = () => {
 					tabBarLabel: Paths.LIBRARY_SCREEN,
 					// tabBarLabel: translate(Paths.LIBRARY_SCREEN),
 					tabBarIcon: HomeIcon,
+					tabBarAccessibilityLabel: "Library tab",
+				}}
+			/>
+			<Tab.Screen
+				component={AccessibilityTab}
+				name="AccessibilityTab"
+				options={{
+					tabBarLabel: "Accessibility",
+					tabBarIcon: AccessibilityIcon,
+					tabBarAccessibilityLabel: "Accessibility settings tab",
 				}}
 			/>
 		</Tab.Navigator>
 	);
 };
-
 
 export default BottomTabNavigation;
