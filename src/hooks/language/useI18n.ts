@@ -45,7 +45,7 @@ const toggleLanguage = () => {
 export const localizedNumber = (value) =>
   new Intl.NumberFormat(i18next.language).format(value);
 
-const translate = memoize(
+export const translate = memoize(
   (key: string, config?) => i18next.t(key, config),
   (key: string, config?) => (config ? key + JSON.stringify(config) : key)
 );

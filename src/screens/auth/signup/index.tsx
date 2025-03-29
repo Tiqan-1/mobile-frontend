@@ -38,8 +38,8 @@ function SignUp({ navigation }: RootScreenProps<Paths.SignUp>) {
   };
 
   const SignUpValidationSchema = yup.object().shape({
-    name: yup.string().required('Name is required'),
-    email: yup.string().email('Invalid email').required('Email is required'),
+    name: yup.string().required(t('auth.email_invalid')),
+    email: yup.string().email(t('auth.email_invalid')).required(t('auth.email_required')),
     password: yup
       .string()
       .matches(/\w*[a-z]\w*/, 'Password must have a small letter')
@@ -139,7 +139,7 @@ function SignUp({ navigation }: RootScreenProps<Paths.SignUp>) {
 
               {apiState.error && (
                 <Text style={{ color: colors.ERROR }}>
-                  {t('common:common_error')}
+                  {t('common_error')}
                 </Text>
               )}
 

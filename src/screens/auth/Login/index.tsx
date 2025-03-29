@@ -53,8 +53,8 @@ function Login({ navigation }: RootScreenProps<Paths.Login>) {
   };
 
   const loginValidationSchema = yup.object().shape({
-    email: yup.string().email('Invalid email').required('Name is required'),
-    password: yup.string().required('Password is required'),
+    email: yup.string().email(t('auth.email_invalid')).required(t('auth.email_required')),
+    password: yup.string().required(t('auth.password_required')),
   });
 
   const handleSubmit = (vlaues) => {
@@ -171,14 +171,14 @@ function Login({ navigation }: RootScreenProps<Paths.Login>) {
 
       <Button
         type="underline"
-        title={t('auth.sign_up')}
+        title={t('common:AccessibilitySettings')}
         onPress={() => {
           navigation.navigate(Paths.AccessibilitySettings);
         }}
       />
       <ActionSheet
         ref={sheet}
-        title={t('change_language')}
+        title={t('common:change_language')}
         options={['English', 'عربي', 'Hide']}
         cancelButtonIndex={2}
         destructiveButtonIndex={-1}

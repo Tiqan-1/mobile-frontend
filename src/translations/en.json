@@ -1,5 +1,5 @@
 {
-  "common": {
+  "screens": {
     "common_appName": {
       "full": "Mobadrat",
       "initials": "RNB"
@@ -21,16 +21,26 @@
     "email": "Email",
     "password": "Password",
     "forgot_password": "Forgot password?",
-      "enter_email": "Enter Email",
-      "enter_password": "Enter Password",
-      "dont_have_account":"Don't have an Account?",
-      "sign_up": "Sign Up",
-      "have_account": "Have an Account?",
-      "sign_in": "Sign In",
-      "sign_out": "Sign out"
+    "enter_email": "Enter Email",
+    "enter_password": "Enter Password",
+    "dont_have_account":"Don't have an Account?",
+    "sign_up": "Sign Up",
+    "have_account": "Have an Account?",
+    "sign_in": "Sign In",
+    "sign_out": "Sign out",
+    "name": "Name",
+    "enter_name": "Enter your name",
+
+    "email_required": "Email is required",
+    "email_invalid": "Invlaid Email",
+    "password_required": "Password is required",
+    "password_invalid": "Password is invalid",
+    "confirm_password": "Confirm Password",
+    "confirm_password_required": "Confirm password is required",
+    "password_not_match": "Password not match",
     }
   },
-  "translation": {
+  "common": {
     "myLibrary": "My Library",
     "downloadedBooks": "Downloaded Books",
     "currentPage": "Current Page",
@@ -44,5 +54,7 @@
     "downloadError": "Error downloading file",
     "openDocument": "Open Document",
     "deleteDocument": "Delete Document",
+    "change_language":"Change Language",
+
   },
 }

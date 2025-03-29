@@ -11,7 +11,7 @@ import en from './en.json';
 import { I18nManager } from 'react-native';
 import { APP_LANGUTAGE } from '@/config';
 
-export const defaultNS = ['common', 'auth'] as const;
+export const defaultNS = ['screens', 'common'] as const;
 
 // Key for storing language preference
 const LANGUAGE_STORAGE_KEY = 'app_language';

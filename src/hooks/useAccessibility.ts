@@ -9,7 +9,7 @@ import {
   setReduceMotionEnabled,
   setReduceTransparencyEnabled,
   setScreenReaderEnabled,
-} from '@/store/slices/accessibilitySlice';
+} from '@/store/accessibilitySlice';
 
 const announceForAccessibility = (message: string) => {
   AccessibilityInfo.announceForAccessibility(message);

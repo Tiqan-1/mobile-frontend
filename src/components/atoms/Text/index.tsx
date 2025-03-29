@@ -1,10 +1,15 @@
-import type { StyleProp, TextProps, TextStyle } from 'react-native';
-import type { Text as RNText } from 'react-native';
+import type {
+  Text as RNText,
+  StyleProp,
+  TextProps,
+  TextStyle,
+} from 'react-native';
 
 import React from 'react';
-import { Text as RNTXT } from 'react-native';
 import { useTranslation } from 'react-i18next';
+import { Text as RNTXT } from 'react-native';
 
+import { useTheme } from '@/theme';
 import typography from '@/theme/typography';
 
 import { isRTL } from '@/utils/constants';
@@ -21,7 +26,18 @@ export type TextTypes =
 interface Txt extends TextProps {
   accessibilityHint?: string;
   accessibilityLabel?: string;
-  accessibilityRole?: 'adjustable' | 'button' | 'header' | 'image' | 'imagebutton' | 'keyboardkey' | 'link' | 'none' | 'search' | 'summary' | 'text';
+  accessibilityRole?:
+    | 'adjustable'
+    | 'button'
+    | 'header'
+    | 'image'
+    | 'imagebutton'
+    | 'keyboardkey'
+    | 'link'
+    | 'none'
+    | 'search'
+    | 'summary'
+    | 'text';
   accessibilityState?: {
     busy?: boolean;
     checked?: 'mixed' | boolean;
@@ -54,7 +70,7 @@ const TextBlock = React.forwardRef<RNText, Txt>(
     ref
   ) => {
     const { i18n } = useTranslation();
-    
+    const { colors } = useTheme();
     const textContent = () => {
       if (Array.isArray(children)) {
         children = children.map((child) => {
@@ -66,7 +82,11 @@ const TextBlock = React.forwardRef<RNText, Txt>(
           if (React.isValidElement(children)) {
             return children;
           }
-          if (children && typeof children === 'object' && i18n.language in children) {
+          if (
+            children &&
+            typeof children === 'object' &&
+            i18n.language in children
+          ) {
             return children[i18n.language as keyof typeof children];
           }
           return JSON.stringify(children)?.toString().trim();
@@ -86,9 +106,10 @@ const TextBlock = React.forwardRef<RNText, Txt>(
     }, {});
 
     // Set default accessibility role based on text type if not provided
-    const defaultAccessibilityRole = !accessibilityRole && (type === 'title' || type === 'smallTitle') 
-      ? 'header' 
-      : accessibilityRole;
+    const defaultAccessibilityRole =
+      !accessibilityRole && (type === 'title' || type === 'smallTitle')
+        ? 'header'
+        : accessibilityRole;
 
     return (
       <RNTXT
@@ -102,7 +123,7 @@ const TextBlock = React.forwardRef<RNText, Txt>(
         accessibilityRole={defaultAccessibilityRole}
         accessibilityState={accessibilityState}
         {...rest}
-        style={[typography[type], override]}>
+        style={[typography[type], { color: colors.BLACK }, override]}>
         {isRTL ? '\u2067' : ''}
         {textContent()}
         {isRTL ? '\u2069' : ''}

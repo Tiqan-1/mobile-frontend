@@ -1,5 +1,5 @@
 {
-  "common": {
+  "screens": {
     "common_appName": {
       "full": "مبادرات",
       "initials": "RNB"
@@ -29,11 +29,18 @@
       "sign_in": "تسجيل الدخول",
       "sign_out": "تسجيل الخروج",
       "name": "الاسم",
-      "enter_name": "أدخل اسمك"
-      
+      "enter_name": "أدخل اسمك",
+
+      "email_required": "البريد الإلكتروني مطلوب",
+      "email_invalid": "البريد الإلكتروني غير صالح",
+      "password_required": "كلمة المرور مطلوبة",
+      "password_invalid": "كلمة المرور غير صحيحة ",
+      "confirm_password": "تأكيد كلمة المرور",
+      "confirm_password_required": "تأكيد كلمة المرور مطلوب",
+      "password_not_match": "كلمة المرور غير متطابقة",
     }
   },
-  "translation": {
+  "common": {
     "myLibrary": "مكتبتي",
     "downloadedBooks": "الكتب المحملة",
     "currentPage": "الصفحة الحالية",
@@ -46,6 +53,8 @@
     "downloadComplete": "اكتمل التحميل",
     "downloadError": "خطأ في تحميل الملف",
     "openDocument": "فتح المستند",
-    "deleteDocument": "حذف المستند"
-  }
+    "deleteDocument": "حذف المستند",
+    "AccessibilitySettings": "tttttt",
+    "change_language":"تغيير اللغة",
+  },
 }

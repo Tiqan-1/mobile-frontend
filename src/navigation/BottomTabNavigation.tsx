@@ -1,7 +1,7 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { useNavigation } from '@react-navigation/native';
 import React from 'react';
-import Icon from 'react-native-vector-icons/MaterialIcons';
+import Icon from 'react-native-vector-icons/dist/FontAwesome';
 
 import { useI18n } from '@/hooks';
 
@@ -9,6 +9,7 @@ import LibraryScreen from '@/screens/LibraryScreen';
 
 import { Paths } from './paths';
 import MainScreen from '@/screens/MainScreen';
+import Menu from '@/screens/Menu';
 
 const Tab = createBottomTabNavigator();
 
@@ -27,7 +28,7 @@ const HomeIcon: React.FC<IconProps> = ({ color, size }) => (
 );
 
 const AccessibilityIcon: React.FC<IconProps> = ({ color, size }) => (
-  <Icon name="accessibility" color={color} size={size} />
+  <Icon name="menu" color={color} size={size} />
 );
 
 // Placeholder component for the Accessibility tab
@@ -52,7 +53,7 @@ const BottomTabNavigation = () => {
         tabBarAccessibilityLabel: 'Bottom navigation tabs',
       }}>
       <Tab.Screen
-        component={LibraryScreen}
+        component={MainScreen}
         name={Paths.Main}
         options={{
           tabBarLabel: Paths.Main,
@@ -62,10 +63,29 @@ const BottomTabNavigation = () => {
         }}
       />
       <Tab.Screen
+        component={LibraryScreen}
+        name={Paths.LIBRARY_SCREEN}
+        options={{
+          tabBarLabel: Paths.LIBRARY_SCREEN,
+          // tabBarLabel: translate(Paths.LIBRARY_SCREEN),
+          tabBarIcon: HomeIcon,
+          tabBarAccessibilityLabel: 'Library tab',
+        }}
+      />
+      {/* <Tab.Screen
         component={AccessibilityTab}
         name="AccessibilityTab"
         options={{
           tabBarLabel: 'Accessibility',
+          tabBarIcon: AccessibilityIcon,
+          tabBarAccessibilityLabel: 'Accessibility settings tab',
+        }}
+      /> */}
+      <Tab.Screen
+        component={Menu}
+        name="Menu"
+        options={{
+          tabBarLabel: 'Menu',
           tabBarIcon: AccessibilityIcon,
           tabBarAccessibilityLabel: 'Accessibility settings tab',
         }}

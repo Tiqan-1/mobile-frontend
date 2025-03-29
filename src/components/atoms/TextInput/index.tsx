@@ -36,7 +36,7 @@ export interface TI extends TextInputProps {
   containerStyle?: ViewStyle;
   debounce?: number;
   enablePlaceHolder?: boolean;
-  errors?: null | string| string[];
+  errors?: string | string[]| undefined| undefined[];
   Icon?: React.ComponentType<IconComponentProps>;
   IconLeft?: React.ComponentType<IconComponentProps>;
   IconLeftStyle?: ViewStyle;
@@ -248,7 +248,7 @@ const TextInput = forwardRef<TextInputReact, TI>((props, ref) => {
               </Pressable>
             )}
           </View>
-          {_renderErrorFlat()}
+          {_renderError()}
         </>
       </View>
       <View style={Height > 20 ? { height: Height - 20 + 4 } : {}} />

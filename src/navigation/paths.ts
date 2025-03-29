@@ -5,6 +5,7 @@ export enum Paths {
   LIBRARY_SCREEN='LIBRARY_SCREEN',
   Login = 'Login',
   Main = 'Main',
+  Menu = 'Menu',
   SignUp = 'SignUp',
   Startup = 'Startup',
   TabNav = 'TabNav',

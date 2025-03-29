@@ -1,3 +1,4 @@
+import { storage } from "@/store";
 
 const colorsLight = {
   gray100: '#DFDFDF',
@@ -87,9 +88,10 @@ export const PALETTEDARK = {
   ...colorsDark,
 } as const;
 
+const savedTheme = storage.getString('theme');
 
 // eslint-disable-next-line no-var
-export var PALETTE = {...PALETTELIGHT};
+export var PALETTE = {...(savedTheme === 'dark' ? PALETTEDARK :PALETTELIGHT)};
 
 const toDark = () => {
   PALETTE = {...PALETTEDARK};

@@ -16,7 +16,8 @@ import type { Storage } from 'redux-persist'
 
 import documentsReducer from './documentsSlice';
 import authReducer from './auth';
-import accessibilityReducer from './slices/accessibilitySlice';
+import accessibilityReducer from './accessibilitySlice';
+import AppReducer from './app';
 
 export const storage = new MMKV()
 
@@ -47,6 +48,7 @@ const rootReducer = combineReducers({
   documents: documentsReducer,
   auth: authReducer,
   accessibility: accessibilityReducer,
+  app: AppReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
