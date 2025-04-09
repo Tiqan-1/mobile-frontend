@@ -1,35 +1,31 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { useNavigation } from '@react-navigation/native';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import Icon from 'react-native-vector-icons/dist/FontAwesome';
 
 import { useI18n } from '@/hooks';
 
 import LibraryScreen from '@/screens/LibraryScreen';
-
-import { Paths } from './paths';
 import MainScreen from '@/screens/MainScreen';
 import Menu from '@/screens/Menu';
+import Programs from '@/screens/Programs';
+
+import { Paths } from './paths';
+import typography from '@/theme/typography';
 
 const Tab = createBottomTabNavigator();
 
-const TAB_SCREEN_OPTIONS = {
-  drawerPosition: 'right',
-  headerLeft: () => false,
-};
+
 
 interface IconProps {
   color: string;
   size: number;
 }
 
-const HomeIcon: React.FC<IconProps> = ({ color, size }) => (
-  <Icon name="home" color={color} size={size} />
-);
+const HomeIcon: React.FC<IconProps> = ({ color, size }) => <Icon name="home" color={color} size={size} />;
 
-const AccessibilityIcon: React.FC<IconProps> = ({ color, size }) => (
-  <Icon name="menu" color={color} size={size} />
-);
+const AccessibilityIcon: React.FC<IconProps> = ({ color, size }) => <Icon name="menu" color={color} size={size} />;
 
 // Placeholder component for the Accessibility tab
 const AccessibilityTab = () => {
@@ -45,6 +41,15 @@ const AccessibilityTab = () => {
 
 const BottomTabNavigation = () => {
   const { translate } = useI18n();
+  const { t, i18n } = useTranslation();
+
+  const TAB_SCREEN_OPTIONS = {
+    drawerPosition: 'right',
+    headerLeft: () => false,
+    headerShown: false,
+    headerTitleStyle: typography['text'],
+    headerBackTitle: translate('back'),
+  };
 
   return (
     <Tab.Navigator
@@ -60,6 +65,17 @@ const BottomTabNavigation = () => {
           // tabBarLabel: translate(Paths.LIBRARY_SCREEN),
           tabBarIcon: HomeIcon,
           tabBarAccessibilityLabel: 'Library tab',
+        }}
+      />
+      <Tab.Screen
+        component={Programs}
+        name={Paths.Programs}
+        options={{
+          tabBarLabel: t('navigation.Programs'),
+          tabBarIcon: HomeIcon,
+          tabBarAccessibilityLabel: 'Library tab',
+          title: t('navigation.Programs'),
+          
         }}
       />
       <Tab.Screen

@@ -38,6 +38,14 @@
       "confirm_password": "تأكيد كلمة المرور",
       "confirm_password_required": "تأكيد كلمة المرور مطلوب",
       "password_not_match": "كلمة المرور غير متطابقة",
+    },
+    "navigation":{
+      "Programs":"البرامج"
+    },
+    "Programs":{
+      "remainig":"متبقي",
+      "past":"مضي",
+      "day":"يوم"
     }
   },
   "common": {

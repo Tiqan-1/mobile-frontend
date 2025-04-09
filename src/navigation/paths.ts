@@ -6,6 +6,8 @@ export enum Paths {
   Login = 'Login',
   Main = 'Main',
   Menu = 'Menu',
+  Program = 'Program',
+  Programs = 'Programs',
   SignUp = 'SignUp',
   Startup = 'Startup',
   TabNav = 'TabNav',

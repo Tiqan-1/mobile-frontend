@@ -1,17 +1,18 @@
 import type { RootScreenProps } from '@/navigation/types';
 
+import { useNavigation } from '@react-navigation/native';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { FlatList, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { FlatList, RefreshControl, StyleSheet, TouchableOpacity, View } from 'react-native';
 
 import { useTheme } from '@/theme';
 import { useAppDispatch, useAppSelector } from '@/hooks/useAppDispatch';
-import type { Paths } from '@/navigation/paths';
+import { Paths } from '@/navigation/paths';
 
 import { SmallTitle, Text } from '@/components/atoms/Text';
 import { SafeScreen } from '@/components/templates';
 
-import { GET, initStateAPIState } from '@/services/API';
+import { GET, initStateAPIState, POST } from '@/services/API';
 import { parseRemaining } from '@/utils/dateTime';
 
 
@@ -35,8 +36,8 @@ const ProgramCard = ({ program }: { program: Subcription;  }) => {
 };
 
 function MainScreen({ navigation }: RootScreenProps<Paths.Main>) {
-  // const { isDark, colors } = useTheme();
-  // const { t, i18n } = useTranslation();
+  const { isDark, colors, toggleTheme } = useTheme();
+  const { t, i18n } = useTranslation();
   const [apiState, setapiState] = useState<APISTATE>(initStateAPIState);
   const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.auth);

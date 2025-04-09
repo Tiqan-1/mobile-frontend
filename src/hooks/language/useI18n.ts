@@ -6,6 +6,7 @@ import { I18nManager } from 'react-native';
 import RNRestart from 'react-native-restart';
 import { storage } from '@/store';
 import { SupportedLanguages } from './schema';
+import { resources } from '@/translations';
 
 // import RNLocalize from 'react-native-localize';
 // import { resources } from '@/translations';
@@ -46,7 +47,7 @@ export const localizedNumber = (value) =>
   new Intl.NumberFormat(i18next.language).format(value);
 
 export const translate = memoize(
-  (key: string, config?) => i18next.t(key, config),
+  (key: typeof resources.ar, config?) => i18next.t(key, config),
   (key: string, config?) => (config ? key + JSON.stringify(config) : key)
 );
 

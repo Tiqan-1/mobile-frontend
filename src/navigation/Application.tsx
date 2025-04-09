@@ -1,10 +1,6 @@
 import type { RootStackParamList } from '@/navigation/types';
 
-import {
-  DarkTheme,
-  DefaultTheme,
-  NavigationContainer,
-} from '@react-navigation/native';
+import { DarkTheme, DefaultTheme, NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { useTranslation } from 'react-i18next';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -19,6 +15,7 @@ import AccessibilitySettings from '@/screens/AccessibilitySettings';
 import SignUp from '@/screens/auth/signup';
 
 import BottomTabNavigation from './BottomTabNavigation';
+import Program from '@/screens/Program';
 
 // import BottomTabNavigation from './BottomTabNavigation';
 
@@ -31,8 +28,7 @@ const NAVIGATION_OPTIONS = {
 
 function AuthNavigation() {
   return (
-    <Stack.Navigator
-      screenOptions={NAVIGATION_OPTIONS}>
+    <Stack.Navigator screenOptions={NAVIGATION_OPTIONS}>
       <Stack.Screen name={Paths.Login} component={Login} />
       <Stack.Screen
         name={Paths.SignUp}
@@ -49,6 +45,8 @@ function AuthNavigation() {
 
 function ApplicationNavigator() {
   const { colors, isDark } = useTheme();
+  const { t, i18n } = useTranslation();
+
   const navigationTheme = {
     dark: isDark,
 
@@ -62,21 +60,15 @@ function ApplicationNavigator() {
   return (
     <SafeAreaProvider>
       <NavigationContainer theme={navigationTheme}>
-        <Stack.Navigator
-          key={isDark ? 'dark' : 'light'}
-          screenOptions={NAVIGATION_OPTIONS}>
-          <Stack.Screen
-            component={Startup}
-            name={Paths.Startup}
-          />
-          <Stack.Screen
-            component={AuthNavigation}
-            name={Paths.Auth}
-          />
-          <Stack.Screen
-            component={Example}
-            name={Paths.Example}
-          />
+        <Stack.Navigator key={isDark ? 'dark' : 'light'} screenOptions={NAVIGATION_OPTIONS}>
+          <Stack.Screen component={Startup} name={Paths.Startup} />
+          <Stack.Screen component={AuthNavigation} name={Paths.Auth} />
+          <Stack.Screen component={Example} name={Paths.Example} />
+          <Stack.Screen component={Program} name={Paths.Program} options={{
+              headerShown: true,
+              title: t('common:myLibrary'),
+              headerBackTitle: t('auth.sign_up'),
+            }} />
           <Stack.Screen
             component={AccessibilitySettings}
             name={Paths.AccessibilitySettings}
@@ -85,10 +77,7 @@ function ApplicationNavigator() {
               title: 'Accessibility',
             }}
           />
-          <Stack.Screen
-            component={BottomTabNavigation}
-            name={Paths.TabNav}
-          />
+          <Stack.Screen component={BottomTabNavigation} name={Paths.TabNav} />
         </Stack.Navigator>
       </NavigationContainer>
     </SafeAreaProvider>

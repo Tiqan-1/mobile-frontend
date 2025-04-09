@@ -52,12 +52,13 @@ function Login({ navigation }: RootScreenProps<Paths.Login>) {
     }
   };
 
+  const initialValues = { email: '', password: '' };
   const loginValidationSchema = yup.object().shape({
     email: yup.string().email(t('auth.email_invalid')).required(t('auth.email_required')),
     password: yup.string().required(t('auth.password_required')),
   });
 
-  const handleSubmit = (vlaues) => {
+  const handleSubmit = (vlaues: typeof initialValues) => {
     POST('/api/authentication/login', vlaues, setapiState).then((res) => {
       const token = res.accessToken;
       api.setHeader('Authorization', `bearer ${token}`);
@@ -73,11 +74,7 @@ function Login({ navigation }: RootScreenProps<Paths.Login>) {
           paddingHorizontal: '20',
           backgroundColor: PALETTE.APP_BACKGROUND,
         }}>
-        <Pressable
-          onPress={() => {
-            sheet.current?.show();
-          }}
-          style={style.row}>
+        <Pressable onPress={() => sheet.current?.show()} style={style.row}>
           <Text>{currentLanguage}</Text>
           <IconDown />
         </Pressable>
@@ -93,19 +90,8 @@ function Login({ navigation }: RootScreenProps<Paths.Login>) {
           <SmallTitle>{t('screen_example.title')}</SmallTitle>
         </View>
 
-        <Formik
-          initialValues={{ email: '', password: '' }}
-          onSubmit={handleSubmit}
-          validationSchema={loginValidationSchema}>
-          {({
-            handleBlur,
-            handleChange,
-            values,
-            errors,
-            touched,
-            handleSubmit,
-            isValid,
-          }) => (
+        <Formik initialValues={initialValues} onSubmit={handleSubmit} validationSchema={loginValidationSchema}>
+          {({ handleBlur, handleChange, values, errors, touched, handleSubmit, isValid }) => (
             <>
               <View style={style.inputGroup}>
                 <Text>{t('auth.email')}</Text>
@@ -132,11 +118,7 @@ function Login({ navigation }: RootScreenProps<Paths.Login>) {
                 />
               </View>
 
-              {apiState.error && (
-                <Text style={{color: colors.ERROR}}>
-                  {t('common_error')}
-                </Text>
-              )}
+              {apiState.error && <Text style={{ color: colors.ERROR }}>{t('common_error')}</Text>}
 
               <Button
                 type="underline"
@@ -168,6 +150,16 @@ function Login({ navigation }: RootScreenProps<Paths.Login>) {
           />
         </View>
       </View>
+
+      {__DEV__ && (
+        <Button
+          type="underline"
+          title='Fast Login Dev'
+          onPress={() => {
+            handleSubmit({ email: 'm@m.com', password: 'Aa@123123' });
+          }}
+        />
+      )}
 
       <Button
         type="underline"

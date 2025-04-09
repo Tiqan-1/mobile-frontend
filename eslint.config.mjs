@@ -111,7 +111,7 @@ export default [
       'unicorn/prefer-string-slice': 2,
       'unicorn/prefer-structured-clone': 2,
       'unicorn/prefer-ternary': 2,
-      'unicorn/prefer-top-level-await': 0, // not valid on RN for the moment
+      // 'unicorn/prefer-top-level-await': 0, // not valid on RN for the moment
       'unicorn/text-encoding-identifier-case': 2,
       'unused-imports/no-unused-imports': 0,
     },

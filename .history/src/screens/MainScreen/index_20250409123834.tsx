@@ -35,8 +35,8 @@ const ProgramCard = ({ program }: { program: Subcription;  }) => {
 };
 
 function MainScreen({ navigation }: RootScreenProps<Paths.Main>) {
-  // const { isDark, colors } = useTheme();
-  // const { t, i18n } = useTranslation();
+  const { isDark, colors } = useTheme();
+  const { t, i18n } = useTranslation();
   const [apiState, setapiState] = useState<APISTATE>(initStateAPIState);
   const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.auth);
