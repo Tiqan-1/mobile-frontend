@@ -10,6 +10,7 @@ export enum Paths {
   Programs = 'Programs',
   SignUp = 'SignUp',
   Startup = 'Startup',
+  Subscrption = 'Subscrption',
   TabNav = 'TabNav',
   
 }

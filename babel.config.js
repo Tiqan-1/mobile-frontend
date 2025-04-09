@@ -11,6 +11,7 @@ module.exports = {
         root: ['./src'],
       },
     ],
+    ["@babel/plugin-proposal-decorators", { "legacy": true }],
     'inline-dotenv',
     'react-native-reanimated/plugin', // needs to be last
   ],

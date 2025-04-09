@@ -20,3 +20,16 @@ export  const parseRemaining = (end) => {
   }
   return `${t('Programs.remainig')} ${days} ${t('Programs.day')}`;
 };
+
+
+export const calculateProgress = (start: Date, end: Date): number => {
+  const now = new Date();
+  const startTime = new Date(start).getTime();
+  const endTime = new Date(end).getTime();
+  const currentTime = now.getTime();
+
+  if (currentTime < startTime) {return 0;}
+  if (currentTime > endTime) {return 100;}
+
+  return ((currentTime - startTime) / (endTime - startTime)) * 100;
+};

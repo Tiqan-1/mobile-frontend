@@ -5,23 +5,23 @@ interface Program {
   id: string;
   levels: unknown[];
   name: string;
-  registrationEnd: string;
-  registrationStart: string;
+  registrationEnd: Date;
+  registrationStart: Date;
   start: string;
 }
 
 interface Level {
-  end: string;
+  end: Date;
   id: string;
   name: string;
-  start: string;
+  start: Date;
   tasks: Task[];
 }
 
 interface Task {
-  date: string;
+  date: Date;
   id: string;
-  lessons: Lesson;
+  lessons: Lesson[];
 }
 interface Lesson {
   id: string;
@@ -30,7 +30,7 @@ interface Lesson {
   url: string;
 }
 
-interface Subcription {
+interface Subscription {
   id: string;
   level: Level;
   program: Program;

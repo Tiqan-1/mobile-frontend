@@ -1,34 +1,48 @@
 import type { RootScreenProps } from '@/navigation/types';
 
+import { useNavigation } from '@react-navigation/native';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FlatList, StyleSheet, TouchableOpacity, View } from 'react-native';
 
 import { useTheme } from '@/theme';
 import { useAppDispatch, useAppSelector } from '@/hooks/useAppDispatch';
-import type { Paths } from '@/navigation/paths';
+import { useProgress } from '@/hooks/useProgress';
+import { Paths } from '@/navigation/paths';
 
 import { SmallTitle, Text } from '@/components/atoms/Text';
 import { SafeScreen } from '@/components/templates';
 
 import { GET, initStateAPIState } from '@/services/API';
-import { parseRemaining } from '@/utils/dateTime';
+import { calculateProgress, parseRemaining } from '@/utils/dateTime';
 
-
-const ProgramCard = ({ program }: { program: Subcription;  }) => {
+const ProgramCard = ({ program }: { program: Subscription }) => {
   const { colors } = useTheme();
-
+  const progress = calculateProgress(program.level.start, program.level.end);
+  const navigation = useNavigation();
+  // const { saveProgress, getProgress } = useProgress(program.id);
   return (
     <TouchableOpacity
       style={[styles.card, { backgroundColor: colors.SURFACE }]}
       onPress={() => {
+        navigation.navigate(Paths.Subscrption, program);
       }}>
-      <Text style={[styles.programName, { color: colors.BLACK }]}>{program.program.name} - {program.level.name}</Text>
-      <View style={styles.datesContainer}>
-        <Text style={[styles.registrationText, { color: colors.BLACK }]}>
-          انتهاء التسجيل: {parseRemaining(program.level.start)}
-        </Text>
-        <Text style={[styles.dateText, { color: colors.BLACK }]}>بدء البرنامج {parseRemaining(program.level.start)}</Text>
+      <Text style={[styles.programName, { color: colors.BLACK }]}>
+        {program.program.name} - {program.level.name}
+      </Text>
+
+      <View style={styles.progressContainer}>
+        <View style={[styles.progressBar, { backgroundColor: colors.GREY }]}>
+          <View
+            style={[
+              styles.progressFill,
+              {
+                backgroundColor: colors.PRIMARY_COLOR,
+                width: `${progress}%`,
+              },
+            ]}
+          />
+        </View>
       </View>
     </TouchableOpacity>
   );
@@ -54,7 +68,7 @@ function MainScreen({ navigation }: RootScreenProps<Paths.Main>) {
       <View style={styles.container}>
         <SmallTitle>اهلا {user.name}</SmallTitle>
         <FlatList
-          data={apiState.results as Subcription[]}
+          data={apiState.results as Subscription[]}
           renderItem={({ item }) => <ProgramCard program={item} />}
           keyExtractor={(item) => item.id}
           contentContainerStyle={styles.listContainer}
@@ -105,5 +119,32 @@ const styles = StyleSheet.create({
   },
   registrationText: {
     fontSize: 12,
+  },
+  progressContainer: {
+    marginVertical: 12,
+  },
+  progressLabels: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 4,
+  },
+  progressLabel: {
+    fontSize: 12,
+  },
+  progressBar: {
+    height: 6,
+    borderRadius: 2,
+    overflow: 'visible',
+  },
+  progressFill: {
+    height: '100%',
+    borderRadius: 2,
+  },
+  progressDot: {
+    position: 'absolute',
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    top: -4,
   },
 });

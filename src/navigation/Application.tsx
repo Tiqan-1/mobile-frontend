@@ -16,6 +16,7 @@ import SignUp from '@/screens/auth/signup';
 
 import BottomTabNavigation from './BottomTabNavigation';
 import Program from '@/screens/Program';
+import Subscrption from '@/screens/Subscription';
 
 // import BottomTabNavigation from './BottomTabNavigation';
 
@@ -65,6 +66,11 @@ function ApplicationNavigator() {
           <Stack.Screen component={AuthNavigation} name={Paths.Auth} />
           <Stack.Screen component={Example} name={Paths.Example} />
           <Stack.Screen component={Program} name={Paths.Program} options={{
+              headerShown: true,
+              title: t('common:myLibrary'),
+              headerBackTitle: t('auth.sign_up'),
+            }} />
+          <Stack.Screen component={Subscrption} name={Paths.Subscrption} options={{
               headerShown: true,
               title: t('common:myLibrary'),
               headerBackTitle: t('auth.sign_up'),
