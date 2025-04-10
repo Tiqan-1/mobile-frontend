@@ -1,15 +1,14 @@
-import Config from 'react-native-config';
+import type { ApiResponse } from 'apisauce';
+import type { Dispatch, SetStateAction } from 'react';
 
-import type { ApiResponse} from 'apisauce';
 import { create } from 'apisauce';
 
-import type { Dispatch, SetStateAction } from 'react';
 import { IsIOS } from '@/utils/constants';
 
 // import * as DataBase from './AsyncStorage';
 // import {isTestAPI} from './constants';
-export const baseURLProd = "https://officially-together-joey.ngrok-free.app"; 
-// export const baseURLProd = Config.API_URL; 
+export const baseURLProd = 'https://officially-together-joey.ngrok-free.app';
+// export const baseURLProd = Config.API_URL;
 
 export type PARAMS = {
   Append?: boolean;
@@ -27,22 +26,23 @@ export type PARAMS = {
 export type APISTATE = {
   error: string;
   isRequesting?: boolean;
-  length: any;
+  length?: number;
   loading: boolean;
   message?: string;
   pagination?: object;
-  results: object;
-  token?: any;
+  results: unknown[];
+  token?: string;
 };
 export const initStateAPIState: APISTATE = { results: [], error: '', loading: false, isRequesting: false };
 
 export type PROTO = {
   body: object;
   param: PARAMS;
-  setState?: Dispatch<SetStateAction<{ error: string; loading: boolean; params: string; results: never[]; url: string }>> | undefined;
+  setState?:
+    | Dispatch<SetStateAction<{ error: string; loading: boolean; params: string; results: never[]; url: string }>>
+    | undefined;
   url: string;
 };
-
 
 export const headers = {
   Accept: 'application/json',
@@ -61,10 +61,14 @@ const api = create({
   // }),
 });
 
+import { logger } from './logger';
 
 const handeResponse = (
-  response: ApiResponse<any>,
-): [string, { [key: string]: any; current_page?: number; data?: { [key: string]: any; message?: string } }] => {
+  response: ApiResponse<unknown> | undefined
+): [
+  string,
+  { [key: string]: unknown; current_page?: number; data?: { [key: string]: string | unknown; message?: string } }
+] => {
   let error = '';
   let results = {};
   if (!response) {
@@ -73,11 +77,11 @@ const handeResponse = (
   if (response.problem === 'NETWORK_ERROR') {
     error = 'No Internet Connection, Please Check';
     results = {};
-    console.log('NETWORK_ERROR');
+    logger.error('NETWORK_ERROR');
   } else if (response.problem === 'TIMEOUT_ERROR') {
     error = 'No Internet Connection, Please Check';
     results = {};
-    console.log('TIMEOUT_ERROR');
+    logger.error('TIMEOUT_ERROR');
   } else if (response?.status && response?.status >= 200 && response?.status < 400) {
     results = response.data;
   } else if (response?.status && response.status >= 400 && response.status < 500) {
@@ -87,7 +91,7 @@ const handeResponse = (
       error = 'Page Not Found';
     } else {
       if (typeof response.data === 'string' && !Array.isArray(response.data)) {
-        console.log('string');
+        // console.log('string');
         error = response.data;
       } else if ('exception' in response.data) {
         error = 'Some Thing went Wrong';
@@ -104,7 +108,7 @@ const handeResponse = (
     if (response.status === 402 || response.status === 401 || response.status === 403) {
       error = response.data?.message || response.data;
     }
-    console.log('Server Replied with errors', error);
+    logger.warn('Server Replied with errors', error);
   } else if (response.status && response.status >= 500) {
     error = 'Server Error';
   }
@@ -115,7 +119,7 @@ export const ConvertToForm = (item: { [x: string]: any } | null | undefined): {}
   const data = new FormData();
   try {
     if (item) {
-      Object.keys(item).forEach(keyName => {
+      Object.keys(item).forEach((keyName) => {
         if (keyName === 'file' || keyName === 'image') {
           data.append(
             'file',
@@ -125,7 +129,7 @@ export const ConvertToForm = (item: { [x: string]: any } | null | undefined): {}
               size: item?.[keyName]?.fileSize,
               uri: IsIOS ? item?.[keyName]?.uri.replace('file://', '') : item?.[keyName]?.uri,
             },
-            item?.[keyName]?.fileName,
+            item?.[keyName]?.fileName
           );
         } else if (item[keyName] !== undefined) {
           data.append(keyName, item[keyName]);
@@ -190,9 +194,10 @@ export const REQUESTING = async (
   url = '',
   body: Record<string, string> | undefined = undefined,
   setState: React.Dispatch<React.SetStateAction<any | APISTATE>> | undefined = undefined,
-  params: PARAMS,
+  params: PARAMS
 ): Promise<any | APIResponseError | APISTATE> => {
-  const { showLoading, usePagination, Append, forceData, isForm, header, headerP, debounce, cancelToken, retry } = params;
+  const { showLoading, usePagination, Append, forceData, isForm, header, headerP, debounce, cancelToken, retry } =
+    params;
   if (debounce && requestMap.get(url) && (retry ?? 1) < 2) {
     return; // Exit if a request for this URL is already in progress
   }
@@ -228,17 +233,17 @@ export const REQUESTING = async (
           default:
             response = await api.get(url, bodyModified, { ...CONFIG });
         }
-        console.log('URL=======', url, api.getBaseURL(), response);
+        logger.info('URL=======', url, api.getBaseURL(), response); // Replace with:
         if (response && response.problem === 'CANCEL_ERROR') {
-          console.log('URL======= API CANCELED ==> ', url);
+          logger.info('URL======= API CANCELED ==> ', url); 
           return;
         }
         const [error, results] = handeResponse(response);
         if (response.problem === 'TIMEOUT_ERROR' && (retry || 1) < 3) {
-          console.log('Retry ######', retry);
+          logger.info('Retrying request',  retry );
           return await REQUESTING(method, url, body, setState, { ...params, retry: (retry || 1) + 1 })
-            .then(res => resolve(res))
-            .catch(error_ => reject(error_));
+            .then((res) => resolve(res))
+            .catch((error_) => reject(error_));
         } else if (error) {
           setState?.((state: APISTATE) => ({
             ...state,
@@ -276,7 +281,7 @@ export const REQUESTING = async (
           resolve(results);
         }
       } catch (error) {
-        console.log('APIerr ', error);
+        logger.error('API error:', error);
         setState?.((state: APISTATE) => ({
           ...state,
           error: 'Some Thing went Wrong',

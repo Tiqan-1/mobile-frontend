@@ -27,7 +27,7 @@ const isIOS = Platform.OS === 'ios';
 
 // Define a type for the icon components
 type IconComponentProps = {
-  style?: any; // Using any here to avoid complex style type issues
+  style?: unknown; // Using any here to avoid complex style type issues
 };
 
 // Define types for the component props
@@ -36,7 +36,7 @@ export interface TI extends TextInputProps {
   containerStyle?: ViewStyle;
   debounce?: number;
   enablePlaceHolder?: boolean;
-  errors?: string | string[]| undefined| undefined[];
+  errors?: string | string[] ;
   Icon?: React.ComponentType<IconComponentProps>;
   IconLeft?: React.ComponentType<IconComponentProps>;
   IconLeftStyle?: ViewStyle;

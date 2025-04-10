@@ -34,7 +34,7 @@ function onChangeLocale(nextlocale: string) {
 function Login({ navigation }: RootScreenProps<Paths.Login>) {
   const { isDark, colors, toggleTheme } = useTheme();
   const { t, i18n } = useTranslation();
-  const sheet = useRef(null);
+  const sheet = useRef({});
 
   const [apiState, setapiState] = useState<APISTATE>(initStateAPIState);
   const { translate, changeLanguage } = useI18n();
@@ -42,7 +42,7 @@ function Login({ navigation }: RootScreenProps<Paths.Login>) {
   const dispatch = useAppDispatch();
   const currentLanguage = i18n.language;
 
-  const changeLang = (index) => {
+  const changeLang = (index: number) => {
     if (index === 0) {
       changeLanguage(LANG_EN);
       onChangeLocale(LANG_EN);
@@ -52,7 +52,7 @@ function Login({ navigation }: RootScreenProps<Paths.Login>) {
     }
   };
 
-  const initialValues = { email: '', password: '' };
+  const initialValues = { email: __DEV__ ? 'm@m.com' : '', password: __DEV__ ? 'Aa@123123' : '' };
   const loginValidationSchema = yup.object().shape({
     email: yup.string().email(t('auth.email_invalid')).required(t('auth.email_required')),
     password: yup.string().required(t('auth.password_required')),
@@ -71,7 +71,7 @@ function Login({ navigation }: RootScreenProps<Paths.Login>) {
       <View
         style={{
           flex: 1,
-          paddingHorizontal: '20',
+          paddingHorizontal: 20,
           backgroundColor: PALETTE.APP_BACKGROUND,
         }}>
         <Pressable onPress={() => sheet.current?.show()} style={style.row}>
@@ -101,7 +101,7 @@ function Login({ navigation }: RootScreenProps<Paths.Login>) {
                   placeholder={t('auth.enter_email')}
                   value={values.email}
                   keyboardType="email-address"
-                  errors={touched.email ? [errors.email] : undefined}
+                  errors={touched.email ? [errors.email] : ''}
                 />
               </View>
               <View style={style.inputGroup}>
@@ -154,7 +154,7 @@ function Login({ navigation }: RootScreenProps<Paths.Login>) {
       {__DEV__ && (
         <Button
           type="underline"
-          title='Fast Login Dev'
+          title="Fast Login Dev"
           onPress={() => {
             handleSubmit({ email: 'm@m.com', password: 'Aa@123123' });
           }}
