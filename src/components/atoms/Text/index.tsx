@@ -13,6 +13,7 @@ import { useTheme } from '@/theme';
 import typography from '@/theme/typography';
 
 import { isRTL } from '@/utils/constants';
+import { isLight } from '@/utils/helpers';
 
 export type TextTypes =
   | 'extraSmallText'
@@ -27,17 +28,17 @@ interface Txt extends TextProps {
   accessibilityHint?: string;
   accessibilityLabel?: string;
   accessibilityRole?:
-    | 'adjustable'
-    | 'button'
-    | 'header'
-    | 'image'
-    | 'imagebutton'
-    | 'keyboardkey'
-    | 'link'
-    | 'none'
-    | 'search'
-    | 'summary'
-    | 'text';
+  | 'adjustable'
+  | 'button'
+  | 'header'
+  | 'image'
+  | 'imagebutton'
+  | 'keyboardkey'
+  | 'link'
+  | 'none'
+  | 'search'
+  | 'summary'
+  | 'text';
   accessibilityState?: {
     busy?: boolean;
     checked?: 'mixed' | boolean;
@@ -46,6 +47,7 @@ interface Txt extends TextProps {
     selected?: boolean;
   };
   accessible?: boolean;
+  bgColor?: string;
   dotted?: boolean;
   style?: StyleProp<TextStyle>;
   type?: TextTypes;
@@ -65,6 +67,7 @@ const TextBlock = React.forwardRef<RNText, Txt>(
       accessibilityHint,
       accessibilityRole,
       accessibilityState,
+      bgColor,
       ...rest
     },
     ref
@@ -111,6 +114,13 @@ const TextBlock = React.forwardRef<RNText, Txt>(
         ? 'header'
         : accessibilityRole;
 
+    const TextBestColor =
+      bgColor && isLight(bgColor)
+        ? colors.BLACK
+        : bgColor && !isLight(bgColor)
+          ? colors.WHITE
+          : colors.BLACK;
+
     return (
       <RNTXT
         ref={ref}
@@ -123,7 +133,7 @@ const TextBlock = React.forwardRef<RNText, Txt>(
         accessibilityRole={defaultAccessibilityRole}
         accessibilityState={accessibilityState}
         {...rest}
-        style={[typography[type], { color: colors.BLACK }, override]}>
+        style={[typography[type], { color: TextBestColor }, override]}>
         {isRTL ? '\u2067' : ''}
         {textContent()}
         {isRTL ? '\u2069' : ''}

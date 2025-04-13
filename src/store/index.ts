@@ -18,6 +18,7 @@ import documentsReducer from './documentsSlice';
 import authReducer from './auth';
 import accessibilityReducer from './accessibilitySlice';
 import AppReducer from './app';
+import subscriptionsReducer from './subscriptionSlice';
 
 export const storage = new MMKV()
 
@@ -49,6 +50,7 @@ const rootReducer = combineReducers({
   auth: authReducer,
   accessibility: accessibilityReducer,
   app: AppReducer,
+  subscriptions: subscriptionsReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

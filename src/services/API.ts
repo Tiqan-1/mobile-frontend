@@ -23,14 +23,14 @@ export type PARAMS = {
   usePagination?: boolean;
 };
 
-export type APISTATE = {
+export type APISTATE<a> = {
   error: string;
   isRequesting?: boolean;
   length?: number;
   loading: boolean;
   message?: string;
   pagination?: object;
-  results: unknown[];
+  results: a[];
   token?: string;
 };
 export const initStateAPIState: APISTATE = { results: [], error: '', loading: false, isRequesting: false };

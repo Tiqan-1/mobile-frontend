@@ -73,7 +73,7 @@ function Programs({ navigation }: RootScreenProps<Paths.Programs>) {
           keyExtractor={(item) => item.id}
           contentContainerStyle={styles.listContainer}
           showsVerticalScrollIndicator={false}
-          refreshing={apiState.loading && !apiState.results}
+          refreshing={apiState.loading && !apiState.results.length}
           onRefresh={onRefresh}
         />
       </View>

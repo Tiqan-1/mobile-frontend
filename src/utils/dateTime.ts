@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 
 export const remaingDays = (end) => {
   if (!end) {
-    return '∞';
+    return Infinity;
   }
   const a = moment(end);
   const b = moment(new Date());

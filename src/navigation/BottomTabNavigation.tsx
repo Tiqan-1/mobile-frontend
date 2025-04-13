@@ -1,9 +1,11 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { useNavigation } from '@react-navigation/native';
+
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import Icon from 'react-native-vector-icons/dist/FontAwesome';
 
+import typography from '@/theme/typography';
 import { useI18n } from '@/hooks';
 
 import LibraryScreen from '@/screens/LibraryScreen';
@@ -12,20 +14,9 @@ import Menu from '@/screens/Menu';
 import Programs from '@/screens/Programs';
 
 import { Paths } from './paths';
-import typography from '@/theme/typography';
-
+import Book from 'assets/svg-app/book.svg';
+import Bookm from 'assets/svg-app/bookm.svg';
 const Tab = createBottomTabNavigator();
-
-
-
-interface IconProps {
-  color: string;
-  size: number;
-}
-
-const HomeIcon: React.FC<IconProps> = ({ color, size }) => <Icon name="home" color={color} size={size} />;
-
-const AccessibilityIcon: React.FC<IconProps> = ({ color, size }) => <Icon name="menu" color={color} size={size} />;
 
 // Placeholder component for the Accessibility tab
 const AccessibilityTab = () => {
@@ -49,6 +40,9 @@ const BottomTabNavigation = () => {
     headerShown: false,
     headerTitleStyle: typography['text'],
     headerBackTitle: translate('back'),
+    labelStyle: {
+      ...typography['text'],
+    },
   };
 
   return (
@@ -61,10 +55,9 @@ const BottomTabNavigation = () => {
         component={MainScreen}
         name={Paths.Main}
         options={{
-          tabBarLabel: Paths.Main,
-          // tabBarLabel: translate(Paths.LIBRARY_SCREEN),
-          tabBarIcon: HomeIcon,
-          tabBarAccessibilityLabel: 'Library tab',
+          tabBarLabel: t('navigation.Main'),
+          tabBarIcon: ({ focused, color, size }) => <Bookm fill={color} width={size} />,
+          tabBarAccessibilityLabel: 'Main tab',
         }}
       />
       <Tab.Screen
@@ -72,10 +65,9 @@ const BottomTabNavigation = () => {
         name={Paths.Programs}
         options={{
           tabBarLabel: t('navigation.Programs'),
-          tabBarIcon: HomeIcon,
+          tabBarIcon: ({ focused, color, size }) => <Book fill={color} height={size} width={size} />,
           tabBarAccessibilityLabel: 'Library tab',
           title: t('navigation.Programs'),
-          
         }}
       />
       <Tab.Screen
@@ -84,7 +76,7 @@ const BottomTabNavigation = () => {
         options={{
           tabBarLabel: Paths.LIBRARY_SCREEN,
           // tabBarLabel: translate(Paths.LIBRARY_SCREEN),
-          tabBarIcon: HomeIcon,
+          tabBarIcon:  ({ color, size }) => <Icon name="home" color={color} size={size} />,
           tabBarAccessibilityLabel: 'Library tab',
         }}
       />
@@ -102,7 +94,7 @@ const BottomTabNavigation = () => {
         name="Menu"
         options={{
           tabBarLabel: 'Menu',
-          tabBarIcon: AccessibilityIcon,
+          tabBarIcon: ({ color, size }) => <Icon name="coffee" color={color} size={size} />,
           tabBarAccessibilityLabel: 'Accessibility settings tab',
         }}
       />

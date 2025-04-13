@@ -33,7 +33,7 @@ const ProgramCard = ({ task }: { task: Lesson }) => {
   );
 };
 
-function Subscrption({ navigation, route }: RootScreenProps<Paths.Subscrption>) {
+function Subscription({ navigation, route }: RootScreenProps<Paths.Subscription>) {
   // const { isDark, colors, toggleTheme } = useTheme();
   // const { t, i18n } = useTranslation();
   const [apiState, setapiState] = useState<APISTATE>(initStateAPIState);
@@ -81,7 +81,7 @@ function Subscrption({ navigation, route }: RootScreenProps<Paths.Subscrption>) 
   );
 }
 
-export default Subscrption;
+export default Subscription;
 
 const styles = StyleSheet.create({
   container: {

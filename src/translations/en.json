@@ -14,30 +14,38 @@
       "title": "Oops! Something went wrong.",
       "description": "We are sorry for the inconvenience. Please try again later.",
       "cta": "Reload the screen"
-  },
-  "auth": {
-    "change_language": "Change Language",
-    "login": "Login",
-    "email": "Email",
-    "password": "Password",
-    "forgot_password": "Forgot password?",
-    "enter_email": "Enter Email",
-    "enter_password": "Enter Password",
-    "dont_have_account":"Don't have an Account?",
-    "sign_up": "Sign Up",
-    "have_account": "Have an Account?",
-    "sign_in": "Sign In",
-    "sign_out": "Sign out",
-    "name": "Name",
-    "enter_name": "Enter your name",
+    },
+    "auth": {
+      "change_language": "Change Language",
+      "login": "Login",
+      "email": "Email",
+      "password": "Password",
+      "forgot_password": "Forgot password?",
+      "enter_email": "Enter Email",
+      "enter_password": "Enter Password",
+      "dont_have_account": "Don't have an Account?",
+      "sign_up": "Sign Up",
+      "have_account": "Have an Account?",
+      "sign_in": "Sign In",
+      "sign_out": "Sign out",
+      "name": "Name",
+      "enter_name": "Enter your name",
 
-    "email_required": "Email is required",
-    "email_invalid": "Invlaid Email",
-    "password_required": "Password is required",
-    "password_invalid": "Password is invalid",
-    "confirm_password": "Confirm Password",
-    "confirm_password_required": "Confirm password is required",
-    "password_not_match": "Password not match",
+      "email_required": "Email is required",
+      "email_invalid": "Invlaid Email",
+      "password_required": "Password is required",
+      "password_invalid": "Password is invalid",
+      "confirm_password": "Confirm Password",
+      "confirm_password_required": "Confirm password is required",
+      "password_not_match": "Password not match"
+    },
+    "navigation": {
+      "Programs": "Programs"
+    },
+    "Programs": {
+      "remainig": "remainig",
+      "past": "past",
+      "day": "day"
     }
   },
   "common": {
@@ -54,7 +62,7 @@
     "downloadError": "Error downloading file",
     "openDocument": "Open Document",
     "deleteDocument": "Delete Document",
-    "change_language":"Change Language",
-
-  },
+    "AccessibilitySettings": "tttttt",
+    "change_language": "Change Language"
+  }
 }

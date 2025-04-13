@@ -1,14 +1,15 @@
-import { PDFDocument } from './pdf';
+import type { RootStackParamList } from "@/navigation/types";
 
-export type RootStackParamList = {
-  Library: undefined;
-  PDFViewer: {
-    document: PDFDocument;
-  };
-};
+// export type RootStackParamList = {
+//   Library: undefined;
+//   PDFViewer: {
+//     document: PDFDocument;
+//   };
+//   ...Params
+// };
 
 declare global {
   namespace ReactNavigation {
     interface RootParamList extends RootStackParamList {}
   }
-} 
+}

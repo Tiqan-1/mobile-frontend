@@ -13,18 +13,16 @@ import { Paths } from '@/navigation/paths';
 import { Example, Login, Startup } from '@/screens';
 import AccessibilitySettings from '@/screens/AccessibilitySettings';
 import SignUp from '@/screens/auth/signup';
+import Program from '@/screens/Program';
+import Subscription from '@/screens/Subscription';
 
 import BottomTabNavigation from './BottomTabNavigation';
-import Program from '@/screens/Program';
-import Subscrption from '@/screens/Subscription';
-
-// import BottomTabNavigation from './BottomTabNavigation';
 
 const Stack = createStackNavigator<RootStackParamList>();
 const NAVIGATION_OPTIONS = {
   headerShown: false,
   headerTitleStyle: typography['text'],
-  headerBackTitle: translate('back'),
+  headerBackTitle: translate('common:back'),
 };
 
 function AuthNavigation() {
@@ -46,7 +44,7 @@ function AuthNavigation() {
 
 function ApplicationNavigator() {
   const { colors, isDark } = useTheme();
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
 
   const navigationTheme = {
     dark: isDark,
@@ -65,16 +63,14 @@ function ApplicationNavigator() {
           <Stack.Screen component={Startup} name={Paths.Startup} />
           <Stack.Screen component={AuthNavigation} name={Paths.Auth} />
           <Stack.Screen component={Example} name={Paths.Example} />
-          <Stack.Screen component={Program} name={Paths.Program} options={{
-              headerShown: true,
-              title: t('common:myLibrary'),
-              headerBackTitle: t('auth.sign_up'),
-            }} />
-          <Stack.Screen component={Subscrption} name={Paths.Subscrption} options={{
-              headerShown: true,
-              title: t('common:myLibrary'),
-              headerBackTitle: t('auth.sign_up'),
-            }} />
+          <Stack.Screen
+            component={Program}
+            name={Paths.Program}
+          />
+          <Stack.Screen
+            component={Subscription}
+            name={Paths.Subscription}
+          />
           <Stack.Screen
             component={AccessibilitySettings}
             name={Paths.AccessibilitySettings}

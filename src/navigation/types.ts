@@ -12,7 +12,7 @@ export type RootStackParamList = {
   [Paths.SignUp]: undefined;
 
   [Paths.Startup]: undefined;
-  [Paths.Subscrption]: Subscription;
+  [Paths.Subscription]: Subscription;
   [Paths.TabNav]: undefined;
 };
 

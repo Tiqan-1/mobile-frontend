@@ -15,6 +15,7 @@ import { SafeScreen } from '@/components/templates';
 
 import { GET, initStateAPIState } from '@/services/API';
 import { calculateProgress, parseRemaining } from '@/utils/dateTime';
+import { setSubscriptions } from '@/store/subscriptionSlice';
 
 const ProgramCard = ({ program }: { program: Subscription }) => {
   const { colors } = useTheme();
@@ -25,7 +26,7 @@ const ProgramCard = ({ program }: { program: Subscription }) => {
     <TouchableOpacity
       style={[styles.card, { backgroundColor: colors.SURFACE }]}
       onPress={() => {
-        navigation.navigate(Paths.Subscrption, program);
+        navigation.navigate(Paths.Subscription, program);
       }}>
       <Text style={[styles.programName, { color: colors.BLACK }]}>
         {program.program.name} - {program.level.name}
@@ -51,13 +52,19 @@ const ProgramCard = ({ program }: { program: Subscription }) => {
 function MainScreen({ navigation }: RootScreenProps<Paths.Main>) {
   // const { isDark, colors } = useTheme();
   // const { t, i18n } = useTranslation();
-  const [apiState, setapiState] = useState<APISTATE>(initStateAPIState);
+  const [apiState, setapiState] = useState<APISTATE<Subscription>>(initStateAPIState);
   const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.auth);
+  const { items: subscriptionsState,  } = useAppSelector((state) => state.subscriptions);
 
   useEffect(() => {
     GET('/api/students/subscriptions', {}, setapiState);
   }, []);
+  useEffect(() => {
+    if (apiState.results.length) {
+      dispatch(setSubscriptions(apiState.results));
+    }
+  }, [apiState.results, dispatch]);
 
   const onRefresh = () => {
     GET('/api/students/subscriptions', {}, setapiState);
@@ -73,7 +80,7 @@ function MainScreen({ navigation }: RootScreenProps<Paths.Main>) {
           keyExtractor={(item) => item.id}
           contentContainerStyle={styles.listContainer}
           showsVerticalScrollIndicator={false}
-          refreshing={apiState.loading && !apiState.results}
+          refreshing={apiState.loading && !apiState.results.length}
           onRefresh={onRefresh}
         />
       </View>

@@ -23,7 +23,7 @@
       "forgot_password": "هل نسيت كلمة المرور؟",
       "enter_email": "أدخل بريدك الإلكتروني",
       "enter_password": "أدخل كلمة المرور",
-      "dont_have_account":"ليس لديك حساب؟",
+      "dont_have_account": "ليس لديك حساب؟",
       "sign_up": "سجل حساب",
       "have_account": "هل لديك حساب؟",
       "sign_in": "تسجيل الدخول",
@@ -37,18 +37,28 @@
       "password_invalid": "كلمة المرور غير صحيحة ",
       "confirm_password": "تأكيد كلمة المرور",
       "confirm_password_required": "تأكيد كلمة المرور مطلوب",
-      "password_not_match": "كلمة المرور غير متطابقة",
+      "password_not_match": "كلمة المرور غير متطابقة"
     },
-    "navigation":{
-      "Programs":"البرامج"
+    "navigation": {
+      "Programs": "البرامج",
+      "Main": "اشتركاتي"
     },
-    "Programs":{
-      "remainig":"متبقي",
-      "past":"مضي",
-      "day":"يوم"
+    "Programs": {
+      "remainig": "متبقي",
+      "past": "مضي",
+      "day": "يوم"
     }
   },
   "common": {
+    "back": "الرجوع",
+    "cancel": "إلغاء",
+    "close": "إغلاق",
+    "ok": "موافق",
+    "yes": "نعم",
+    "no": "لا",
+    "confirm": "تأكيد",
+    "search": "بحث",
+    "clear": "مسح",
     "myLibrary": "مكتبتي",
     "downloadedBooks": "الكتب المحملة",
     "currentPage": "الصفحة الحالية",
@@ -63,6 +73,6 @@
     "openDocument": "فتح المستند",
     "deleteDocument": "حذف المستند",
     "AccessibilitySettings": "tttttt",
-    "change_language":"تغيير اللغة",
-  },
+    "change_language": "تغيير اللغة"
+  }
 }
