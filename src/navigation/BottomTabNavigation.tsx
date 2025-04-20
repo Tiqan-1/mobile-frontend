@@ -70,7 +70,7 @@ const BottomTabNavigation = () => {
           title: t('navigation.Programs'),
         }}
       />
-      <Tab.Screen
+      {/* <Tab.Screen
         component={LibraryScreen}
         name={Paths.LIBRARY_SCREEN}
         options={{
@@ -79,7 +79,7 @@ const BottomTabNavigation = () => {
           tabBarIcon:  ({ color, size }) => <Icon name="home" color={color} size={size} />,
           tabBarAccessibilityLabel: 'Library tab',
         }}
-      />
+      /> */}
       {/* <Tab.Screen
         component={AccessibilityTab}
         name="AccessibilityTab"

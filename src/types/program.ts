@@ -8,6 +8,7 @@ interface Program {
   registrationEnd: Date;
   registrationStart: Date;
   start: string;
+  thumbnail: string;
 }
 
 interface Level {
@@ -26,7 +27,7 @@ interface Task {
 interface Lesson {
   id: string;
   title: string;
-  type: string;
+  type: 'pdf' | 'video' | 'other';
   url: string;
 }
 

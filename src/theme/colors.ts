@@ -55,7 +55,7 @@ export const PALETTELIGHT = {
   BG_WITH_LOGO: '#F2F2F2',
   APP_BACKGROUND: colorsLight.gray50,
   SURFACE: colorsLight.gray100,
-
+  DISABLED: '#D1D5DB',
   ...colorsLight,
 } as const;
 
@@ -85,6 +85,7 @@ export const PALETTEDARK = {
   BG_WITH_LOGO: '#252732',
   APP_BACKGROUND: colorsDark.gray200,
   SURFACE: colorsLight.gray800,
+  DISABLED: '#D1D5DB',
   ...colorsDark,
 } as const;
 

@@ -1,21 +1,17 @@
+import { SmallTitle, Text } from '@/components/atoms/Text';
+import { SafeScreen } from '@/components/templates';
+import { useAppDispatch, useAppSelector } from '@/hooks/useAppDispatch';
+import { useProgress } from '@/hooks/useProgress';
+import { Paths } from '@/navigation/paths';
 import type { RootScreenProps } from '@/navigation/types';
-
+import { GET, initStateAPIState } from '@/services/API';
+import { setSubscriptions } from '@/store/subscriptionSlice';
+import { useTheme } from '@/theme';
+import { calculateProgress, parseRemaining } from '@/utils/dateTime';
 import { useNavigation } from '@react-navigation/native';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FlatList, StyleSheet, TouchableOpacity, View } from 'react-native';
-
-import { useTheme } from '@/theme';
-import { useAppDispatch, useAppSelector } from '@/hooks/useAppDispatch';
-import { useProgress } from '@/hooks/useProgress';
-import { Paths } from '@/navigation/paths';
-
-import { SmallTitle, Text } from '@/components/atoms/Text';
-import { SafeScreen } from '@/components/templates';
-
-import { GET, initStateAPIState } from '@/services/API';
-import { calculateProgress, parseRemaining } from '@/utils/dateTime';
-import { setSubscriptions } from '@/store/subscriptionSlice';
 
 const ProgramCard = ({ program }: { program: Subscription }) => {
   const { colors } = useTheme();
@@ -34,15 +30,7 @@ const ProgramCard = ({ program }: { program: Subscription }) => {
 
       <View style={styles.progressContainer}>
         <View style={[styles.progressBar, { backgroundColor: colors.GREY }]}>
-          <View
-            style={[
-              styles.progressFill,
-              {
-                backgroundColor: colors.PRIMARY_COLOR,
-                width: `${progress}%`,
-              },
-            ]}
-          />
+          <View style={[styles.progressFill, { backgroundColor: colors.PRIMARY_COLOR, width: `${progress}%` }]} />
         </View>
       </View>
     </TouchableOpacity>
@@ -54,15 +42,15 @@ function MainScreen({ navigation }: RootScreenProps<Paths.Main>) {
   // const { t, i18n } = useTranslation();
   const [apiState, setapiState] = useState<APISTATE<Subscription>>(initStateAPIState);
   const dispatch = useAppDispatch();
-  const user = useAppSelector((state) => state.auth);
-  const { items: subscriptionsState,  } = useAppSelector((state) => state.subscriptions);
+  const user = useAppSelector(state => state.auth);
+  const { items: subscriptionsState } = useAppSelector(state => state.subscriptions);
 
   useEffect(() => {
     GET('/api/students/subscriptions', {}, setapiState);
   }, []);
   useEffect(() => {
     if (apiState.results.length) {
-      dispatch(setSubscriptions(apiState.results));
+      dispatch(setSubscriptions(apiState.results as Subscription[]));
     }
   }, [apiState.results, dispatch]);
 
@@ -75,9 +63,9 @@ function MainScreen({ navigation }: RootScreenProps<Paths.Main>) {
       <View style={styles.container}>
         <SmallTitle>اهلا {user.name}</SmallTitle>
         <FlatList
-          data={apiState.results as Subscription[]}
+          data={subscriptionsState || (apiState.results as Subscription[])}
           renderItem={({ item }) => <ProgramCard program={item} />}
-          keyExtractor={(item) => item.id}
+          keyExtractor={item => item.id}
           contentContainerStyle={styles.listContainer}
           showsVerticalScrollIndicator={false}
           refreshing={apiState.loading && !apiState.results.length}
@@ -127,16 +115,9 @@ const styles = StyleSheet.create({
   registrationText: {
     fontSize: 12,
   },
+
   progressContainer: {
     marginVertical: 12,
-  },
-  progressLabels: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 4,
-  },
-  progressLabel: {
-    fontSize: 12,
   },
   progressBar: {
     height: 6,
@@ -146,12 +127,5 @@ const styles = StyleSheet.create({
   progressFill: {
     height: '100%',
     borderRadius: 2,
-  },
-  progressDot: {
-    position: 'absolute',
-    width: 12,
-    height: 12,
-    borderRadius: 6,
-    top: -4,
   },
 });

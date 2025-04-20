@@ -67,7 +67,7 @@ export default [
       // 'perfectionist/sort-objects': 'error',
       'perfectionist/sort-sets': 'error',
       'perfectionist/sort-switch-case': 'error',
-      'perfectionist/sort-union-types': 'error',
+      'perfectionist/sort-union-types':'warn',
       'perfectionist/sort-variable-declarations': 'error',
       'prefer-arrow-callback': [2, { allowNamedFunctions: true }],
       'prefer-const': 2,

@@ -11,6 +11,7 @@ export enum Paths {
   SignUp = 'SignUp',
   Startup = 'Startup',
   Subscription = 'Subscription',
+  PDF = 'PDF',
   TabNav = 'TabNav',
   
 }

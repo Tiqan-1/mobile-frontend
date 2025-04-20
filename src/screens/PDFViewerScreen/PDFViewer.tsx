@@ -2,16 +2,14 @@ import React, {useEffect, useState} from 'react';
 import {View, StyleSheet, Dimensions, ActivityIndicator} from 'react-native';
 import Pdf from 'react-native-pdf';
 import {useRoute} from '@react-navigation/native';
-import {PDFDocument} from '@/types/pdf';
 import {setCurrentPage} from '@/store/documentsSlice';
 import {useAppDispatch} from '@/hooks/useAppDispatch';
 
 const PDFViewerScreen = () => {
   const route = useRoute();
-  const {document} = route.params as {document: PDFDocument};
+  const {document} = route.params as {document: Lesson};
   const [fileUrl, setFileUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
-  console.log('document', document, fileUrl);
   const dispatch = useAppDispatch();
 
   useEffect(() => {

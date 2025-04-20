@@ -1,22 +1,19 @@
-import type { RootStackParamList } from '@/navigation/types';
-
-import { DarkTheme, DefaultTheme, NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
-import { useTranslation } from 'react-i18next';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
-
-import { useTheme } from '@/theme';
-import typography from '@/theme/typography';
 import { translate } from '@/hooks/language/useI18n';
 import { Paths } from '@/navigation/paths';
-
+import type { RootStackParamList } from '@/navigation/types';
 import { Example, Login, Startup } from '@/screens';
 import AccessibilitySettings from '@/screens/AccessibilitySettings';
 import SignUp from '@/screens/auth/signup';
 import Program from '@/screens/Program';
 import Subscription from '@/screens/Subscription';
-
+import { useTheme } from '@/theme';
+import typography from '@/theme/typography';
+import { DarkTheme, DefaultTheme, NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
+import { useTranslation } from 'react-i18next';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 import BottomTabNavigation from './BottomTabNavigation';
+import PDFViewerScreen from '@/screens/PDFViewerScreen/PDFViewer';
 
 const Stack = createStackNavigator<RootStackParamList>();
 const NAVIGATION_OPTIONS = {
@@ -63,14 +60,8 @@ function ApplicationNavigator() {
           <Stack.Screen component={Startup} name={Paths.Startup} />
           <Stack.Screen component={AuthNavigation} name={Paths.Auth} />
           <Stack.Screen component={Example} name={Paths.Example} />
-          <Stack.Screen
-            component={Program}
-            name={Paths.Program}
-          />
-          <Stack.Screen
-            component={Subscription}
-            name={Paths.Subscription}
-          />
+          <Stack.Screen component={Program} name={Paths.Program} />
+          <Stack.Screen component={Subscription} name={Paths.Subscription} />
           <Stack.Screen
             component={AccessibilitySettings}
             name={Paths.AccessibilitySettings}
@@ -78,6 +69,13 @@ function ApplicationNavigator() {
               headerShown: true,
               title: 'Accessibility',
             }}
+          />
+          <Stack.Screen
+            name={Paths.PDF}
+            component={PDFViewerScreen}
+            options={({ route }) => ({
+              title: route.params?.document?.title || '',
+            })}
           />
           <Stack.Screen component={BottomTabNavigation} name={Paths.TabNav} />
         </Stack.Navigator>
