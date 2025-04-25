@@ -14,6 +14,19 @@ import { persistor, storage, store } from '@/store';
 import '@/translations';
 
 import React from 'react';
+import * as Sentry from '@sentry/react-native';
+
+Sentry.init({
+  dsn: 'https://03c561f706f33bd93950556b709e7366@o4509213076160512.ingest.de.sentry.io/4509213096083536',
+
+  // Configure Session Replay
+  replaysSessionSampleRate: 0.1,
+  replaysOnErrorSampleRate: 1,
+  integrations: [Sentry.mobileReplayIntegration()],
+
+  // uncomment the line below to enable Spotlight (https://spotlightjs.com)
+  // spotlight: __DEV__,
+});
 
 const LoadingComponent = () => (
   <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
@@ -38,4 +51,4 @@ function App() {
   );
 }
 
-export default App;
+export default Sentry.wrap(App);

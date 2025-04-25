@@ -25,6 +25,7 @@
     "@react-navigation/native-stack": "^6.9.22",
     "@react-navigation/stack": "^6.4.1",
     "@reduxjs/toolkit": "^2.6.0",
+    "@sentry/react-native": "^6.11.0",
     "@tanstack/react-query": "^5.59.8",
     "apisauce": "^3.1.0",
     "babel-plugin-transform-remove-console": "^6.9.4",
