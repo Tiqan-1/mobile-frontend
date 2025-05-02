@@ -4,6 +4,7 @@ import type { RootStackParamList } from '@/navigation/types';
 import { Example, Login, Startup } from '@/screens';
 import AccessibilitySettings from '@/screens/AccessibilitySettings';
 import SignUp from '@/screens/auth/signup';
+import PDFViewerScreen from '@/screens/PDFViewerScreen/PDFViewer';
 import Program from '@/screens/Program';
 import Subscription from '@/screens/Subscription';
 import { useTheme } from '@/theme';
@@ -13,7 +14,6 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { useTranslation } from 'react-i18next';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import BottomTabNavigation from './BottomTabNavigation';
-import PDFViewerScreen from '@/screens/PDFViewerScreen/PDFViewer';
 
 const Stack = createStackNavigator<RootStackParamList>();
 const NAVIGATION_OPTIONS = {
@@ -74,7 +74,7 @@ function ApplicationNavigator() {
             name={Paths.PDF}
             component={PDFViewerScreen}
             options={({ route }) => ({
-              title: route.params?.document?.title || '',
+              title: route.params?.title || '',
             })}
           />
           <Stack.Screen component={BottomTabNavigation} name={Paths.TabNav} />

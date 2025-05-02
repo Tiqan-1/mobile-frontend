@@ -1,14 +1,14 @@
 /* eslint-disable @typescript-eslint/ban-types */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { IsIOS } from "@/utils/constants";
-import type { ApiResponse } from "apisauce";
-import { create } from "apisauce";
-import type { Dispatch, SetStateAction } from "react";
-import { logger } from "./logger";
+import { IsIOS } from '@/utils/constants';
+import type { ApiResponse } from 'apisauce';
+import { create } from 'apisauce';
+import type { Dispatch, SetStateAction } from 'react';
+import { logger } from './logger';
 
 // import * as DataBase from './AsyncStorage';
 // import {isTestAPI} from './constants';
-export const baseURLProd = "https://officially-together-joey.ngrok-free.app";
+export const baseURLProd = 'https://officially-together-joey.ngrok-free.app';
 // export const baseURLProd = Config.API_URL;
 
 export type PARAMS = {
@@ -37,7 +37,7 @@ export type APISTATE<a = unknown> = {
 
 export const initStateAPIState: APISTATE<never> = {
   results: [],
-  error: "",
+  error: '',
   loading: false,
   isRequesting: false,
 };
@@ -45,25 +45,15 @@ export const initStateAPIState: APISTATE<never> = {
 export type PROTO = {
   body: object;
   param: PARAMS;
-  setState?:
-    | Dispatch<
-        SetStateAction<{
-          error: string;
-          loading: boolean;
-          params: string;
-          results: never[];
-          url: string;
-        }>
-      >
-    | undefined;
+  setState?: Dispatch<SetStateAction<APISTATE>> | undefined;
   url: string;
 };
 
 export const headers = {
-  Accept: "application/json",
-  "Content-Type": "application/json",
+  Accept: 'application/json',
+  'Content-Type': 'application/json',
   // 'Cache-Control': 'no-cache',
-  Connection: "keep-alive",
+  Connection: 'keep-alive',
 };
 
 // define the api
@@ -83,100 +73,78 @@ export type APIResponseError = {
 };
 
 // Update the handeResponse function signature
-const handeResponse = (
-  response: ApiResponse<any> | undefined
-): [string, any] => {
-  let error = "";
+const handeResponse = (response: ApiResponse<any> | undefined): [string, any] => {
+  let error = '';
   let results = {};
   if (!response) {
     return [error, results];
   }
-  if (response.problem === "NETWORK_ERROR") {
-    error = "No Internet Connection, Please Check";
+  if (response.problem === 'NETWORK_ERROR') {
+    error = 'No Internet Connection, Please Check';
     results = {};
-    logger.error("NETWORK_ERROR");
-  } else if (response.problem === "TIMEOUT_ERROR") {
-    error = "No Internet Connection, Please Check";
+    logger.error('NETWORK_ERROR');
+  } else if (response.problem === 'TIMEOUT_ERROR') {
+    error = 'No Internet Connection, Please Check';
     results = {};
-    logger.error("TIMEOUT_ERROR");
-  } else if (
-    response?.status &&
-    response?.status >= 200 &&
-    response?.status < 400
-  ) {
+    logger.error('TIMEOUT_ERROR');
+  } else if (response?.status && response?.status >= 200 && response?.status < 400) {
     results = response.data;
-  } else if (
-    response?.status &&
-    response.status >= 400 &&
-    response.status < 500
-  ) {
-    if (
-      response.status === 402 ||
-      response.status === 401 ||
-      response.status === 403
-    ) {
+  } else if (response?.status && response.status >= 400 && response.status < 500) {
+    if (response.status === 402 || response.status === 401 || response.status === 403) {
       error = response.data?.message;
     } else if (response.status === 404) {
-      error = "Page Not Found";
+      error = 'Page Not Found';
     } else {
-      if (typeof response.data === "string" && !Array.isArray(response.data)) {
+      if (typeof response.data === 'string' && !Array.isArray(response.data)) {
         // console.log('string');
         error = response.data;
-      } else if ("exception" in response.data) {
-        error = "Some Thing went Wrong";
-      } else if ("errors" in response.data && "message" in response.data) {
+      } else if ('exception' in response.data) {
+        error = 'Some Thing went Wrong';
+      } else if ('errors' in response.data && 'message' in response.data) {
         error = response.data;
-      } else if ("errors" in response.data) {
+      } else if ('errors' in response.data) {
         error = response.data.errors;
-      } else if ("message" in response.data) {
+      } else if ('message' in response.data) {
         error = response.data.message;
       } else {
-        error = "Some Thing went Wrong";
+        error = 'Some Thing went Wrong';
       }
     }
-    if (
-      response.status === 402 ||
-      response.status === 401 ||
-      response.status === 403
-    ) {
+    if (response.status === 402 || response.status === 401 || response.status === 403) {
       error = response.data?.message || response.data;
     }
-    logger.warn("Server Replied with errors", error);
+    logger.warn('Server Replied with errors', error);
   } else if (response.status && response.status >= 500) {
-    error = "Server Error";
+    error = 'Server Error';
   }
   return [error, results];
 };
 
-export const ConvertToForm = (
-  item: { [x: string]: any } | null | undefined
-): {} | undefined => {
+export const ConvertToForm = (item: { [x: string]: any } | null | undefined): {} | undefined => {
   const data = new FormData();
   try {
     if (item) {
-      Object.keys(item).forEach((keyName) => {
-        if (keyName === "file" || keyName === "image") {
+      Object.keys(item).forEach(keyName => {
+        if (keyName === 'file' || keyName === 'image') {
           data.append(
-            "file",
+            'file',
             {
               name: item?.[keyName]?.fileName,
               type: item?.[keyName]?.type,
               size: item?.[keyName]?.fileSize,
-              uri: IsIOS
-                ? item?.[keyName]?.uri.replace("file://", "")
-                : item?.[keyName]?.uri,
-            }
+              uri: IsIOS ? item?.[keyName]?.uri.replace('file://', '') : item?.[keyName]?.uri,
+            },
             // item?.[keyName]?.fileName
           );
         } else if (item[keyName] !== undefined) {
           data.append(keyName, item[keyName]);
         }
       });
-      logger.info("formData", data);
+      logger.info('formData', data);
     }
     return data;
   } catch (error) {
-    logger.error("Form", error);
+    logger.error('Form', error);
     if (item) {
       return item;
     }
@@ -205,66 +173,45 @@ const DefaultParams = {
  */
 // export async function POST<T=unknown>(url = '', body: T , setState = () => {}, param: PARAMS) {
 export const POST = async <T = unknown>(
-  url = "",
+  url = '',
   body = {},
-  setState: Dispatch<SetStateAction<APISTATE<T>>> | undefined = undefined,
-  param?: PARAMS
+  setState: Dispatch<SetStateAction<PaginationState<T>>> | undefined = undefined,
+  param?: PARAMS,
 ) => {
   const params = { ...DefaultParams, ...param };
-  return REQUESTING<T>("POST", url, body, setState, params);
+  return REQUESTING<T>('POST', url, body, setState, params);
 };
 
-export const DELETE = async <T = unknown>(
-  url = "",
-  body = {},
-  setState = undefined,
-  param?: PARAMS
-) => {
+export const DELETE = async <T = unknown>(url = '', body = {}, setState = undefined, param?: PARAMS) => {
   const params = { ...DefaultParams, ...param };
-  return REQUESTING<T>("DELETE", url, body, setState, params);
+  return REQUESTING<T>('DELETE', url, body, setState, params);
 };
 
 export const GET = async <T = unknown>(
-  url = "",
+  url = '',
   body = {},
-  setState: Dispatch<SetStateAction<APISTATE<T>>> | undefined = undefined,
-  param?: PARAMS
+  setState: Dispatch<SetStateAction<PaginationState<T>>> | undefined = undefined,
+  param?: PARAMS,
 ) => {
   const params = { ...DefaultParams, ...param };
-  return REQUESTING<T>("GET", url, body, setState, params);
+  return REQUESTING<T>('GET', url, body, setState, params);
 };
 
-export const PUT = async <T = unknown>(
-  url = "",
-  body = {},
-  setState = undefined,
-  param?: PARAMS
-) => {
+export const PUT = async <T = unknown>(url = '', body = {}, setState = undefined, param?: PARAMS) => {
   const params: PARAMS = { ...DefaultParams, ...param };
-  return REQUESTING<T>("PUT", url, body, setState, params);
+  return REQUESTING<T>('PUT', url, body, setState, params);
 };
 
 const requestMap = new Map<string, boolean>();
 
 export const REQUESTING = async <T = unknown>(
-  method = "POST",
-  url = "",
+  method = 'POST',
+  url = '',
   body: Record<string, string> | undefined = undefined,
-  setState: Dispatch<SetStateAction<APISTATE<T>>> | undefined = undefined,
-  params: PARAMS
-): Promise<any | APIResponseError | APISTATE> => {
-  const {
-    showLoading,
-    usePagination,
-    Append,
-    forceData,
-    isForm,
-    header,
-    headerP,
-    debounce,
-    cancelToken,
-    retry,
-  } = params;
+  setState: Dispatch<SetStateAction<PaginationState<T>>> | undefined = undefined,
+  params: PARAMS,
+): Promise<any | APIResponseError | PaginationState<T>> => {
+  const { showLoading, usePagination, Append, forceData, isForm, header, headerP, debounce, cancelToken, retry } = params;
   if (debounce && requestMap.get(url) && (retry ?? 1) < 2) {
     return; // Exit if a request for this URL is already in progress
   }
@@ -281,17 +228,17 @@ export const REQUESTING = async <T = unknown>(
     (async () => {
       try {
         if (showLoading) {
-          setState?.((state: APISTATE<T>) => ({
+          setState?.((state: PaginationState<T>) => ({
             ...state,
-            error: "",
+            error: '',
             loading: true,
             isRequesting: true,
             ...forceData,
           }));
         } else {
-          setState?.((state: APISTATE<T>) => ({
+          setState?.((state: PaginationState<T>) => ({
             ...state,
-            error: "",
+            error: '',
             loading: false,
             isRequesting: true,
             ...forceData,
@@ -300,58 +247,54 @@ export const REQUESTING = async <T = unknown>(
         let response;
         const bodyModified = isForm ? ConvertToForm(body) : body;
         switch (method) {
-          case "DELETE":
+          case 'DELETE':
             response = await api.delete(url, bodyModified, { ...CONFIG });
             break;
-          case "POST":
+          case 'POST':
             response = await api.post(url, bodyModified, { ...CONFIG });
             break;
-          case "PUT":
+          case 'PUT':
             response = await api.put(url, bodyModified, { ...CONFIG });
             break;
           default:
             response = await api.get(url, bodyModified, { ...CONFIG });
         }
-        logger.info("URL=======", url, api.getBaseURL(), response); // Replace with:
-        if (response && response.problem === "CANCEL_ERROR") {
-          logger.info("URL======= API CANCELED ==> ", url);
+        logger.info('URL=======', url, api.getBaseURL(), response); // Replace with:
+        if (response && response.problem === 'CANCEL_ERROR') {
+          logger.info('URL======= API CANCELED ==> ', url);
           return;
         }
         const [error, results] = handeResponse(response);
-        if (response.problem === "TIMEOUT_ERROR" && (retry || 1) < 3) {
-          logger.info("Retrying request", retry);
+        if (response.problem === 'TIMEOUT_ERROR' && (retry || 1) < 3) {
+          logger.info('Retrying request', retry);
           return await REQUESTING(method, url, body, setState, {
             ...params,
             retry: (retry || 1) + 1,
           })
-            .then((res) => resolve(res))
-            .catch((error_) => reject(error_));
+            .then(res => resolve(res))
+            .catch(error_ => reject(error_));
         } else if (error) {
-          setState?.((state: APISTATE<T>) => ({
+          setState?.((state: PaginationState<T>) => ({
             ...state,
             error,
             loading: false,
             isRequesting: false,
           }));
-        } else if (
-          usePagination &&
-          !!results?.current_page &&
-          Array.isArray(results?.data)
-        ) {
-          const { data, ...rest } = results || {};
-          if (Append && data) {
-            setState?.((state: APISTATE) => ({
+        } else if (usePagination && !!results?.page && Array.isArray(results?.items)) {
+          const { items, ...rest } = results || {};
+          if (Append && items) {
+            setState?.((state: PaginationState<T>) => ({
               ...state,
-              results: [...state.results, ...(data || [])],
+              results: [...state.results, ...(items || [])],
               error,
               loading: false,
               isRequesting: false,
               pagination: rest,
             }));
           } else {
-            setState?.((state: APISTATE) => ({
+            setState?.((state: PaginationState<T>) => ({
               ...state,
-              results: data ? data : undefined,
+              results: items ? items : undefined,
               error,
               loading: false,
               isRequesting: false,
@@ -359,7 +302,7 @@ export const REQUESTING = async <T = unknown>(
             }));
           }
         } else {
-          setState?.((state: APISTATE) => ({
+          setState?.((state: PaginationState<T>) => ({
             ...state,
             results,
             error,
@@ -373,10 +316,10 @@ export const REQUESTING = async <T = unknown>(
           resolve(results);
         }
       } catch (error) {
-        logger.error("API error:", error);
-        setState?.((state: APISTATE<T>) => ({
+        logger.error('API error:', error);
+        setState?.((state: PaginationState<T>) => ({
           ...state,
-          error: "Some Thing went Wrong",
+          error: 'Some Thing went Wrong',
           loading: false,
           isRequesting: false,
         }));

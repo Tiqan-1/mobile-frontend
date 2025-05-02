@@ -2402,6 +2402,13 @@
   dependencies:
     ts-toolbelt "^6.15.1"
 
+"@types/react-native-actionsheet@^2.4.7":
+  version "2.4.7"
+  resolved "https://registry.yarnpkg.com/@types/react-native-actionsheet/-/react-native-actionsheet-2.4.7.tgz#0be00a31b792d5b245b0eaed29c22558aead76e7"
+  integrity sha512-OxseY74NqeSbUDLhXGuWmxrViZRQ0arLFGMcrkvm1RaWhOGGBMhVsa6LDjHTtk4fDkVGsnwakXyLo/iwJw/b3A==
+  dependencies:
+    "@types/react" "*"
+
 "@types/react-test-renderer@^19.1.0":
   version "19.1.0"
   resolved "https://registry.yarnpkg.com/@types/react-test-renderer/-/react-test-renderer-19.1.0.tgz#1d0af8f2e1b5931e245b8b5b234d1502b854dc10"

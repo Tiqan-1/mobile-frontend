@@ -1,5 +1,6 @@
 import { Text } from '@/components/atoms/Text';
 import { useAppDispatch } from '@/hooks/useAppDispatch';
+import { Paths } from '@/navigation/paths';
 import { useNavigation } from '@react-navigation/native';
 import { ActivityIndicator, StyleSheet, TouchableOpacity, View } from 'react-native';
 import YoutubePlayer from 'react-native-youtube-iframe';
@@ -7,7 +8,7 @@ import YoutubePlayer from 'react-native-youtube-iframe';
 const renderItem = ({ item }: { item: Lesson }) => {
   const navigation = useNavigation();
   const dispatch = useAppDispatch();
-
+ 
 
   if (item.type === 'pdf') {
     const pdfDoc = { ...item, ...store.progressData[item.id] };
@@ -15,10 +16,10 @@ const renderItem = ({ item }: { item: Lesson }) => {
       if (!pdfDoc.localPath) {
         // await dispatch(downloadDocument(pdfDoc));
       }
-      navigation.navigate('PDFViewer', { document: pdfDoc });
+      navigation.navigate(Paths.PDF, {  ...pdfDoc });
     };
 
-    const isDownloading = currentDownloading === pdfDoc.id;
+    const isDownloading = false;// currentDownloading === pdfDoc.id;
 
     return (
       <TouchableOpacity style={styles.documentItem} onPress={handlePress}>
@@ -30,7 +31,7 @@ const renderItem = ({ item }: { item: Lesson }) => {
       </TouchableOpacity>
     );
   }
-  if (type === 'youtube') {
+  if (item.type === 'video') {
     // YouTube video rendering
     const youtubeId = item.url.split('v=')[1]?.split('&')[0];
     const isPlaylist =
@@ -50,7 +51,7 @@ const renderItem = ({ item }: { item: Lesson }) => {
           webViewProps={{
             androidLayerType: 'hardware',
           }}
-          onChangeState={state => console.log({ state })}
+          // onChangeState={state => console.log({ state })}
         />
 
         {/* <YouTube

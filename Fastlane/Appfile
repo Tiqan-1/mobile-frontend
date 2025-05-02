@@ -1,0 +1,19 @@
+#################### iOS ####################
+
+app_identifier("com.dl.sdccards") # The bundle identifier of your app
+apple_id("msn4eg@gmail.com") # Your Apple email address
+
+itc_team_id("120250180") # App Store Connect Team ID
+team_id("3DW44UVK42") # Developer Portal Team ID
+
+# For more information about the Appfile, see:
+#     https://docs.fastlane.tools/advanced/#appfile
+
+
+######################## ANDROID ########################
+
+package_name ''
+
+# Credentials
+# https://docs.fastlane.tools/getting-started/android/setup/#collect-your-google-credentials
+json_key_file ''

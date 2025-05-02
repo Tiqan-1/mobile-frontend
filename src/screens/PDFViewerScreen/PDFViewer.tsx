@@ -1,14 +1,22 @@
-import React, {useEffect, useState} from 'react';
-import {View, StyleSheet, Dimensions, ActivityIndicator} from 'react-native';
+import { useAppDispatch } from '@/hooks/useAppDispatch';
+import { setCurrentPage } from '@/store/documentsSlice';
+import { useRoute } from '@react-navigation/native';
+import React, { useEffect, useState } from 'react';
+import { ActivityIndicator, Dimensions, StyleSheet, View } from 'react-native';
 import Pdf from 'react-native-pdf';
-import {useRoute} from '@react-navigation/native';
-import {setCurrentPage} from '@/store/documentsSlice';
-import {useAppDispatch} from '@/hooks/useAppDispatch';
+
+interface DOCUMENT extends Lesson {
+  bookmarks: number[];
+  currentPage: number;
+  lastReadDate: string;
+  localPath: string;
+  totalPages: number;
+}
 
 const PDFViewerScreen = () => {
   const route = useRoute();
-  const {document} = route.params as {document: Lesson};
-  const [fileUrl, setFileUrl] = useState<string | null>(null);
+  const document = route.params as DOCUMENT;
+  const [fileUrl, setFileUrl] = useState<null | string>(null);
   const [loading, setLoading] = useState(true);
   const dispatch = useAppDispatch();
 
@@ -16,7 +24,7 @@ const PDFViewerScreen = () => {
     const loadFile = async () => {
       try {
         if (document.url.includes('drive.google.com')) {
-          const fileId = document.url.match(/[-\w]{25,}/);
+          const fileId = document.url.match(/[\w-]{25,}/);
           if (fileId) {
             setFileUrl(`https://drive.google.com/uc?export=download&id=${fileId[0]}`);
           } else {
@@ -28,8 +36,9 @@ const PDFViewerScreen = () => {
           // const url = await getFileUrl(document.id);
           setFileUrl(document.url);
         }
-      } catch (error) {
-        console.error('Error loading PDF:', error);
+      } catch {
+        // console.error('Error loading PDF:', error);
+        setFileUrl(document.url);
       } finally {
         setLoading(false);
       }
@@ -61,7 +70,7 @@ const PDFViewerScreen = () => {
   return (
     <View style={styles.container}>
       <Pdf
-        source={{uri: fileUrl}}
+        source={{ uri: fileUrl }}
         style={styles.pdf}
         page={document.currentPage || 1}
         onPageChanged={onPageChanged}

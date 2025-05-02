@@ -1,9 +1,12 @@
+/* eslint-disable perfectionist/sort-object-types */
 import { Text } from '@/components/atoms/Text';
 import { SafeScreen } from '@/components/templates';
 import { useAppDispatch, useAppSelector } from '@/hooks/useAppDispatch';
 import { Paths } from '@/navigation/paths';
 import type { RootScreenProps } from '@/navigation/types';
 import { GET, initStateAPIState, POST } from '@/services/API';
+import { logger } from '@/services/logger';
+import { Pagination } from '@/services/Pagination';
 import { useTheme } from '@/theme';
 import { calculateProgress, parseRemaining } from '@/utils/dateTime';
 import { useNavigation } from '@react-navigation/native';
@@ -56,19 +59,44 @@ const ProgramCard = ({ program }: { program: Program }) => {
   );
 };
 
+type ProgramQuery = {
+  id?: string;
+  name?: string;
+  description?: string;
+  start?: string;
+  end?: string;
+  registrationStart?: string; //string($date-time);
+  registrationEnd?: string; //string($date-time);
+  page?: number;
+  pageSize?: number;
+  state?: string;
+  skip?: number;
+  limit?: number;
+};
+
 function Programs({ navigation }: RootScreenProps<Paths.Programs>) {
   // const { isDark, colors, toggleTheme } = useTheme();
   // const { t, i18n } = useTranslation();
-  const [apiState, setapiState] = useState<APISTATE<Program>>(initStateAPIState);
+  const [apiState, setapiState] = useState<PaginationState<Program>>({ ...initStateAPIState, url: '/api/students/v2/programs' });
+  const ItemClass = new Pagination<Program>(apiState, setapiState);
+
   // const dispatch = useAppDispatch();
   // const user = useAppSelector((state) => state.auth);
 
   useEffect(() => {
-    GET('/api/students/open-programs', {}, setapiState);
+    ItemClass.init();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const onRefresh = () => {
-    GET('/api/students/open-programs', {}, setapiState);
+    ItemClass.reload(apiState);
+  };
+
+  const onEndReached = () => {
+    if (apiState.loading) {
+      return;
+    }
+    ItemClass.next(apiState);
   };
 
   return (
@@ -80,16 +108,17 @@ function Programs({ navigation }: RootScreenProps<Paths.Programs>) {
           keyExtractor={item => item.id}
           contentContainerStyle={styles.listContainer}
           showsVerticalScrollIndicator={false}
-          refreshing={apiState.loading && !apiState.results.length}
+          refreshing={apiState.loading && !apiState.results?.length}
           onRefresh={onRefresh}
+          onEndReached={onEndReached}
           ListEmptyComponent={() =>
             apiState.loading ? (
+              <View />
+            ) : (
               <View style={styles.emptyContainer}>
                 {apiState.error ? <Text>يوجد مشكله فى الوصول الى المعلومات</Text> : <Text>لا يوجد برامج</Text>}
                 <Text> حاول مرة اخرى لاحقا</Text>
               </View>
-            ) : (
-              <View />
             )
           }
         />

@@ -36,8 +36,8 @@ export interface TI extends TextInputProps {
   containerStyle?: ViewStyle;
   debounce?: number;
   enablePlaceHolder?: boolean;
-  errors?: string | string[] ;
-  Icon?: React.ComponentType<IconComponentProps>;
+  errors?: string | string[] | undefined;
+  Icon?: React.ComponentType;
   IconLeft?: React.ComponentType<IconComponentProps>;
   IconLeftStyle?: ViewStyle;
   IconStyle?: ViewStyle;

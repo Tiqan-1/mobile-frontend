@@ -6,12 +6,12 @@ export enum Paths {
   Login = 'Login',
   Main = 'Main',
   Menu = 'Menu',
+  PDF = 'PDF',
   Program = 'Program',
   Programs = 'Programs',
   SignUp = 'SignUp',
   Startup = 'Startup',
   Subscription = 'Subscription',
-  PDF = 'PDF',
   TabNav = 'TabNav',
   
 }

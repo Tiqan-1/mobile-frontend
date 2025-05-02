@@ -1,19 +1,28 @@
 import Clock from '@/assets/svg-app/clock.svg';
+import Level from '@/assets/svg-app/level.svg';
 import Student from '@/assets/svg-app/student.svg';
 import Video from '@/assets/svg-app/video.svg';
-import { SmallTitle, Text, Title } from '@/components/atoms/Text';
+import { SmallText, SmallTitle, Text, Title } from '@/components/atoms/Text';
 import { SafeScreen } from '@/components/templates';
-import type { Paths } from '@/navigation/paths';
+import { Paths } from '@/navigation/paths';
 import type { RootScreenProps } from '@/navigation/types';
 import { initStateAPIState } from '@/services/API';
+import { logger } from '@/services/logger';
 import { useTheme } from '@/theme';
 import { PALETTE } from '@/theme/colors';
 import { parseRemaining, remaingDays } from '@/utils/dateTime';
 import moment from 'moment';
 import React, { useEffect, useState } from 'react';
-import { Linking, Modal, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { FlatList, Linking, Modal, StyleSheet, TouchableOpacity, View } from 'react-native';
 import Timeline from 'react-native-beautiful-timeline';
 import YoutubePlayer from 'react-native-youtube-iframe';
+
+const getYoutubeId = (url: string) => {
+  if (url.includes('youtu.be')) {
+    return url.split('youtu.be/')[1]?.split('?')[0];
+  }
+  return url.split('v=')[1]?.split('&')[0];
+};
 
 function Subscription({ navigation, route }: RootScreenProps<Paths.Subscription>) {
   const { colors } = useTheme();
@@ -21,47 +30,29 @@ function Subscription({ navigation, route }: RootScreenProps<Paths.Subscription>
 
   const subscription = route.params;
   useEffect(() => {
-    // GET('/api/students/open-programs', {}, setapiState);
     navigation.setOptions({ title: subscription.program.name });
-  }, []);
+  }, [navigation, subscription]);
 
-  const onRefresh = () => {
-    // GET('/api/students/open-programs', {}, setapiState);
-  };
-  const lesson = 1; //subscription?.level?.tasks?.length;
+  const lesson = subscription.level.tasks.reduce((acc, task) => {
+    return acc + task.lessons.length;
+  }, 0);
 
-  const lessons = subscription.level.tasks.map((task: Task, index) => {
-    return {
+  const flatLessons = subscription.level.tasks.flatMap((task: Task) =>
+    task.lessons.map((lesson: Lesson) => ({
+      ...lesson,
       date: task.date,
-      data: task.lessons.map((lesson: Lesson, index) => {
-        return {
-          title: lesson.type,
-          subtitle: lesson.title,
-          // type: 'custom',
-          date: task.date,
-          item: lesson,
-        };
-      }),
-    };
-  });
+    })),
+  );
 
-  const onCardPress = item => {
-    console.log('item', item);
-    const url = item.item.url;
-    if (item.item.type === 'video' && (url.includes('youtube') || url.includes('youtu.be'))) {
-      setSelectedVideo(item.item);
-    } else if (item.item.type === 'pdf') {
-      navigation.navigate('PDFViewer', { document: item.item });
+  const onCardPress = (item: Lesson) => {
+    const url = item.url;
+    if (item.type === 'video' && (url.includes('youtube') || url.includes('youtu.be'))) {
+      setSelectedVideo(item);
+    } else if (item.type === 'pdf') {
+      navigation.navigate(Paths.PDF, { ...item });
     } else {
-      Linking.openURL(item.item.url);
+      Linking.openURL(item.url);
     }
-  };
-
-  const getYoutubeId = (url: string) => {
-    if (url.includes('youtu.be')) {
-      return url.split('youtu.be/')[1]?.split('?')[0];
-    }
-    return url.split('v=')[1]?.split('&')[0];
   };
 
   const youtubeId = selectedVideo?.url ? getYoutubeId(selectedVideo.url) : undefined;
@@ -73,6 +64,57 @@ function Subscription({ navigation, route }: RootScreenProps<Paths.Subscription>
     selectedVideo?.url.includes('view_as=subscriber');
   const playlistId = selectedVideo?.url.split('list=')[1]?.split('&')[0];
 
+  const renderLessonCard = ({ item }: { item: Lesson }) => {
+    //check if data passed
+    const dateStatus = moment(new Date(item.date)).diff(moment(new Date()), 'days');
+
+    const status: 'Passed' | 'Next' | 'Done' | 'Now' = dateStatus < 0 ? 'Passed' : dateStatus === 0 ? 'Now' : 'Next';
+    return (
+      <TouchableOpacity style={[styles.card, { backgroundColor: colors.SURFACE }]} onPress={() => onCardPress(item)}>
+        <View style={{ paddingHorizontal: 2 }}>
+          <SmallTitle style={[styles.dateText, { color: colors.BLACK, fontWeight: 'bold' }]}>
+            {moment(new Date(item.date)).format('DD')}
+          </SmallTitle>
+          <Text style={[styles.dateText, { color: colors.GREY }]}>{moment(new Date(item.date)).format('MMM')}</Text>
+        </View>
+        <Circle status={status} />
+        <View style={{ paddingHorizontal: 2 }}>
+          <Text style={[styles.programName, { color: colors.BLACK }]}>{item.title}</Text>
+          <SmallText style={[styles.programName, { color: colors.GREY }]}>{item.title}</SmallText>
+        </View>
+      </TouchableOpacity>
+    );
+  };
+
+  const Circle = ({ status }: { status: string }) => {
+    const color =
+      status === 'Passed'
+        ? colors.ERROR
+        : status === 'Next'
+        ? colors.WARNING
+        : status === 'Done'
+        ? colors.SUCCESS
+        : status === 'Now'
+        ? colors.PRIMARY_COLOR
+        : colors.GREY;
+    return (
+      <View
+        style={{
+          margin: 5,
+          width: 15,
+          height: 15,
+          borderRadius: 12,
+          padding: 4,
+          borderWidth: 1,
+          justifyContent: 'center',
+          alignItems: 'center',
+          borderStyle: 'dashed',
+          borderColor: color,
+        }}>
+        <View style={{ width: 8, height: 8, backgroundColor: color, borderRadius: 12, padding: 4 }} />
+      </View>
+    );
+  };
   return (
     <SafeScreen>
       <View style={styles.container}>
@@ -80,46 +122,29 @@ function Subscription({ navigation, route }: RootScreenProps<Paths.Subscription>
           <SmallTitle bgColor={styles.header.backgroundColor}>{subscription.program.name}</SmallTitle>
           <Title bgColor={styles.header.backgroundColor}>{subscription.program.name}</Title>
           <Text style={{ color: colors.WARNING }}>يبدا فى {moment(new Date(subscription.program.start)).format('YYYY/MM/DD')}</Text>
-          <View
-            style={{
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              width: '100%',
-            }}>
+          <View style={styles.element}>
+            <Level />
+            <Text bgColor={styles.header.backgroundColor}>{subscription.level.name}</Text>
+          </View>
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
             <View style={styles.element}>
               <Video />
               <Text bgColor={styles.header.backgroundColor}>{` ${lesson} محاضرة `}</Text>
             </View>
-          </View>
-
-          <View
-            style={{
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              width: '100%',
-            }}>
             <Student />
             <View style={styles.element}>
               <Clock />
-              <Text bgColor={styles.header.backgroundColor}>
-                {remaingDays(subscription.program.end) - remaingDays(subscription.program.start)} يوم
-              </Text>
+              <Text bgColor={styles.header.backgroundColor}>{remaingDays(subscription.program.end)} يوم</Text>
             </View>
           </View>
-
-          <Text bgColor={styles.header.backgroundColor}>{parseRemaining(subscription.program.registrationStart)}</Text>
-          <Text bgColor={styles.header.backgroundColor}>{parseRemaining(subscription.program.registrationEnd)}</Text>
-          {/* <Text>{program.levels.length}</Text> */}
         </View>
-        <Timeline
-          onCardPress={onCardPress}
-          cardStyle={styles.timeLine}
-          data={lessons}
-          timelineStyle={{ direction: 'rtl', paddingBottom: 100 }}
+        <FlatList
+          data={flatLessons}
+          renderItem={renderLessonCard}
+          keyExtractor={(item, index) => `${item.id}-${index}`}
+          contentContainerStyle={styles.listContainer}
+          showsVerticalScrollIndicator={false}
         />
-
         <Modal visible={!!selectedVideo} animationType="slide" transparent={true} onRequestClose={() => setSelectedVideo(null)}>
           <View style={styles.modalContainer}>
             <View style={[styles.modalContent, { backgroundColor: colors.SURFACE }]}>
@@ -135,10 +160,8 @@ function Subscription({ navigation, route }: RootScreenProps<Paths.Subscription>
                   width={'100%'}
                   playList={isPlaylist ? playlistId : undefined}
                   videoId={isPlaylist ? undefined : youtubeId}
-                  webViewProps={{
-                    androidLayerType: 'hardware',
-                  }}
-                  onChangeState={state => console.log({ state })}
+                  webViewProps={{ androidLayerType: 'hardware' }}
+                  // onChangeState={state => console.log({ state })}
                 />
               )}
               {selectedVideo?.url && (
@@ -161,7 +184,7 @@ export default Subscription;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    // padding: 16,
+    padding: 16,
   },
   timeLine: {},
   listContainer: {
@@ -178,10 +201,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 20,
     borderRadius: 10,
-    margin: 15,
+    marginVertical: 15,
   },
   card: {
-    padding: 16,
+    padding: 8,
     borderRadius: 12,
     marginBottom: 16,
     elevation: 2,
@@ -189,9 +212,11 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   programName: {
-    fontSize: 18,
+    // fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 8,
   },
@@ -203,12 +228,7 @@ const styles = StyleSheet.create({
   datesContainer: {
     gap: 4,
   },
-  dateText: {
-    fontSize: 12,
-  },
-  registrationText: {
-    fontSize: 12,
-  },
+
   modalContainer: {
     flex: 1,
     justifyContent: 'center',
@@ -231,4 +251,5 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     marginTop: 15,
   },
+  dateText: {},
 });

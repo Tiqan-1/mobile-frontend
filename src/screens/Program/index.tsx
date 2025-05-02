@@ -1,20 +1,19 @@
 import Clock from '@/assets/svg-app/clock.svg';
 import Level from '@/assets/svg-app/level.svg';
 import List from '@/assets/svg-app/list.svg';
-import Student from '@/assets/svg-app/student.svg';
 import Video from '@/assets/svg-app/video.svg';
 import { handleErrorMessage, handleSuccessMessage } from '@/components/atoms/FlashMessage';
-import { SmallTitle, Text, Title } from '@/components/atoms/Text';
+import { Text, Title } from '@/components/atoms/Text';
 import { SafeScreen } from '@/components/templates';
 import { useAppSelector } from '@/hooks/useAppDispatch';
 import type { Paths } from '@/navigation/paths';
 import type { RootScreenProps } from '@/navigation/types';
-import { initStateAPIState, POST } from '@/services/API';
+import { POST } from '@/services/API';
 import { useTheme } from '@/theme';
 import { PALETTE } from '@/theme/colors';
-import { parseRemaining, remaingDays } from '@/utils/dateTime';
+import { calculateProgress, parseRemaining, remaingDays } from '@/utils/dateTime';
 import moment from 'moment';
-import React, { useEffect, useState } from 'react';
+import React, {  } from 'react';
 import { Alert, FlatList, StyleSheet, TouchableOpacity, View } from 'react-native';
 
 const ProgramCard = ({ level, programID }: { level: Level; programID: string }) => {
@@ -27,31 +26,27 @@ const ProgramCard = ({ level, programID }: { level: Level; programID: string }) 
     <TouchableOpacity
       style={[styles.card, { backgroundColor: colors.SURFACE }]}
       onPress={() => {
-        Alert.alert(
-          level.name,
-          'سيتم تسجيلك فى برنامج',
-          [
-            {
-              text: 'نعم',
-              onPress: () =>
-                POST('/api/students/subscriptions/subscribe', {
-                  programId: `${programID}`,
-                  levelId: `${level.id}`,
+        Alert.alert(level.name, 'سيتم تسجيلك فى برنامج', [
+          {
+            text: 'نعم',
+            onPress: () =>
+              POST('/api/students/subscriptions', {
+                programId: `${programID}`,
+                levelId: `${level.id}`,
+              })
+                .then(res => {
+                  handleSuccessMessage(res.data.message ?? 'تم تسجيلك بنجاح');
                 })
-                  .then(res => {
-                    handleSuccessMessage(res.data.message ?? 'تم تسجيلك بنجاح');
-                  })
-                  .catch(error => {
-                    handleErrorMessage(error.data.message);
-                  }),
-            },
-            {
-              text: 'الغاء',
-              isPreferred: true,
-              style: 'cancel',
-            },
-          ],
-        );
+                .catch(error => {
+                  handleErrorMessage(error.data.message);
+                }),
+          },
+          {
+            text: 'الغاء',
+            isPreferred: true,
+            style: 'cancel',
+          },
+        ]);
       }}>
       <Text style={[styles.programName, { color: colors.BLACK }]}>{level.name}</Text>
       <View style={styles.datesContainer}>
@@ -89,11 +84,13 @@ function Program({ navigation, route }: RootScreenProps<Paths.Program>) {
     );
   }, 0);
 
+  const progress = calculateProgress(program.registrationStart, program.registrationEnd);
+
   return (
     <SafeScreen>
       <View style={styles.container}>
         <View style={styles.header}>
-          <SmallTitle bgColor={styles.header.backgroundColor}>{program.name}</SmallTitle>
+          {/* <SmallTitle bgColor={styles.header.backgroundColor}>{program.name}</SmallTitle> */}
           <Title bgColor={styles.header.backgroundColor}>{program.name}</Title>
           <Text style={{ color: colors.WARNING }}>يبدا فى {moment(new Date(program.start)).format('YYYY/MM/DD')}</Text>
           <View
@@ -104,14 +101,14 @@ function Program({ navigation, route }: RootScreenProps<Paths.Program>) {
               width: '100%',
             }}>
             <View style={styles.element}>
-              <Level />
+              <Level style={{ marginHorizontal: 3 }} />
               <Text bgColor={styles.header.backgroundColor}>{` ${program.levels.length} مستويات `}</Text>
             </View>
             <View style={styles.element}>
-              <List /> <Text bgColor={styles.header.backgroundColor}>{` ${subjects} مواد `}</Text>
+              <List style={{ marginHorizontal: 3 }} /> <Text bgColor={styles.header.backgroundColor}>{` ${subjects} مواد `}</Text>
             </View>
             <View style={styles.element}>
-              <Video />
+              <Video style={{ marginHorizontal: 3 }} />
               <Text bgColor={styles.header.backgroundColor}>{` ${video} محاضرة `}</Text>
             </View>
           </View>
@@ -123,16 +120,11 @@ function Program({ navigation, route }: RootScreenProps<Paths.Program>) {
               alignItems: 'center',
               width: '100%',
             }}>
-            <Student />
             <View style={styles.element}>
-              <Clock />
+              <Clock style={{ marginHorizontal: 3 }} />
               <Text bgColor={styles.header.backgroundColor}>{remaingDays(program.end) - remaingDays(program.start)} يوم</Text>
             </View>
           </View>
-
-          <Text bgColor={styles.header.backgroundColor}>{parseRemaining(program.registrationStart)}</Text>
-          <Text bgColor={styles.header.backgroundColor}>{parseRemaining(program.registrationEnd)}</Text>
-          {/* <Text>{program.levels.length}</Text> */}
         </View>
 
         <FlatList
@@ -193,12 +185,6 @@ const styles = StyleSheet.create({
   datesContainer: {
     gap: 4,
   },
-  dateText: {
-    fontSize: 12,
-  },
-  registrationText: {
-    fontSize: 12,
-  },
 
   statusTag: {
     paddingHorizontal: 12,
@@ -208,11 +194,31 @@ const styles = StyleSheet.create({
     marginTop: 4,
     position: 'absolute',
     right: 16,
-    top: 16,
+    bottom: 16,
     zIndex: 1,
   },
   statusText: {
     fontSize: 12,
     fontWeight: '600',
   },
+
+  progressContainer: {
+    // marginVertical: 0,
+  },
+  progressBar: {
+    height: 6,
+    borderRadius: 2,
+    overflow: 'visible',
+  },
+  progressFill: {
+    height: '100%',
+    borderRadius: 2,
+  },
+
+  registrationText:{
+
+  },
+  dateText:{
+    
+  }
 });

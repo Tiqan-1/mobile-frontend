@@ -1,5 +1,19 @@
+import MainLogo from '@/assets/logo/main-logo.svg';
+import IconDown from '@/assets/svg/icon-down.svg';
+import Button from '@/components/atoms/Button';
+import Switch from '@/components/atoms/Switch';
+import { SmallTitle, Text } from '@/components/atoms/Text';
+import TextInput from '@/components/atoms/TextInput';
+import { SafeScreen } from '@/components/templates';
+import { useI18n } from '@/hooks';
+import { LANG_AR, LANG_EN } from '@/hooks/language/useI18n';
+import { useAppDispatch } from '@/hooks/useAppDispatch';
+import { Paths } from '@/navigation/paths';
 import type { RootScreenProps } from '@/navigation/types';
-
+import api, { initStateAPIState, POST } from '@/services/API';
+import { login } from '@/store/auth';
+import { useTheme } from '@/theme';
+import { PALETTE } from '@/theme/colors';
 import EyeClose from 'assets/svg/input-eye-close.svg';
 import Eye from 'assets/svg/input-eye.svg';
 import { Formik } from 'formik';
@@ -9,24 +23,6 @@ import { ActivityIndicator, Pressable, StyleSheet, View } from 'react-native';
 import ActionSheet from 'react-native-actionsheet';
 import * as yup from 'yup';
 
-import { useTheme } from '@/theme';
-import { PALETTE } from '@/theme/colors';
-import { useI18n } from '@/hooks';
-import { LANG_AR, LANG_EN } from '@/hooks/language/useI18n';
-import { useAppDispatch } from '@/hooks/useAppDispatch';
-import { Paths } from '@/navigation/paths';
-
-import Button from '@/components/atoms/Button';
-import Switch from '@/components/atoms/Switch';
-import { SmallTitle, Text } from '@/components/atoms/Text';
-import TextInput from '@/components/atoms/TextInput';
-import { SafeScreen } from '@/components/templates';
-
-import MainLogo from '@/assets/logo/main-logo.svg';
-import IconDown from '@/assets/svg/icon-down.svg';
-import api, { initStateAPIState, POST } from '@/services/API';
-import { login } from '@/store/auth';
-
 function onChangeLocale(nextlocale: string) {
   api.setHeader('X-localization', nextlocale);
 }
@@ -34,9 +30,9 @@ function onChangeLocale(nextlocale: string) {
 function Login({ navigation }: RootScreenProps<Paths.Login>) {
   const { isDark, colors, toggleTheme } = useTheme();
   const { t, i18n } = useTranslation();
-  const sheet = useRef({});
+  const sheet = useRef<ActionSheet>(null);
 
-  const [apiState, setapiState] = useState<APISTATE>(initStateAPIState);
+  const [apiState, setapiState] = useState<APISTATE<unknown>>(initStateAPIState);
   const { translate, changeLanguage } = useI18n();
   const [secure, setsecure] = useState(true);
   const dispatch = useAppDispatch();
@@ -59,7 +55,7 @@ function Login({ navigation }: RootScreenProps<Paths.Login>) {
   });
 
   const handleSubmit = (vlaues: typeof initialValues) => {
-    POST('/api/authentication/login', vlaues, setapiState).then((res) => {
+    POST('/api/authentication/login', vlaues, setapiState).then(res => {
       const token = res.accessToken;
       api.setHeader('Authorization', `bearer ${token}`);
       dispatch(login(res));
@@ -74,7 +70,7 @@ function Login({ navigation }: RootScreenProps<Paths.Login>) {
           paddingHorizontal: 20,
           backgroundColor: PALETTE.APP_BACKGROUND,
         }}>
-        <Pressable onPress={() => sheet.current?.show()} style={style.row}>
+        <Pressable onPress={() => sheet.current?.show?.()} style={style.row}>
           <Text>{currentLanguage}</Text>
           <IconDown />
         </Pressable>
@@ -101,7 +97,7 @@ function Login({ navigation }: RootScreenProps<Paths.Login>) {
                   placeholder={t('auth.enter_email')}
                   value={values.email}
                   keyboardType="email-address"
-                  errors={touched.email ? [errors.email] : ''}
+                  errors={touched.email ? [errors.email || ''] : ''}
                 />
               </View>
               <View style={style.inputGroup}>
@@ -114,7 +110,7 @@ function Login({ navigation }: RootScreenProps<Paths.Login>) {
                   value={values.password}
                   Icon={secure ? Eye : EyeClose}
                   onPressIcon={() => setsecure(!secure)}
-                  errors={touched.password ? [errors.password] : undefined}
+                  errors={touched.password ? [errors.password || ''] : undefined}
                 />
               </View>
 

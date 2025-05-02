@@ -22,6 +22,8 @@
 	<string>????</string>
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSAppTransportSecurity</key>
@@ -32,12 +34,26 @@
 		<true/>
 	</dict>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string/>
+	<string></string>
+	<key>UIAppFonts</key>
+	<array>
+		<string>Cairo-Black.ttf</string>
+		<string>Cairo-Bold.ttf</string>
+		<string>Cairo-ExtraLight.ttf</string>
+		<string>Cairo-Light.ttf</string>
+		<string>Cairo-Regular.ttf</string>
+		<string>Cairo-SemiBold.ttf</string>
+		<string>FontAwesome.ttf</string>
+	</array>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>remote-notification</string>
+	</array>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen.storyboard</string>
 	<key>UIRequiredDeviceCapabilities</key>
 	<array>
-		<string>armv64</string>
+		<string>arm64</string>
 	</array>
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
@@ -51,15 +67,5 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
-	<key>UIAppFonts</key>
-	<array>
-		<string>Cairo-Black.ttf</string>
-		<string>Cairo-Bold.ttf</string>
-		<string>Cairo-ExtraLight.ttf</string>
-		<string>Cairo-Light.ttf</string>
-		<string>Cairo-Regular.ttf</string>
-		<string>Cairo-SemiBold.ttf</string>
-		<string>FontAwesome.ttf</string>
-	</array>
 </dict>
 </plist>

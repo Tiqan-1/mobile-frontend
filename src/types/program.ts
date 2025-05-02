@@ -25,6 +25,7 @@ interface Task {
   lessons: Lesson[];
 }
 interface Lesson {
+  date: Date;
   id: string;
   title: string;
   type: 'pdf' | 'video' | 'other';
