@@ -16,6 +16,7 @@ import Programs from '@/screens/Programs';
 import { Paths } from './paths';
 import Book from 'assets/svg-app/book.svg';
 import Bookm from 'assets/svg-app/bookm.svg';
+import TodayLessons from '@/screens/TodayLessons';
 const Tab = createBottomTabNavigator();
 
 // Placeholder component for the Accessibility tab
@@ -58,6 +59,16 @@ const BottomTabNavigation = () => {
           tabBarLabel: t('navigation.Main'),
           tabBarIcon: ({ focused, color, size }) => <Bookm fill={color} width={size} />,
           tabBarAccessibilityLabel: 'Main tab',
+        }}
+      />
+      <Tab.Screen
+        component={TodayLessons}
+        name={Paths.TodayLessons}
+        options={{
+          tabBarLabel: t('navigation.TodayLessons'),
+          tabBarIcon: ({ focused, color, size }) => <Book fill={color} height={size} width={size} />,
+          tabBarAccessibilityLabel: 'TodayLessons tab',
+          title: t('navigation.TodayLessons'),
         }}
       />
       <Tab.Screen

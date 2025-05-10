@@ -145,7 +145,6 @@ function TodayLessons({ navigation }: RootScreenProps<Paths.TodayLessons>) {
             calendarBackground: colors.APP_BACKGROUND,
           }}
           monthFormat="MMMM yyyy"
-          firstDay={1} // Start week on Monday for Arabic
         />
         <View style={styles.lessonsContainer}>
           <Text style={[styles.dateHeader, { color: colors.BLACK }]}>{moment(selectedDate).format('MMMM D, YYYY')}</Text>

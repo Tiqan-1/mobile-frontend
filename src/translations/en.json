@@ -40,7 +40,9 @@
       "password_not_match": "Password not match"
     },
     "navigation": {
-      "Programs": "Programs"
+      "Programs": "Programs",
+      "Main": "My Subscriptions",
+      "TodayLessons": "Today Lessons"
     },
     "Programs": {
       "remainig": "remainig",
