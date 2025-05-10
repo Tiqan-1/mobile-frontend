@@ -15,6 +15,7 @@ export type RootStackParamList = {
   [Paths.Startup]: undefined;
   [Paths.Subscription]: Subscription;
   [Paths.TabNav]: undefined;
+  [Paths.TodayLessons]: undefined;
 };
 
 export type RootScreenProps<

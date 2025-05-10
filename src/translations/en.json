@@ -46,6 +46,11 @@
       "remainig": "remainig",
       "past": "past",
       "day": "day"
+    },
+    "TodayLessons": {
+      "title": "Today Lessons",
+      "noLessons": "No lessons scheduled for today",
+      "programLevel": "{{program}} - {{level}}"
     }
   },
   "common": {

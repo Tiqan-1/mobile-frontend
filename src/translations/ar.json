@@ -47,7 +47,13 @@
       "remainig": "متبقي",
       "past": "مضي",
       "day": "يوم"
+    },
+    "TodayLessons": {
+      "title": "الدروس المنتظرة",
+      "noLessons": "لا يوجد دروس منتظرة لهذا اليوم",
+      "programLevel": "{{program}} - {{level}}"
     }
+
   },
   "common": {
     "back": "الرجوع",

@@ -2,8 +2,9 @@
 import { handleErrorMessage } from '@/components/atoms/FlashMessage';
 import type { Dispatch, SetStateAction } from 'react';
 import { GET } from './API';
+import type { APISTATE as APISTATEType } from '@/services/API';
 
-export interface PaginationState<a> extends APISTATE<a> {
+export interface PaginationState<a> extends APISTATEType<a> {
   cancelToken?: string;
   forceUpdate?: object;
   pagination?: {

@@ -14,6 +14,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { useTranslation } from 'react-i18next';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import BottomTabNavigation from './BottomTabNavigation';
+import TodayLessons from '@/screens/TodayLessons';
 
 const Stack = createStackNavigator<RootStackParamList>();
 const NAVIGATION_OPTIONS = {
@@ -62,6 +63,7 @@ function ApplicationNavigator() {
           <Stack.Screen component={Example} name={Paths.Example} />
           <Stack.Screen component={Program} name={Paths.Program} />
           <Stack.Screen component={Subscription} name={Paths.Subscription} />
+          <Stack.Screen component={TodayLessons} name={Paths.TodayLessons} />
           <Stack.Screen
             component={AccessibilitySettings}
             name={Paths.AccessibilitySettings}

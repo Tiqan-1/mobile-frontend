@@ -86,10 +86,11 @@ function MainScreen({ navigation }: RootScreenProps<Paths.Main>) {
   const dispatch = useAppDispatch();
   const user = useAppSelector(state => state.auth);
   const { items: subscriptionsState } = useAppSelector(state => state.subscriptions);
+  const { colors: themeColors } = useTheme();
 
   useEffect(() => {
     ItemClass.init();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const onRefresh = () => {
@@ -97,7 +98,9 @@ function MainScreen({ navigation }: RootScreenProps<Paths.Main>) {
   };
 
   const onEndReached = () => {
-    if (apiState.loading) {return;}
+    if (apiState.loading) {
+      return;
+    }
     ItemClass.next(apiState);
   };
 
@@ -112,7 +115,14 @@ function MainScreen({ navigation }: RootScreenProps<Paths.Main>) {
   return (
     <SafeScreen>
       <View style={styles.container}>
-        <SmallTitle>اهلا {user.name}</SmallTitle>
+        <View style={styles.headerContainer}>
+          <SmallTitle>اهلا {user.name}</SmallTitle>
+          <TouchableOpacity
+            style={[styles.todayButton, { backgroundColor: themeColors.PRIMARY_COLOR }]}
+            onPress={() => navigation.navigate(Paths.TodayLessons)}>
+            <Text style={[styles.todayButtonText, { color: themeColors.WHITE }]}>دروس اليوم</Text>
+          </TouchableOpacity>
+        </View>
         <FlatList
           data={subscriptionsState || (apiState.results as Subscription[])}
           renderItem={({ item }) => <ProgramCard program={item} />}
@@ -179,5 +189,20 @@ const styles = StyleSheet.create({
   progressFill: {
     height: '100%',
     borderRadius: 2,
+  },
+  headerContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  todayButton: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 8,
+  },
+  todayButtonText: {
+    fontSize: 14,
+    fontWeight: '600',
   },
 });

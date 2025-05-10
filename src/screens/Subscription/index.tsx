@@ -2,27 +2,19 @@ import Clock from '@/assets/svg-app/clock.svg';
 import Level from '@/assets/svg-app/level.svg';
 import Student from '@/assets/svg-app/student.svg';
 import Video from '@/assets/svg-app/video.svg';
+import CircleStatus from '@/components/atoms/CircleStatus';
 import { SmallText, SmallTitle, Text, Title } from '@/components/atoms/Text';
+import { VideoModal } from '@/components/organisms/VideoModal';
 import { SafeScreen } from '@/components/templates';
 import { Paths } from '@/navigation/paths';
 import type { RootScreenProps } from '@/navigation/types';
-import { initStateAPIState } from '@/services/API';
-import { logger } from '@/services/logger';
 import { useTheme } from '@/theme';
 import { PALETTE } from '@/theme/colors';
-import { parseRemaining, remaingDays } from '@/utils/dateTime';
+import { remaingDays } from '@/utils/dateTime';
 import moment from 'moment';
 import React, { useEffect, useState } from 'react';
-import { FlatList, Linking, Modal, StyleSheet, TouchableOpacity, View } from 'react-native';
-import Timeline from 'react-native-beautiful-timeline';
-import YoutubePlayer from 'react-native-youtube-iframe';
+import { FlatList, Linking, StyleSheet, TouchableOpacity, View } from 'react-native';
 
-const getYoutubeId = (url: string) => {
-  if (url.includes('youtu.be')) {
-    return url.split('youtu.be/')[1]?.split('?')[0];
-  }
-  return url.split('v=')[1]?.split('&')[0];
-};
 
 function Subscription({ navigation, route }: RootScreenProps<Paths.Subscription>) {
   const { colors } = useTheme();
@@ -55,20 +47,7 @@ function Subscription({ navigation, route }: RootScreenProps<Paths.Subscription>
     }
   };
 
-  const youtubeId = selectedVideo?.url ? getYoutubeId(selectedVideo.url) : undefined;
-  const isPlaylist =
-    selectedVideo?.url.includes('list=') ||
-    selectedVideo?.url.includes('playlist=') ||
-    selectedVideo?.url.includes('p=') ||
-    selectedVideo?.url.includes('listType=') ||
-    selectedVideo?.url.includes('view_as=subscriber');
-  const playlistId = selectedVideo?.url.split('list=')[1]?.split('&')[0];
-
   const renderLessonCard = ({ item }: { item: Lesson }) => {
-    //check if data passed
-    const dateStatus = moment(new Date(item.date)).diff(moment(new Date()), 'days');
-
-    const status: 'Passed' | 'Next' | 'Done' | 'Now' = dateStatus < 0 ? 'Passed' : dateStatus === 0 ? 'Now' : 'Next';
     return (
       <TouchableOpacity style={[styles.card, { backgroundColor: colors.SURFACE }]} onPress={() => onCardPress(item)}>
         <View style={{ paddingHorizontal: 2 }}>
@@ -77,7 +56,7 @@ function Subscription({ navigation, route }: RootScreenProps<Paths.Subscription>
           </SmallTitle>
           <Text style={[styles.dateText, { color: colors.GREY }]}>{moment(new Date(item.date)).format('MMM')}</Text>
         </View>
-        <Circle status={status} />
+        <CircleStatus Dtstatus={item.date} />
         <View style={{ paddingHorizontal: 2 }}>
           <Text style={[styles.programName, { color: colors.BLACK }]}>{item.title}</Text>
           <SmallText style={[styles.programName, { color: colors.GREY }]}>{item.title}</SmallText>
@@ -86,35 +65,6 @@ function Subscription({ navigation, route }: RootScreenProps<Paths.Subscription>
     );
   };
 
-  const Circle = ({ status }: { status: string }) => {
-    const color =
-      status === 'Passed'
-        ? colors.ERROR
-        : status === 'Next'
-        ? colors.WARNING
-        : status === 'Done'
-        ? colors.SUCCESS
-        : status === 'Now'
-        ? colors.PRIMARY_COLOR
-        : colors.GREY;
-    return (
-      <View
-        style={{
-          margin: 5,
-          width: 15,
-          height: 15,
-          borderRadius: 12,
-          padding: 4,
-          borderWidth: 1,
-          justifyContent: 'center',
-          alignItems: 'center',
-          borderStyle: 'dashed',
-          borderColor: color,
-        }}>
-        <View style={{ width: 8, height: 8, backgroundColor: color, borderRadius: 12, padding: 4 }} />
-      </View>
-    );
-  };
   return (
     <SafeScreen>
       <View style={styles.container}>
@@ -145,35 +95,7 @@ function Subscription({ navigation, route }: RootScreenProps<Paths.Subscription>
           contentContainerStyle={styles.listContainer}
           showsVerticalScrollIndicator={false}
         />
-        <Modal visible={!!selectedVideo} animationType="slide" transparent={true} onRequestClose={() => setSelectedVideo(null)}>
-          <View style={styles.modalContainer}>
-            <View style={[styles.modalContent, { backgroundColor: colors.SURFACE }]}>
-              <TouchableOpacity
-                style={[styles.closeButton, { backgroundColor: colors.PRIMARY_COLOR }]}
-                onPress={() => setSelectedVideo(null)}>
-                <Text style={{ color: colors.WHITE }}>Close</Text>
-              </TouchableOpacity>
-              <Text style={[styles.modalTitle, { color: colors.BLACK }]}>{selectedVideo?.title}</Text>
-              {!!selectedVideo && (playlistId || youtubeId) && (
-                <YoutubePlayer
-                  height={200}
-                  width={'100%'}
-                  playList={isPlaylist ? playlistId : undefined}
-                  videoId={isPlaylist ? undefined : youtubeId}
-                  webViewProps={{ androidLayerType: 'hardware' }}
-                  // onChangeState={state => console.log({ state })}
-                />
-              )}
-              {selectedVideo?.url && (
-                <TouchableOpacity
-                  style={[styles.closeButton, { backgroundColor: colors.PRIMARY_COLOR }]}
-                  onPress={() => Linking.openURL(selectedVideo.url)}>
-                  <Text style={{ color: colors.WHITE }}>Open External</Text>
-                </TouchableOpacity>
-              )}
-            </View>
-          </View>
-        </Modal>
+        <VideoModal selectedVideo={selectedVideo} onClose={() => setSelectedVideo(null)} />
       </View>
     </SafeScreen>
   );
@@ -216,7 +138,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   programName: {
-    // fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 8,
   },
@@ -227,29 +148,6 @@ const styles = StyleSheet.create({
   },
   datesContainer: {
     gap: 4,
-  },
-
-  modalContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-  },
-  modalContent: {
-    width: '90%',
-    padding: 20,
-    borderRadius: 10,
-    alignItems: 'center',
-  },
-  modalTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 15,
-  },
-  closeButton: {
-    padding: 10,
-    borderRadius: 5,
-    marginTop: 15,
   },
   dateText: {},
 });

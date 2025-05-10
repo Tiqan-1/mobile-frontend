@@ -13,5 +13,5 @@ export enum Paths {
   Startup = 'Startup',
   Subscription = 'Subscription',
   TabNav = 'TabNav',
-  
+  TodayLessons = 'TodayLessons',
 }
