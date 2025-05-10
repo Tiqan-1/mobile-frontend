@@ -6,7 +6,7 @@ update_fastlane
 ###################### SETUP ######################
 dir = File.expand_path('..', Dir.pwd).freeze
 
-APP_VERSION_NAME = "6.6.2".freeze
+APP_VERSION_NAME = "1.0".freeze
 XCODE_PROJECT_PATH = "ios/#{PROJECT_NAME}.xcodeproj".freeze
 XCODE_WORKSPACE_PATH = "ios/#{PROJECT_NAME}.xcworkspace".freeze
 RELEASE_SCHEME_NAME = "#{PROJECT_NAME}".freeze

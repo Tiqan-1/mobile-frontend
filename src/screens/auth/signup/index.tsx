@@ -25,7 +25,7 @@ function SignUp({ navigation }: RootScreenProps<Paths.SignUp>) {
   const { colors } = useTheme();
   const { t } = useTranslation();
 
-  const [apiState, setapiState] = useState<APISTATE>(initStateAPIState);
+  const [apiState, setapiState] = useState<APISTATE<unknown>>(initStateAPIState);
 
   const [secure, setsecure] = useState(true);
   const dispatch = useAppDispatch();

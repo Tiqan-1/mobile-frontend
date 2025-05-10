@@ -175,7 +175,7 @@ const DefaultParams = {
 export const POST = async <T = unknown>(
   url = '',
   body = {},
-  setState: Dispatch<SetStateAction<PaginationState<T>>> | undefined = undefined,
+  setState: Dispatch<SetStateAction<APISTATE<T>>> | undefined = undefined,
   param?: PARAMS,
 ) => {
   const params = { ...DefaultParams, ...param };
@@ -190,7 +190,7 @@ export const DELETE = async <T = unknown>(url = '', body = {}, setState = undefi
 export const GET = async <T = unknown>(
   url = '',
   body = {},
-  setState: Dispatch<SetStateAction<PaginationState<T>>> | undefined = undefined,
+  setState: Dispatch<SetStateAction<APISTATE<T>>> | undefined = undefined,
   param?: PARAMS,
 ) => {
   const params = { ...DefaultParams, ...param };
@@ -208,9 +208,9 @@ export const REQUESTING = async <T = unknown>(
   method = 'POST',
   url = '',
   body: Record<string, string> | undefined = undefined,
-  setState: Dispatch<SetStateAction<PaginationState<T>>> | undefined = undefined,
+  setState: Dispatch<SetStateAction<APISTATE<T>>> | undefined = undefined,
   params: PARAMS,
-): Promise<any | APIResponseError | PaginationState<T>> => {
+): Promise<any | APIResponseError | APISTATE<T>> => {
   const { showLoading, usePagination, Append, forceData, isForm, header, headerP, debounce, cancelToken, retry } = params;
   if (debounce && requestMap.get(url) && (retry ?? 1) < 2) {
     return; // Exit if a request for this URL is already in progress
@@ -228,21 +228,9 @@ export const REQUESTING = async <T = unknown>(
     (async () => {
       try {
         if (showLoading) {
-          setState?.((state: PaginationState<T>) => ({
-            ...state,
-            error: '',
-            loading: true,
-            isRequesting: true,
-            ...forceData,
-          }));
+          setState?.((state: APISTATE<T>) => ({ ...state, error: '', loading: true, isRequesting: true, ...forceData }));
         } else {
-          setState?.((state: PaginationState<T>) => ({
-            ...state,
-            error: '',
-            loading: false,
-            isRequesting: true,
-            ...forceData,
-          }));
+          setState?.((state: APISTATE<T>) => ({ ...state, error: '', loading: false, isRequesting: true, ...forceData }));
         }
         let response;
         const bodyModified = isForm ? ConvertToForm(body) : body;
@@ -267,23 +255,15 @@ export const REQUESTING = async <T = unknown>(
         const [error, results] = handeResponse(response);
         if (response.problem === 'TIMEOUT_ERROR' && (retry || 1) < 3) {
           logger.info('Retrying request', retry);
-          return await REQUESTING(method, url, body, setState, {
-            ...params,
-            retry: (retry || 1) + 1,
-          })
+          return await REQUESTING(method, url, body, setState, { ...params, retry: (retry || 1) + 1 })
             .then(res => resolve(res))
             .catch(error_ => reject(error_));
         } else if (error) {
-          setState?.((state: PaginationState<T>) => ({
-            ...state,
-            error,
-            loading: false,
-            isRequesting: false,
-          }));
+          setState?.((state: APISTATE<T>) => ({ ...state, error, loading: false, isRequesting: false }));
         } else if (usePagination && !!results?.page && Array.isArray(results?.items)) {
           const { items, ...rest } = results || {};
           if (Append && items) {
-            setState?.((state: PaginationState<T>) => ({
+            setState?.((state: APISTATE<T>) => ({
               ...state,
               results: [...state.results, ...(items || [])],
               error,
@@ -292,7 +272,7 @@ export const REQUESTING = async <T = unknown>(
               pagination: rest,
             }));
           } else {
-            setState?.((state: PaginationState<T>) => ({
+            setState?.((state: APISTATE<T>) => ({
               ...state,
               results: items ? items : undefined,
               error,
@@ -302,13 +282,7 @@ export const REQUESTING = async <T = unknown>(
             }));
           }
         } else {
-          setState?.((state: PaginationState<T>) => ({
-            ...state,
-            results,
-            error,
-            loading: false,
-            isRequesting: false,
-          }));
+          setState?.((state: APISTATE<T>) => ({ ...state, results, error, loading: false, isRequesting: false }));
         }
         if (error) {
           reject(response);
@@ -317,9 +291,9 @@ export const REQUESTING = async <T = unknown>(
         }
       } catch (error) {
         logger.error('API error:', error);
-        setState?.((state: PaginationState<T>) => ({
+        setState?.((state: APISTATE<T>) => ({
           ...state,
-          error: 'Some Thing went Wrong',
+          error:  'Some Thing went Wrong',
           loading: false,
           isRequesting: false,
         }));

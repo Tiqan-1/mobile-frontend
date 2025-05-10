@@ -1,4 +1,4 @@
 PROJECT_NAME = 'Binaa'.freeze
-IOS_APP_SPECIFIER = 'com.binaa'.freeze
-AND_APP_SPECIFIER = 'com.binaa'.freeze
+IOS_APP_SPECIFIER = 'com.ebda3.binaa'.freeze
+AND_APP_SPECIFIER = 'com.ebda3.binaa'.freeze
 HUAWEI_APP_ID = ''.freeze 

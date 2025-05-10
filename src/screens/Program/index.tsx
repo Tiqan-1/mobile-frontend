@@ -5,20 +5,23 @@ import Video from '@/assets/svg-app/video.svg';
 import { handleErrorMessage, handleSuccessMessage } from '@/components/atoms/FlashMessage';
 import { Text, Title } from '@/components/atoms/Text';
 import { SafeScreen } from '@/components/templates';
-import { useAppSelector } from '@/hooks/useAppDispatch';
+import { useAppDispatch, useAppSelector } from '@/hooks/useAppDispatch';
 import type { Paths } from '@/navigation/paths';
 import type { RootScreenProps } from '@/navigation/types';
 import { POST } from '@/services/API';
+import { logger } from '@/services/logger';
+import { setSubscriptions } from '@/store/subscriptionSlice';
 import { useTheme } from '@/theme';
 import { PALETTE } from '@/theme/colors';
 import { calculateProgress, parseRemaining, remaingDays } from '@/utils/dateTime';
 import moment from 'moment';
-import React, {  } from 'react';
+import React from 'react';
 import { Alert, FlatList, StyleSheet, TouchableOpacity, View } from 'react-native';
 
-const ProgramCard = ({ level, programID }: { level: Level; programID: string }) => {
+const ProgramCard = ({ level, program }: { level: Level; program: Program }) => {
   const { colors } = useTheme();
   const { items: subscriptionsState } = useAppSelector(state => state.subscriptions);
+  const dispatch = useAppDispatch();
 
   const registerd = subscriptionsState.find(sub => sub.level.id === level.id);
 
@@ -31,14 +34,15 @@ const ProgramCard = ({ level, programID }: { level: Level; programID: string }) 
             text: 'نعم',
             onPress: () =>
               POST('/api/students/subscriptions', {
-                programId: `${programID}`,
+                programId: `${program.id}`,
                 levelId: `${level.id}`,
               })
                 .then(res => {
                   handleSuccessMessage(res.data.message ?? 'تم تسجيلك بنجاح');
+                  dispatch(setSubscriptions([...subscriptionsState, { id: level.id, level, program }] as Subscription[]));
                 })
                 .catch(error => {
-                  handleErrorMessage(error.data.message);
+                  handleErrorMessage(error);
                 }),
           },
           {
@@ -90,22 +94,17 @@ function Program({ navigation, route }: RootScreenProps<Paths.Program>) {
     <SafeScreen>
       <View style={styles.container}>
         <View style={styles.header}>
-          {/* <SmallTitle bgColor={styles.header.backgroundColor}>{program.name}</SmallTitle> */}
           <Title bgColor={styles.header.backgroundColor}>{program.name}</Title>
-          <Text style={{ color: colors.WARNING }}>يبدا فى {moment(new Date(program.start)).format('YYYY/MM/DD')}</Text>
-          <View
-            style={{
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              width: '100%',
-            }}>
+          <Text bgColor={styles.header.backgroundColor}>يبدا فى {moment(new Date(program.start)).format('YYYY/MM/DD')}</Text>
+
+          <View style={styles.row}>
             <View style={styles.element}>
               <Level style={{ marginHorizontal: 3 }} />
               <Text bgColor={styles.header.backgroundColor}>{` ${program.levels.length} مستويات `}</Text>
             </View>
             <View style={styles.element}>
-              <List style={{ marginHorizontal: 3 }} /> <Text bgColor={styles.header.backgroundColor}>{` ${subjects} مواد `}</Text>
+              <List style={{ marginHorizontal: 3 }} />
+              <Text bgColor={styles.header.backgroundColor}>{` ${subjects} مواد `}</Text>
             </View>
             <View style={styles.element}>
               <Video style={{ marginHorizontal: 3 }} />
@@ -113,13 +112,7 @@ function Program({ navigation, route }: RootScreenProps<Paths.Program>) {
             </View>
           </View>
 
-          <View
-            style={{
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              width: '100%',
-            }}>
+          <View style={styles.row}>
             <View style={styles.element}>
               <Clock style={{ marginHorizontal: 3 }} />
               <Text bgColor={styles.header.backgroundColor}>{remaingDays(program.end) - remaingDays(program.start)} يوم</Text>
@@ -129,7 +122,7 @@ function Program({ navigation, route }: RootScreenProps<Paths.Program>) {
 
         <FlatList
           data={program.levels as Level[]}
-          renderItem={({ item }) => <ProgramCard programID={program.id} level={item} />}
+          renderItem={({ item }) => <ProgramCard level={item} program={program}/>}
           keyExtractor={item => item.id}
           contentContainerStyle={styles.listContainer}
           showsVerticalScrollIndicator={false}
@@ -215,10 +208,12 @@ const styles = StyleSheet.create({
     borderRadius: 2,
   },
 
-  registrationText:{
-
+  registrationText: {},
+  dateText: {},
+  row: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    width: '100%',
   },
-  dateText:{
-    
-  }
 });

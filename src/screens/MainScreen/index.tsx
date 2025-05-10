@@ -89,6 +89,7 @@ function MainScreen({ navigation }: RootScreenProps<Paths.Main>) {
 
   useEffect(() => {
     ItemClass.init();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const onRefresh = () => {
@@ -96,7 +97,7 @@ function MainScreen({ navigation }: RootScreenProps<Paths.Main>) {
   };
 
   const onEndReached = () => {
-    if (apiState.loading) return;
+    if (apiState.loading) {return;}
     ItemClass.next(apiState);
   };
 
