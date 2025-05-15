@@ -15,6 +15,7 @@ import { useTranslation } from 'react-i18next';
 import { FlatList, Linking, StyleSheet, TouchableOpacity, View } from 'react-native';
 import type { DateData } from 'react-native-calendars';
 import { Calendar, LocaleConfig } from 'react-native-calendars';
+import { SHADOW } from '@/theme/styles';
 
 LocaleConfig.locales['ar'] = {
   monthNames: ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'],
@@ -43,6 +44,9 @@ function TodayLessons({ navigation }: RootScreenProps<Paths.TodayLessons>) {
   React.useEffect(() => {
     moment.locale(i18n.language);
   }, [i18n.language]);
+  React.useEffect(() => {
+    setSelectedDate(moment().format('YYYY-MM-DD'));
+  }, []);
 
   const LessonCard = ({ subscription }: { subscription: { lesson: Lesson; level: Level; program: Program; task: Task } }) => {
     const { lesson, task, level, program } = subscription;
@@ -117,7 +121,7 @@ function TodayLessons({ navigation }: RootScreenProps<Paths.TodayLessons>) {
     return allLessons.filter(({ task }) => moment(task.date).locale('en').format('YYYY-MM-DD') === selectedDate);
   }, [allLessons, selectedDate]);
 
-  const onDayPress = (day: DateData) => {    
+  const onDayPress = (day: DateData) => {
     setSelectedDate(day.dateString);
   };
 
@@ -173,7 +177,7 @@ export default TodayLessons;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
+    // padding: 16,
   },
   header: {
     marginBottom: 16,
@@ -186,19 +190,19 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '600',
     marginBottom: 16,
+    marginHorizontal: 16,
   },
   listContainer: {
     paddingBottom: 16,
   },
   card: {
+    ...SHADOW,
     padding: 16,
-    borderRadius: 12,
+    borderRadius: 16,
     marginBottom: 16,
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
+    borderWidth: 1,
+    borderColor: 'rgba(0,0,0,0.03)',
+    marginHorizontal: 16,
     flexDirection: 'row',
     alignItems: 'center',
   },

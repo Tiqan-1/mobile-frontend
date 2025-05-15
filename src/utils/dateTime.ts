@@ -29,7 +29,7 @@ export const calculateProgress = (start: Date, end: Date): number => {
   const currentTime = now.getTime();
 
   if (currentTime < startTime) {return 0;}
-  if (currentTime > endTime) {return 100;}
+  if (currentTime > endTime) {return 101;}
 
   return ((currentTime - startTime) / (endTime - startTime)) * 100;
 };
