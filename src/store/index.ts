@@ -9,12 +9,32 @@ import {
   PURGE,
   REGISTER,
 } from 'redux-persist';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import documentsReducer from './documentsSlice';
 
+import { MMKV } from "react-native-mmkv"
+import { Storage } from 'redux-persist'
+
+export const storage = new MMKV()
+
+export const reduxStorage: Storage = {
+  getItem: (key) => {
+    const value = storage.getString(key)
+    return Promise.resolve(value)
+  },
+  removeItem: (key) => {
+    storage.delete(key)
+    return Promise.resolve()
+  },
+  setItem: (key, value) => {
+    storage.set(key, value)
+    return Promise.resolve(true)
+  },
+}
+
+
+import documentsReducer from './documentsSlice';
 const persistConfig = {
   key: 'root',
-  storage: AsyncStorage,
+  storage: reduxStorage,
   // Optionally blacklist some state that you don't want to persist
   blacklist: ['currentDownloading'], 
 };
