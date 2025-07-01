@@ -84,6 +84,7 @@ const documentsSlice = createSlice({
   name: 'documents',
   initialState,
   reducers: {
+    resetDocuments: () => initialState,
     setCurrentPage: (state, action) => {
       if (action.payload.documentId) {
         state.progressData[action.payload.documentId] = {
@@ -148,5 +149,5 @@ const documentsSlice = createSlice({
   },
 });
 
-export const {setCurrentPage} = documentsSlice.actions;
+export const {setCurrentPage, resetDocuments} = documentsSlice.actions;
 export default documentsSlice.reducer;

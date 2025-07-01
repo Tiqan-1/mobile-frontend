@@ -7,10 +7,11 @@ export type RootStackParamList = {
   [Paths.Example]: undefined;
   [Paths.Login]: undefined;
   [Paths.Main]: undefined;
+  [Paths.Menu]: undefined;
   [Paths.PDF]: Lesson;
   [Paths.Program]: Program;
-  [Paths.Programs]: undefined;
 
+  [Paths.Programs]: undefined;
   [Paths.SignUp]: undefined;
   [Paths.Startup]: undefined;
   [Paths.Subscription]: Subscription;

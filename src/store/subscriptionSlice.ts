@@ -19,8 +19,9 @@ const subscriptionsSlice = createSlice({
       state.items = action.payload;
       state.lastUpdated = Date.now();
     },
+    resetSubscriptions: () => initialState,
   },
 });
 
-export const { setSubscriptions } = subscriptionsSlice.actions;
+export const { setSubscriptions, resetSubscriptions } = subscriptionsSlice.actions;
 export default subscriptionsSlice.reducer;
