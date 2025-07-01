@@ -1,6 +1,6 @@
 import React from 'react';
 import { Dimensions, I18nManager, Platform, View } from 'react-native';
-
+export const enableDark = true;
 // import deviceInfoModule from 'react-native-device-info';
 
 export const PLATFORM = Platform.OS === 'ios' ? 'ios' : 'android';

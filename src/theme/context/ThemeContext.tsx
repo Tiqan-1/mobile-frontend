@@ -1,10 +1,8 @@
-import type { MMKV } from 'react-native-mmkv';
-
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { Keyboard, useColorScheme } from 'react-native';
-
-
+import type { MMKV } from 'react-native-mmkv';
 import { PALETTEDARK, PALETTELIGHT, usePALETTE } from '../colors';
+import { enableDark } from '@/utils/constants';
 
 type ThemeColors = typeof PALETTEDARK | typeof PALETTELIGHT;
 
@@ -41,7 +39,7 @@ export const ThemeProvider: React.FC<{
   }, [isDark, storage]);
 
   const toggleTheme = () => {
-    setIsDark((prev) => !prev);
+    setIsDark(prev => !prev);
     if (isDark) {
       toLight();
     } else {
@@ -50,20 +48,14 @@ export const ThemeProvider: React.FC<{
   };
 
   useEffect(() => {
-    const keyboardDidShowListener = Keyboard.addListener(
-      'keyboardDidShow',
-      (frames) => {
-        setKeyboardVisible(true); // or some other action
-        setKeyboardHeight(frames.endCoordinates.height);
-      }
-    );
-    const keyboardDidHideListener = Keyboard.addListener(
-      'keyboardDidHide',
-      () => {
-        setKeyboardVisible(false); // or some other action
-        setKeyboardHeight(0);
-      }
-    );
+    const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', frames => {
+      setKeyboardVisible(true); // or some other action
+      setKeyboardHeight(frames.endCoordinates.height);
+    });
+    const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => {
+      setKeyboardVisible(false); // or some other action
+      setKeyboardHeight(0);
+    });
 
     return () => {
       keyboardDidHideListener.remove();
@@ -71,7 +63,7 @@ export const ThemeProvider: React.FC<{
     };
   }, []);
 
-  const colors = isDark ? PALETTEDARK : PALETTELIGHT;
+  const colors = enableDark && isDark ? PALETTEDARK : PALETTELIGHT;
 
   return (
     <ThemeContext.Provider
