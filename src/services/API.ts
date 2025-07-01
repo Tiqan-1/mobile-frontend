@@ -110,9 +110,6 @@ const handeResponse = (response: ApiResponse<any> | undefined): [string, any] =>
         error = 'Some Thing went Wrong';
       }
     }
-    if (response.status === 402 || response.status === 401 || response.status === 403) {
-      error = response.data?.message || response.data;
-    }
     logger.warn('Server Replied with errors', error);
   } else if (response.status && response.status >= 500) {
     error = 'Server Error';

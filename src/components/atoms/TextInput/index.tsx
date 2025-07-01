@@ -321,8 +321,8 @@ const styles = StyleSheet.create({
     marginHorizontal: 15,
   },
   error: {
-    position: 'absolute',
-    top: '105%',
+    // position: 'absolute',
+    // top: isRTL ? '99%' : '105%',
     // left: 10,
     // right: 10,
     flexDirection: 'row',
@@ -330,8 +330,9 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     alignItems: 'center',
     justifyContent: 'flex-start',
-    marginLeft: 20,
-    zIndex: 9999,
+    // paddingLeft: 20,
+    marginTop: 2,
+    // zIndex: 99999,
   },
   errorText: {
     writingDirection: isRTL ? 'rtl' : 'auto',

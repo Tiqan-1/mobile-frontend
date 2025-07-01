@@ -19,7 +19,7 @@ import Eye from 'assets/svg/input-eye.svg';
 import { Formik } from 'formik';
 import React, { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ActivityIndicator, Pressable, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import ActionSheet from 'react-native-actionsheet';
 import * as yup from 'yup';
 
@@ -63,7 +63,7 @@ function Login({ navigation }: RootScreenProps<Paths.Login>) {
     });
   };
   return (
-    <SafeScreen>
+    <SafeScreen isScroll>
       <View
         style={{
           flex: 1,
@@ -114,7 +114,7 @@ function Login({ navigation }: RootScreenProps<Paths.Login>) {
                 />
               </View>
 
-              {apiState.error && <Text style={{ color: colors.ERROR }}>{t('common_error')}</Text>}
+              {apiState.error && <Text style={{ color: colors.ERROR }}>{apiState.error || t('common_error')}</Text>}
 
               <Button
                 type="underline"

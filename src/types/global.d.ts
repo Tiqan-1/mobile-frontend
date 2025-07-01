@@ -4,8 +4,8 @@ import type { AppStates as AppStatesType } from '@/store/types.t';
 
 declare global {
   type AppStates = AppStatesType;
-  type APISTATE = APISTATEType<unknown> | PaginationStateType<unknown>;
   type APISTATE<a> = APISTATEType<a> | PaginationStateType<a>;
+  type APISTATE = APISTATE<unknown>;
   type PaginationState<a> = PaginationStateType<a>;
   type PaginationState = PaginationStateType<unknown>;
 

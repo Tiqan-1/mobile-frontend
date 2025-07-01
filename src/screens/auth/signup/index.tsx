@@ -1,5 +1,14 @@
+import Button from '@/components/atoms/Button';
+import RadioButton from '@/components/atoms/RadioButton';
+import { SmallTitle, Text } from '@/components/atoms/Text';
+import TextInput from '@/components/atoms/TextInput';
+import { SafeScreen } from '@/components/templates';
+import { useAppDispatch } from '@/hooks/useAppDispatch';
+import { Paths } from '@/navigation/paths';
 import type { RootScreenProps } from '@/navigation/types';
-
+import api, { initStateAPIState, POST } from '@/services/API';
+import { login } from '@/store/auth';
+import { useTheme } from '@/theme';
 import EyeClose from 'assets/svg/input-eye-close.svg';
 import Eye from 'assets/svg/input-eye.svg';
 import { Formik } from 'formik';
@@ -7,19 +16,6 @@ import React, { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { StyleSheet, View } from 'react-native';
 import * as yup from 'yup';
-
-import { useTheme } from '@/theme';
-import { Paths } from '@/navigation/paths';
-
-import Button from '@/components/atoms/Button';
-import RadioButton from '@/components/atoms/RadioButton';
-import { SmallTitle, Text } from '@/components/atoms/Text';
-import TextInput from '@/components/atoms/TextInput';
-import { SafeScreen } from '@/components/templates';
-
-import api, { initStateAPIState, POST } from '@/services/API';
-import { login } from '@/store/auth';
-import { useAppDispatch } from '@/hooks/useAppDispatch';
 
 function SignUp({ navigation }: RootScreenProps<Paths.SignUp>) {
   const { colors } = useTheme();
@@ -45,43 +41,28 @@ function SignUp({ navigation }: RootScreenProps<Paths.SignUp>) {
       .matches(/\w*[a-z]\w*/, 'Password must have a small letter')
       .matches(/\w*[A-Z]\w*/, 'Password must have a capital letter')
       .matches(/\d/, 'Password must have a number')
-      .matches(
-        /[!@#$%^&*()\-_"=+{}; :,<.>]/,
-        'Password must have a special character'
-      )
+      .matches(/[!@#$%^&*()\-_"=+{}; :,<.>]/, 'Password must have a special character')
       .min(8, ({ min }) => `Password must be at least ${min} characters`)
       .required('Password is required'),
   });
 
   const handleSubmit = (values: typeof initialValues) => {
-    POST('/api/students/sign-up', values, setapiState).then((res) => {
+    POST('/api/students/sign-up', values, setapiState).then(res => {
       const token = res.accessToken;
-        api.setHeader('Authorization', `bearer ${token}`);
+      api.setHeader('Authorization', `bearer ${token}`);
       dispatch(login(res));
       navigation.navigate(Paths.TabNav);
     });
   };
   return (
-    <SafeScreen>
+    <SafeScreen isScroll>
       <View style={{ flex: 1, paddingHorizontal: 20 }}>
         <View style={style.header}>
           <SmallTitle>{t('screen_example.title')}</SmallTitle>
         </View>
 
-        <Formik
-          initialValues={initialValues}
-          onSubmit={handleSubmit}
-          validationSchema={SignUpValidationSchema}>
-          {({
-            handleBlur,
-            handleChange,
-            values,
-            errors,
-            touched,
-            handleSubmit,
-            isValid,
-            setFieldValue,
-          }) => (
+        <Formik initialValues={initialValues} onSubmit={handleSubmit} validationSchema={SignUpValidationSchema}>
+          {({ handleBlur, handleChange, values, errors, touched, handleSubmit, isValid, setFieldValue }) => (
             <>
               <View style={style.inputGroup}>
                 <Text>{t('auth.name')}</Text>
@@ -109,16 +90,8 @@ function SignUp({ navigation }: RootScreenProps<Paths.SignUp>) {
               <View style={style.inputGroup}>
                 <View style={style.genderContainer}>
                   <View style={style.genderRadio}>
-                    <RadioButton
-                      label="male"
-                      selected={values.gender === 'male'}
-                      onPress={() => setFieldValue('gender', 'male')}
-                    />
-                    <RadioButton
-                      label="female"
-                      selected={values.gender === 'female'}
-                      onPress={() => setFieldValue('gender', 'female')}
-                    />
+                    <RadioButton label="male" selected={values.gender === 'male'} onPress={() => setFieldValue('gender', 'male')} />
+                    <RadioButton label="female" selected={values.gender === 'female'} onPress={() => setFieldValue('gender', 'female')} />
                   </View>
                 </View>
               </View>
@@ -137,11 +110,7 @@ function SignUp({ navigation }: RootScreenProps<Paths.SignUp>) {
                 />
               </View>
 
-              {apiState.error && (
-                <Text style={{ color: colors.ERROR }}>
-                  {t('common_error')}
-                </Text>
-              )}
+              {apiState.error && <Text style={{ color: colors.ERROR }}>{t('common_error')}</Text>}
 
               <Button
                 type="main"
