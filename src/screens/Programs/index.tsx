@@ -123,7 +123,7 @@ function Programs({ navigation }: RootScreenProps<Paths.Programs>) {
 
   const [apiState, setapiState] = useState<PaginationState<Program>>({
     ...initStateAPIState,
-    url: '/api/students/v2/programs',
+    url: '/api/students/programs/v2',
     params: getParamsString(filters),
   });
 

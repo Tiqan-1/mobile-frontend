@@ -1,7 +1,7 @@
+import CircleStatus from '@/components/atoms/CircleStatus';
 import { SmallTitle, Text } from '@/components/atoms/Text';
 import { SafeScreen } from '@/components/templates';
 import { useAppDispatch, useAppSelector } from '@/hooks/useAppDispatch';
-import { useProgress } from '@/hooks/useProgress';
 import { Paths } from '@/navigation/paths';
 import type { RootScreenProps } from '@/navigation/types';
 import { GET, initStateAPIState } from '@/services/API';
@@ -9,42 +9,29 @@ import { logger } from '@/services/logger';
 import { Pagination } from '@/services/Pagination';
 import { setSubscriptions } from '@/store/subscriptionSlice';
 import { useTheme } from '@/theme';
+import { SHADOW } from '@/theme/styles';
 import { calculateProgress, parseRemaining } from '@/utils/dateTime';
 import { useNavigation } from '@react-navigation/native';
-import React, { useEffect, useState } from 'react';
+import moment from 'moment';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FlatList, StyleSheet, TouchableOpacity, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
+
+type ViewMode = 'subscription' | 'timeline';
 
 const ProgramCard = ({ program }: { program: Subscription }) => {
   const { colors } = useTheme();
   const progress = calculateProgress(program.level.start, program.level.end);
   const navigation = useNavigation();
-  // const { saveProgress, getProgress } = useProgress(program.id);
-  // return (
-  //   <TouchableOpacity
-  //     style={[styles.card, { backgroundColor: colors.SURFACE }]}
-  //     onPress={() => {
-  //       navigation.navigate(Paths.Subscription, program);
-  //     }}>
-  //     <Text style={[styles.programName, { color: colors.BLACK }]}>
-  //       {program.program.name} - {program.level.name}
-  //     </Text>
 
-  //     <View style={styles.progressContainer}>
-  //       <View style={[styles.progressBar, { backgroundColor: colors.GREY }]}>
-  //         <View style={[styles.progressFill, { backgroundColor: colors.PRIMARY_COLOR, width: `${progress}%` }]} />
-  //       </View>
-  //     </View>
-  //   </TouchableOpacity>
-  // );
   return (
     <TouchableOpacity
       style={[styles.card, { backgroundColor: colors.SURFACE }]}
       onPress={() => {
         navigation.navigate(Paths.Subscription, program);
       }}>
-      <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+      <View style={styles.cardContent}>
         <FastImage
           resizeMode="contain"
           source={
@@ -53,35 +40,93 @@ const ProgramCard = ({ program }: { program: Subscription }) => {
               : require('@/assets/images/noImage.png')
           }
           defaultSource={require('@/assets/images/noImage.png')}
-          style={{ width: 50, height: 50, flex: 1 }}
+          style={styles.programImage}
         />
-        <View style={{ flex: 4, paddingHorizontal: 10 }}>
+        <View style={styles.programInfo}>
           <Text style={[styles.programName, { color: colors.BLACK }]}>
             {program.program.name} - {program.level.name}
           </Text>
-          <Text numberOfLines={2} style={[styles.description, { color: colors.BLACK }]}>
+          <Text numberOfLines={2} style={[styles.description, { color: colors.BLACK, opacity: 0.7 }]}>
             {program.program.description}
           </Text>
         </View>
       </View>
       <View style={styles.progressContainer}>
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginVertical: 4 }}>
-          <Text style={[styles.dateText, { color: colors.BLACK }]}>بدء البرنامج {parseRemaining(program.program.start)}</Text>
-          <Text style={[styles.registrationText, { color: colors.BLACK }]}>انتهاء البرنامج: {parseRemaining(program.program.end)}</Text>
+        <View style={styles.progressLabels}>
+          <Text style={[styles.dateText, { color: colors.BLACK }]}>بدء البرنامج {parseRemaining(program.level.start)}</Text>
+          <Text style={[styles.registrationText, { color: colors.BLACK }]}>انتهاء البرنامج: {parseRemaining(program.level.end)}</Text>
         </View>
         <View style={[styles.progressBar, { backgroundColor: colors.GREY }]}>
-          <View style={[styles.progressFill, { backgroundColor: colors.PRIMARY_COLOR, width: `${progress}%` }]} />
+          <View
+            style={[
+              styles.progressFill,
+              {
+                backgroundColor: progress > 100 ? colors.ERROR : colors.WARNING,
+                width: `${progress}%`,
+              },
+            ]}
+          />
         </View>
       </View>
     </TouchableOpacity>
   );
 };
 
+const TimelineCard = ({ lesson, program }: { lesson: Lesson; program: Subscription }) => {
+  const { colors } = useTheme();
+  const navigation = useNavigation();
+  const { t } = useTranslation();
+  return (
+    <TouchableOpacity
+      style={[styles.timelineCard, { backgroundColor: colors.SURFACE }]}
+      onPress={() => navigation.navigate(Paths.Subscription, program)}>
+      <View style={styles.dateContainer}>
+        <SmallTitle style={[styles.dateDayText, { color: colors.BLACK }]}>{moment(new Date(lesson.date)).format('DD')}</SmallTitle>
+        <Text style={[styles.dateMonthText, { color: colors.GREY }]}>{moment(new Date(lesson.date)).format('MMM')}</Text>
+      </View>
+      <CircleStatus Dtstatus={lesson.date} />
+      <View style={styles.lessonInfo}>
+        <Text style={[styles.programLabel, { color: colors.GREY }]}>
+          {t('TodayLessons.programLevel', { program: program.program.name, level: program.level.name })}
+        </Text>
+        <Text style={[styles.lessonTitle, { color: colors.BLACK }]}>{lesson.title}</Text>
+      </View>
+    </TouchableOpacity>
+  );
+};
+
+// Loading shimmer for program cards
+const ProgramCardShimmer = () => {
+  const { colors } = useTheme();
+
+  return (
+    <View style={[styles.card, { backgroundColor: colors.SURFACE }]}>
+      <View style={styles.cardContent}>
+        <View style={[styles.shimmerImage, { backgroundColor: colors.DISABLED }]} />
+        <View style={styles.programInfo}>
+          <View style={[styles.shimmerText, { backgroundColor: colors.DISABLED, width: '80%', height: 20 }]} />
+          <View style={[styles.shimmerText, { backgroundColor: colors.DISABLED, width: '90%', marginTop: 8 }]} />
+          <View style={[styles.shimmerText, { backgroundColor: colors.DISABLED, width: '60%', marginTop: 8 }]} />
+        </View>
+      </View>
+      <View style={styles.progressContainer}>
+        <View style={styles.progressLabels}>
+          <View style={[styles.shimmerText, { backgroundColor: colors.DISABLED, width: '40%' }]} />
+          <View style={[styles.shimmerText, { backgroundColor: colors.DISABLED, width: '40%' }]} />
+        </View>
+        <View style={[styles.progressBar, { backgroundColor: colors.DISABLED }]}>
+          <View style={[styles.progressFill, { backgroundColor: colors.GREY, width: '60%' }]} />
+        </View>
+      </View>
+    </View>
+  );
+};
+
 function MainScreen({ navigation }: RootScreenProps<Paths.Main>) {
-  // const { isDark, colors } = useTheme();
-  // const { t, i18n } = useTranslation();
+  const [viewMode, setViewMode] = useState<ViewMode>('subscription');
   const [apiState, setapiState] = useState<PaginationState<Subscription>>({ ...initStateAPIState, url: '/api/students/subscriptions/v2' });
-  const ItemClass = new Pagination<Subscription>(apiState, setapiState);
+
+  const ItemClass = useMemo(() => new Pagination<Subscription>(apiState, setapiState), [apiState]);
 
   const dispatch = useAppDispatch();
   const user = useAppSelector(state => state.auth);
@@ -110,29 +155,125 @@ function MainScreen({ navigation }: RootScreenProps<Paths.Main>) {
     }
   }, [apiState.results, dispatch]);
 
-  logger.info('subscriptionsState', apiState);
+  const getTimelineData = () => {
+    if (!subscriptionsState) {
+      return [];
+    }
+
+    return subscriptionsState
+      .flatMap(subscription =>
+        subscription.level.tasks.flatMap(task =>
+          task.lessons.map(lesson => ({
+            ...lesson,
+            program: subscription,
+          })),
+        ),
+      )
+      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+  };
+
+  const goToToday = () => {
+    const today = moment().startOf('day');
+    const timelineData = getTimelineData();
+    const todayIndex = timelineData.findIndex(item => moment(item.date).startOf('day').isSame(today));
+
+    if (todayIndex !== -1) {
+      // Scroll to today's lessons
+      // Implementation depends on your FlatList ref
+    }
+  };
 
   return (
     <SafeScreen>
       <View style={styles.container}>
         <View style={styles.headerContainer}>
-          <SmallTitle>اهلا {user.name}</SmallTitle>
-          <TouchableOpacity
-            style={[styles.todayButton, { backgroundColor: themeColors.PRIMARY_COLOR }]}
-            onPress={() => navigation.navigate(Paths.TodayLessons)}>
-            <Text style={[styles.todayButtonText, { color: themeColors.WHITE }]}>دروس اليوم</Text>
-          </TouchableOpacity>
+          <SmallTitle style={styles.welcomeText}>اهلا {user.name}</SmallTitle>
+          <View style={styles.buttonContainer}>
+            <TouchableOpacity
+              style={[
+                styles.viewButton,
+                {
+                  backgroundColor: viewMode === 'subscription' ? themeColors.PRIMARY_COLOR : 'transparent',
+                  borderColor: themeColors.PRIMARY_COLOR,
+                  borderWidth: 1,
+                },
+              ]}
+              onPress={() => setViewMode('subscription')}>
+              <Text style={[styles.buttonText, { color: viewMode === 'subscription' ? themeColors.WHITE : themeColors.PRIMARY_COLOR }]}>
+                الاشتراكات
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[
+                styles.viewButton,
+                {
+                  backgroundColor: viewMode === 'timeline' ? themeColors.PRIMARY_COLOR : 'transparent',
+                  borderColor: themeColors.PRIMARY_COLOR,
+                  borderWidth: 1,
+                },
+              ]}
+              onPress={() => setViewMode('timeline')}>
+              <Text style={[styles.buttonText, { color: viewMode === 'timeline' ? themeColors.WHITE : themeColors.PRIMARY_COLOR }]}>
+                الجدول الزمني
+              </Text>
+            </TouchableOpacity>
+          </View>
         </View>
-        <FlatList
-          data={subscriptionsState || (apiState.results as Subscription[])}
-          renderItem={({ item }) => <ProgramCard program={item} />}
-          keyExtractor={item => item.id}
-          onEndReached={onEndReached}
-          contentContainerStyle={styles.listContainer}
-          showsVerticalScrollIndicator={false}
-          refreshing={apiState.loading && !apiState.results.length}
-          onRefresh={onRefresh}
-        />
+
+        {viewMode === 'subscription' ? (
+          <FlatList
+            data={subscriptionsState || (apiState.results as Subscription[])}
+            renderItem={({ item }) => <ProgramCard program={item} />}
+            keyExtractor={item => item.id}
+            onEndReached={onEndReached}
+            contentContainerStyle={styles.listContainer}
+            showsVerticalScrollIndicator={false}
+            refreshing={apiState.loading && !apiState.results.length}
+            onRefresh={onRefresh}
+            ListEmptyComponent={() =>
+              apiState.loading ? (
+                <View>
+                  <ProgramCardShimmer />
+                  <ProgramCardShimmer />
+                  <ProgramCardShimmer />
+                </View>
+              ) : (
+                <View style={styles.emptyStateContainer}>
+                  <FastImage source={require('@/assets/images/noImage.png')} style={styles.emptyStateImage} resizeMode="contain" />
+                  <Text style={[styles.emptyStateTitle, { color: themeColors.BLACK }]}>لا يوجد اشتراكات</Text>
+                  <Text style={[styles.emptyStateText, { color: themeColors.GREY }]}>يمكنك اضافة اشتراك جديد من خلال البرامج المتاحة</Text>
+                  <TouchableOpacity
+                    style={[styles.emptyStateButton, { backgroundColor: themeColors.PRIMARY_COLOR }]}
+                    onPress={() => navigation.navigate(Paths.Programs)}>
+                    <Text style={[styles.emptyStateButtonText, { color: themeColors.WHITE }]}>عرض البرامج المتاحة</Text>
+                  </TouchableOpacity>
+                </View>
+              )
+            }
+          />
+        ) : (
+          <View style={styles.timelineContainer}>
+            <TouchableOpacity style={[styles.todayButton, { backgroundColor: themeColors.PRIMARY_COLOR }]} onPress={goToToday}>
+              <Text style={[styles.todayButtonText, { color: themeColors.WHITE }]}>دروس اليوم</Text>
+            </TouchableOpacity>
+            <FlatList
+              data={getTimelineData()}
+              renderItem={({ item }) => <TimelineCard lesson={item} program={item.program} />}
+              keyExtractor={(item, index) => `${item.id}-${index}`}
+              contentContainerStyle={styles.listContainer}
+              showsVerticalScrollIndicator={false}
+              refreshing={apiState.loading && !apiState.results.length}
+              onRefresh={onRefresh}
+              ListEmptyComponent={() => (
+                <View style={styles.emptyStateContainer}>
+                  <FastImage source={require('@/assets/images/noImage.png')} style={styles.emptyStateImage} resizeMode="contain" />
+                  <Text style={[styles.emptyStateTitle, { color: themeColors.BLACK }]}>لا يوجد دروس</Text>
+                  <Text style={[styles.emptyStateText, { color: themeColors.GREY }]}>سجل في برامج جديدة لمشاهدة الدروس المتاحة لك</Text>
+                </View>
+              )}
+            />
+          </View>
+        )}
       </View>
     </SafeScreen>
   );
@@ -143,23 +284,33 @@ export default MainScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
   },
   listContainer: {
-    paddingBottom: 16,
+    paddingTop: 6,
+    paddingBottom: 24,
   },
   card: {
+    ...SHADOW,
     padding: 16,
-    borderRadius: 12,
+    borderRadius: 16,
     marginBottom: 16,
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
+    borderWidth: 1,
+    borderColor: 'rgba(0,0,0,0.03)',
+    marginHorizontal: 16,
+  },
+  timelineCard: {
+    ...SHADOW,
+    padding: 16,
+    borderRadius: 16,
+    marginBottom: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(0,0,0,0.03)',
+    marginHorizontal: 16,
   },
   programName: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: 'bold',
     marginBottom: 8,
   },
@@ -168,41 +319,160 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     lineHeight: 20,
   },
-  datesContainer: {
-    gap: 4,
-  },
   dateText: {
-    fontSize: 12,
+    fontSize: 13,
+    fontWeight: '500',
   },
   registrationText: {
-    fontSize: 12,
+    fontSize: 13,
+    fontWeight: '500',
   },
-
   progressContainer: {
-    marginVertical: 12,
+    marginVertical: 8,
   },
   progressBar: {
-    height: 6,
-    borderRadius: 2,
-    overflow: 'visible',
+    height: 8,
+    borderRadius: 4,
+    overflow: 'hidden',
   },
   progressFill: {
     height: '100%',
-    borderRadius: 2,
+    borderRadius: 4,
   },
   headerContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 16,
+    marginBottom: 20,
+    paddingVertical: 16,
+    paddingHorizontal: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(0,0,0,0.05)',
+  },
+  buttonContainer: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  viewButton: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 8,
+    ...SHADOW,
+  },
+  buttonText: {
+    fontSize: 14,
+    fontWeight: '600',
   },
   todayButton: {
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 8,
+    marginBottom: 16,
+    marginRight: 16,
+    alignSelf: 'flex-end',
+    ...SHADOW,
   },
   todayButtonText: {
     fontSize: 14,
     fontWeight: '600',
+  },
+  cardContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  progressLabels: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginVertical: 4,
+  },
+  programImage: {
+    width: 70,
+    height: 70,
+    borderRadius: 10,
+    marginRight: 10,
+  },
+  programInfo: {
+    flex: 1,
+    paddingHorizontal: 10,
+  },
+  shimmerImage: {
+    width: 70,
+    height: 70,
+    borderRadius: 10,
+    marginRight: 10,
+  },
+  shimmerText: {
+    height: 14,
+    borderRadius: 7,
+    marginBottom: 4,
+  },
+  emptyStateImage: {
+    width: 150,
+    height: 150,
+    marginBottom: 20,
+  },
+  emptyStateTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 10,
+    textAlign: 'center',
+  },
+  emptyStateText: {
+    fontSize: 14,
+    opacity: 0.7,
+    textAlign: 'center',
+    marginBottom: 20,
+    paddingHorizontal: 30,
+  },
+  emptyStateContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 40,
+  },
+  welcomeText: {
+    fontSize: 24,
+    fontWeight: 'bold',
+  },
+  dateContainer: {
+    paddingHorizontal: 10,
+    alignItems: 'center',
+  },
+  dateDayText: {
+    fontSize: 20,
+    fontWeight: 'bold',
+  },
+  dateMonthText: {
+    fontSize: 12,
+    marginTop: 2,
+  },
+  lessonInfo: {
+    flex: 1,
+    paddingHorizontal: 10,
+  },
+  programLabel: {
+    fontSize: 12,
+    marginBottom: 4,
+  },
+  lessonTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  emptyStateButton: {
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 8,
+    marginTop: 10,
+    ...SHADOW,
+  },
+  emptyStateButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  timelineContainer: {
+    flex: 1,
+    paddingTop: 10,
   },
 });

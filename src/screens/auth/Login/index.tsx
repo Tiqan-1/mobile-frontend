@@ -157,13 +157,13 @@ function Login({ navigation }: RootScreenProps<Paths.Login>) {
         />
       )}
 
-      <Button
+      {/* <Button
         type="underline"
         title={t('common:AccessibilitySettings')}
         onPress={() => {
           navigation.navigate(Paths.AccessibilitySettings);
         }}
-      />
+      /> */}
       <ActionSheet
         ref={sheet}
         title={t('common:change_language')}
