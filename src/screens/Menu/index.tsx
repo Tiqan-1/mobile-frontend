@@ -69,11 +69,11 @@ function Menu({ navigation }: RootScreenProps<Paths.Menu>) {
   return (
     <SafeScreen>
       <View style={styles.container}>
-        <MenuElement title={'Home'} />
+        {/* <MenuElement title={'Home'} />
         <MenuElement title={'About'} />
         <MenuElement title={'Contact'} />
         <MenuElement title={'Settings'} />
-        <MenuElement title={'AccessibilitySettings'} />
+        <MenuElement title={'AccessibilitySettings'} /> */}
         <Button onPress={logOut} title="Logout" />
       </View>
     </SafeScreen>

@@ -22,7 +22,7 @@ type ViewMode = 'subscription' | 'timeline';
 
 const ProgramCard = ({ program }: { program: Subscription }) => {
   const { colors } = useTheme();
-  const progress = calculateProgress(program.level.start, program.level.end);
+  const progress = program.currentLevel ? calculateProgress(program.currentLevel.start, program.currentLevel.end) : 0;
   const navigation = useNavigation();
 
   return (
@@ -44,7 +44,7 @@ const ProgramCard = ({ program }: { program: Subscription }) => {
         />
         <View style={styles.programInfo}>
           <Text style={[styles.programName, { color: colors.BLACK }]}>
-            {program.program.name} - {program.level.name}
+            {program.program.name} - {program.currentLevel?.name}
           </Text>
           <Text numberOfLines={2} style={[styles.description, { color: colors.BLACK, opacity: 0.7 }]}>
             {program.program.description}
@@ -53,8 +53,10 @@ const ProgramCard = ({ program }: { program: Subscription }) => {
       </View>
       <View style={styles.progressContainer}>
         <View style={styles.progressLabels}>
-          <Text style={[styles.dateText, { color: colors.BLACK }]}>بدء البرنامج {parseRemaining(program.level.start)}</Text>
-          <Text style={[styles.registrationText, { color: colors.BLACK }]}>انتهاء البرنامج: {parseRemaining(program.level.end)}</Text>
+          <Text style={[styles.dateText, { color: colors.BLACK }]}>بدء البرنامج {parseRemaining(program.currentLevel?.start)}</Text>
+          <Text style={[styles.registrationText, { color: colors.BLACK }]}>
+            انتهاء البرنامج: {parseRemaining(program.currentLevel?.end)}
+          </Text>
         </View>
         <View style={[styles.progressBar, { backgroundColor: colors.GREY }]}>
           <View
@@ -72,7 +74,7 @@ const ProgramCard = ({ program }: { program: Subscription }) => {
   );
 };
 
-const TimelineCard = ({ lesson, program }: { lesson: Lesson; program: Subscription }) => {
+const TimelineCard = ({ lesson, program, task }: { lesson: Lesson; program: Subscription; task: Task }) => {
   const { colors } = useTheme();
   const navigation = useNavigation();
   const { t } = useTranslation();
@@ -81,13 +83,13 @@ const TimelineCard = ({ lesson, program }: { lesson: Lesson; program: Subscripti
       style={[styles.timelineCard, { backgroundColor: colors.SURFACE }]}
       onPress={() => navigation.navigate(Paths.Subscription, program)}>
       <View style={styles.dateContainer}>
-        <SmallTitle style={[styles.dateDayText, { color: colors.BLACK }]}>{moment(new Date(lesson.date)).format('DD')}</SmallTitle>
-        <Text style={[styles.dateMonthText, { color: colors.GREY }]}>{moment(new Date(lesson.date)).format('MMM')}</Text>
+        <SmallTitle style={[styles.dateDayText, { color: colors.BLACK }]}>{moment(new Date(task.date)).format('DD')}</SmallTitle>
+        <Text style={[styles.dateMonthText, { color: colors.GREY }]}>{moment(new Date(task.date)).format('MMM')}</Text>
       </View>
       <CircleStatus Dtstatus={lesson.date} />
       <View style={styles.lessonInfo}>
         <Text style={[styles.programLabel, { color: colors.GREY }]}>
-          {t('TodayLessons.programLevel', { program: program.program.name, level: program.level.name })}
+          {t('TodayLessons.programLevel', { program: program.program.name, level: program.currentLevel?.name })}
         </Text>
         <Text style={[styles.lessonTitle, { color: colors.BLACK }]}>{lesson.title}</Text>
       </View>
@@ -162,10 +164,11 @@ function MainScreen({ navigation }: RootScreenProps<Paths.Main>) {
 
     return subscriptionsState
       .flatMap(subscription =>
-        subscription.level.tasks.flatMap(task =>
+        subscription.currentLevel?.tasks?.flatMap(task =>
           task.lessons.map(lesson => ({
             ...lesson,
             program: subscription,
+            lesson: task,
           })),
         ),
       )
@@ -222,7 +225,7 @@ function MainScreen({ navigation }: RootScreenProps<Paths.Main>) {
 
         {viewMode === 'subscription' ? (
           <FlatList
-            data={subscriptionsState || (apiState.results as Subscription[])}
+            data={(apiState.results as Subscription[]) || subscriptionsState}
             renderItem={({ item }) => <ProgramCard program={item} />}
             keyExtractor={item => item.id}
             onEndReached={onEndReached}
@@ -258,7 +261,9 @@ function MainScreen({ navigation }: RootScreenProps<Paths.Main>) {
             </TouchableOpacity>
             <FlatList
               data={getTimelineData()}
-              renderItem={({ item }) => <TimelineCard lesson={item} program={item.program} />}
+              renderItem={({ item }) => (
+                <TimelineCard task={item?.lesson as Task} lesson={item as Lesson} program={item?.program as Subscription} />
+              )}
               keyExtractor={(item, index) => `${item.id}-${index}`}
               contentContainerStyle={styles.listContainer}
               showsVerticalScrollIndicator={false}

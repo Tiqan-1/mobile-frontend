@@ -6,7 +6,7 @@ import { handleErrorMessage, handleSuccessMessage } from '@/components/atoms/Fla
 import { Text, Title } from '@/components/atoms/Text';
 import { SafeScreen } from '@/components/templates';
 import { useAppDispatch, useAppSelector } from '@/hooks/useAppDispatch';
-import type { Paths } from '@/navigation/paths';
+import { Paths } from '@/navigation/paths';
 import type { RootScreenProps } from '@/navigation/types';
 import { POST } from '@/services/API';
 import { logger } from '@/services/logger';
@@ -16,13 +16,13 @@ import { PALETTE } from '@/theme/colors';
 import { calculateProgress, parseRemaining, remaingDays } from '@/utils/dateTime';
 import moment from 'moment';
 import React from 'react';
-import { Alert, FlatList, Pressable, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { Alert, FlatList, StyleSheet, TouchableOpacity, View } from 'react-native';
 
 const ProgramCard = ({ level, program }: { level: Level; program: Program }) => {
   const { colors } = useTheme();
   const { items: subscriptionsState } = useAppSelector(state => state.subscriptions);
 
-  const registerd = subscriptionsState.find(sub => sub.level.id === level.id);
+  const registerd = subscriptionsState.find(sub => sub.currentLevel?.id === level.id);
 
   return (
     <View style={[styles.card, { backgroundColor: colors.SURFACE }]}>
@@ -104,37 +104,44 @@ function Program({ navigation, route }: RootScreenProps<Paths.Program>) {
         />
       </View>
 
-      {/* FAB for subscription */}
-      <Pressable
+      {/* FAB for subscription or navigation */}
+      <TouchableOpacity
         style={[styles.fab, { backgroundColor: colors.PRIMARY_COLOR }]}
         onPress={() => {
-          Alert.alert('سيتم تسجيلك فى برنامج', program.name, [
-            {
-              text: 'نعم',
-              onPress: () =>
-                POST('/api/students/subscriptions/v2/create', {
-                  programId: `${program.id}`,
-                })
-                  .then(res => {
-                    handleSuccessMessage(res.data.message ?? 'تم تسجيلك بنجاح');
-                    dispatch(
-                      setSubscriptions([...subscriptionsState, { id: program.id, program, level: program.levels[0] }] as Subscription[]),
-                    );
+          const enrolledSubscription = subscriptionsState.find(sub => sub.program.id === program.id);
+          
+          if (enrolledSubscription) {
+            // Navigate to subscription screen if enrolled
+            navigation.navigate(Paths.Subscription, enrolledSubscription);
+          } else {
+            // Show enrollment dialog if not enrolled
+            Alert.alert('سيتم تسجيلك فى برنامج', program.name,  [
+              {
+                text: 'نعم',
+                onPress: () =>
+                  POST('/api/students/subscriptions/v2/create', {
+                    programId: `${program.id}`,
                   })
-                  .catch(error => {
-                    handleErrorMessage(error);
-                  }),
-            },
-            {
-              text: 'الغاء',
-              isPreferred: true,
-              style: 'cancel',
-            },
-          ]);
-        }}
-        activeOpacity={0.8}>
-        <Text style={styles.fabText}>+</Text>
-      </Pressable>
+                    .then(res => {
+                      handleSuccessMessage(res.data.message ?? 'تم تسجيلك بنجاح');
+                      dispatch(
+                        setSubscriptions([...subscriptionsState, { id: program.id, program, level: program.levels[0] }] as Subscription[]),
+                      );
+                    })
+                    .catch(error => {
+                      handleErrorMessage(error);
+                    }),
+              },
+              {
+                text: 'الغاء',
+                isPreferred: true,
+                style: 'cancel',
+              },
+            ]);
+          }
+        }}>
+        <Text style={styles.fabText}>{subscriptionsState.some(sub => sub.program.id === program.id) ? '→' : '+'}</Text>
+      </TouchableOpacity>
     </SafeScreen>
   );
 }

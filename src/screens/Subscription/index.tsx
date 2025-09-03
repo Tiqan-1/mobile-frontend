@@ -15,7 +15,6 @@ import moment from 'moment';
 import React, { useEffect, useState } from 'react';
 import { FlatList, Linking, StyleSheet, TouchableOpacity, View } from 'react-native';
 
-
 function Subscription({ navigation, route }: RootScreenProps<Paths.Subscription>) {
   const { colors } = useTheme();
   const [selectedVideo, setSelectedVideo] = useState<Lesson | null>(null);
@@ -25,16 +24,18 @@ function Subscription({ navigation, route }: RootScreenProps<Paths.Subscription>
     navigation.setOptions({ title: subscription.program.name });
   }, [navigation, subscription]);
 
-  const lesson = subscription.level.tasks.reduce((acc, task) => {
-    return acc + task.lessons.length;
-  }, 0);
+  const lesson =
+    subscription.currentLevel?.tasks?.reduce((acc, task) => {
+      return acc + task.lessons.length;
+    }, 0) || [];
 
-  const flatLessons = subscription.level.tasks.flatMap((task: Task) =>
-    task.lessons.map((lesson: Lesson) => ({
-      ...lesson,
-      date: task.date,
-    })),
-  );
+  const flatLessons =
+    subscription.currentLevel?.tasks?.flatMap((task: Task) =>
+      task.lessons.map((lesson: Lesson) => ({
+        ...lesson,
+        date: task.date,
+      })),
+    ) || [];
 
   const onCardPress = (item: Lesson) => {
     const url = item.url;
@@ -74,7 +75,7 @@ function Subscription({ navigation, route }: RootScreenProps<Paths.Subscription>
           <Text style={{ color: colors.WARNING }}>يبدا فى {moment(new Date(subscription.program.start)).format('YYYY/MM/DD')}</Text>
           <View style={styles.element}>
             <Level />
-            <Text bgColor={styles.header.backgroundColor}>{subscription.level.name}</Text>
+            <Text bgColor={styles.header.backgroundColor}>{subscription.currentLevel?.name}</Text>
           </View>
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
             <View style={styles.element}>

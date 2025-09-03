@@ -1,13 +1,13 @@
 interface Program {
   createdBy: Record<string, unknown>;
   description: string;
-  end: string;
+  end: Date;
   id: string;
-  levels: unknown[];
+  levels?: Level[];
   name: string;
   registrationEnd: Date;
   registrationStart: Date;
-  start: string;
+  start: Date;
   thumbnail: string;
 }
 
@@ -16,7 +16,7 @@ interface Level {
   id: string;
   name: string;
   start: Date;
-  tasks: Task[];
+  tasks?: Task[];
 }
 
 interface Task {
@@ -33,8 +33,8 @@ interface Lesson {
 }
 
 interface Subscription {
+  currentLevel?: Level;
   id: string;
-  level: Level;
   program: Program;
   state: 'active';
   subscriptionDate: string;

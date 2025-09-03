@@ -52,7 +52,7 @@ const ProgramCard = ({ program }: { program: Program }) => {
       <View style={styles.progressContainer}>
         <View style={styles.progressLabels}>
           <Text style={[styles.registrationText, { color: colors.BLACK }]}>انتهاء التسجيل: {parseRemaining(program.registrationEnd)}</Text>
-          <Text style={[styles.dateText, { color: colors.BLACK }]}>بدء البرنامج {parseRemaining(program.start)}</Text>
+          <Text style={[styles.dateText, { color: colors.BLACK }]}>بدء البرنامج {parseRemaining(program?.start)}</Text>
         </View>
         <View style={[styles.progressBar, { backgroundColor: colors.GREY }]}>
           <View style={[styles.progressFill, { 
@@ -243,7 +243,7 @@ function Programs({ navigation }: RootScreenProps<Paths.Programs>) {
             <Text style={[styles.filterLabel, { color: colors.BLACK }]}>تاريخ البدء:</Text>
             <TextInput
               style={[styles.input, { borderColor: colors.GREY, color: colors.BLACK }]}
-              value={formatDateForInput(localFilters.start)}
+              value={formatDateForInput(localFilters?.start)}
               onChangeText={text => setLocalFilters({ ...localFilters, start: text })}
               placeholder="YYYY-MM-DD"
               placeholderTextColor={colors.GREY}

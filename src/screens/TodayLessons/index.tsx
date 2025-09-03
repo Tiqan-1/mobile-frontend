@@ -48,8 +48,8 @@ function TodayLessons({ navigation }: RootScreenProps<Paths.TodayLessons>) {
     setSelectedDate(moment().format('YYYY-MM-DD'));
   }, []);
 
-  const LessonCard = ({ subscription }: { subscription: { lesson: Lesson; level: Level; program: Program; task: Task } }) => {
-    const { lesson, task, level, program } = subscription;
+  const LessonCard = ({ subscription }: { subscription: { currentLevel: Level; lesson: Lesson; program: Program; task: Task } }) => {
+    const { lesson, task, currentLevel: level, program } = subscription;
     const { colors } = useTheme();
     const navigation = useNavigation();
 
@@ -67,12 +67,12 @@ function TodayLessons({ navigation }: RootScreenProps<Paths.TodayLessons>) {
     return (
       <TouchableOpacity style={[styles.card, { backgroundColor: colors.SURFACE }]} onPress={() => onCardPress(lesson)}>
         <View style={styles.timeContainer}>
-          <Text style={[styles.timeText, { color: colors.BLACK }]}>{moment(new Date(task.date)).format('HH:mm')}</Text>
+          <Text style={[styles.timeText, { color: colors.BLACK }]}>{task && moment(new Date(task.date)).format('HH:mm')}</Text>
         </View>
         <CircleStatus Dtstatus={task.date} />
         <View style={styles.contentContainer}>
           <Text style={[styles.type, { color: colors.GREY }]}>
-            {t('TodayLessons.programLevel', { program: program.name, level: level.name })}
+            {t('TodayLessons.programLevel', { program: program.name, level: level?.name })}
           </Text>
           <Text style={[styles.title, { color: colors.BLACK }]}>{lesson.title}</Text>
         </View>
@@ -82,12 +82,12 @@ function TodayLessons({ navigation }: RootScreenProps<Paths.TodayLessons>) {
 
   const allLessons = useMemo(() => {
     return subscriptions.flatMap(subscription =>
-      subscription.level.tasks.flatMap(task =>
+      subscription.currentLevel?.tasks?.flatMap(task =>
         task.lessons.map(lesson => ({
           lesson,
           task,
           program: subscription.program,
-          level: subscription.level,
+          level: subscription.currentLevel,
         })),
       ),
     );
@@ -96,6 +96,9 @@ function TodayLessons({ navigation }: RootScreenProps<Paths.TodayLessons>) {
   const markedDates = useMemo(() => {
     const dates: { [key: string]: { dots: { color: string }[] } } = {};
     allLessons.forEach(({ task }) => {
+      if (!task) {
+        return;
+      }
       const date = moment(task.date).locale('en').format('YYYY-MM-DD');
       const dateStatus = moment(new Date(task.date)).diff(moment().startOf('day'), 'days');
       let colorSelected = "";
