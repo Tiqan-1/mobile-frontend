@@ -8,7 +8,7 @@ import { logger } from './logger';
 
 // import * as DataBase from './AsyncStorage';
 // import {isTestAPI} from './constants';
-export const baseURLProd = 'https://officially-together-joey.ngrok-free.app';
+export const baseURLProd = 'https://mubadarah.ce-svcs.cc';
 // export const baseURLProd = Config.API_URL;
 
 export type PARAMS = {

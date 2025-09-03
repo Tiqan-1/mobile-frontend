@@ -1,5 +1,5 @@
 import CircleStatus from '@/components/atoms/CircleStatus';
-import { SmallTitle, Text } from '@/components/atoms/Text';
+import { SmallText, SmallTitle, Text } from '@/components/atoms/Text';
 import { SafeScreen } from '@/components/templates';
 import { useAppDispatch, useAppSelector } from '@/hooks/useAppDispatch';
 import { Paths } from '@/navigation/paths';
@@ -187,7 +187,7 @@ function MainScreen({ navigation }: RootScreenProps<Paths.Main>) {
     <SafeScreen>
       <View style={styles.container}>
         <View style={styles.headerContainer}>
-          <SmallTitle style={styles.welcomeText}>اهلا {user.name}</SmallTitle>
+          <Text style={styles.welcomeText}>اهلا, {user.name}</Text>
           <View style={styles.buttonContainer}>
             <TouchableOpacity
               style={[
@@ -254,7 +254,7 @@ function MainScreen({ navigation }: RootScreenProps<Paths.Main>) {
         ) : (
           <View style={styles.timelineContainer}>
             <TouchableOpacity style={[styles.todayButton, { backgroundColor: themeColors.PRIMARY_COLOR }]} onPress={goToToday}>
-              <Text style={[styles.todayButtonText, { color: themeColors.WHITE }]}>دروس اليوم</Text>
+              <SmallText style={[styles.todayButtonText, { color: themeColors.WHITE }]}>دروس اليوم</SmallText>
             </TouchableOpacity>
             <FlatList
               data={getTimelineData()}
@@ -354,21 +354,20 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   viewButton: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 8,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 4,
     ...SHADOW,
   },
   buttonText: {
-    fontSize: 14,
     fontWeight: '600',
   },
   todayButton: {
-    paddingHorizontal: 16,
+    paddingHorizontal: 4,
     paddingVertical: 8,
     borderRadius: 8,
-    marginBottom: 16,
-    marginRight: 16,
+    marginBottom: 8,
+    marginRight: 8,
     alignSelf: 'flex-end',
     ...SHADOW,
   },
@@ -433,7 +432,6 @@ const styles = StyleSheet.create({
     paddingVertical: 40,
   },
   welcomeText: {
-    fontSize: 24,
     fontWeight: 'bold',
   },
   dateContainer: {

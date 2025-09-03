@@ -1,5 +1,6 @@
 import type { PayloadAction } from "@reduxjs/toolkit";
 import { createSlice } from "@reduxjs/toolkit";
+import { PURGE } from "redux-persist";
 
 interface SubscriptionsState {
   items: Subscription[];
@@ -20,6 +21,10 @@ const subscriptionsSlice = createSlice({
       state.lastUpdated = Date.now();
     },
     resetSubscriptions: () => initialState,
+  },
+  extraReducers: builder => {
+    builder.addCase(PURGE, () => initialState);
+    builder.addCase('auth/logout', () => initialState);
   },
 });
 

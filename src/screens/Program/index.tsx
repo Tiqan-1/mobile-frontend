@@ -16,42 +16,16 @@ import { PALETTE } from '@/theme/colors';
 import { calculateProgress, parseRemaining, remaingDays } from '@/utils/dateTime';
 import moment from 'moment';
 import React from 'react';
-import { Alert, FlatList, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { Alert, FlatList, Pressable, StyleSheet, TouchableOpacity, View } from 'react-native';
 
 const ProgramCard = ({ level, program }: { level: Level; program: Program }) => {
   const { colors } = useTheme();
   const { items: subscriptionsState } = useAppSelector(state => state.subscriptions);
-  const dispatch = useAppDispatch();
 
   const registerd = subscriptionsState.find(sub => sub.level.id === level.id);
 
   return (
-    <TouchableOpacity
-      style={[styles.card, { backgroundColor: colors.SURFACE }]}
-      onPress={() => {
-        Alert.alert(level.name, 'سيتم تسجيلك فى برنامج', [
-          {
-            text: 'نعم',
-            onPress: () =>
-              POST('/api/students/subscriptions', {
-                programId: `${program.id}`,
-                levelId: `${level.id}`,
-              })
-                .then(res => {
-                  handleSuccessMessage(res.data.message ?? 'تم تسجيلك بنجاح');
-                  dispatch(setSubscriptions([...subscriptionsState, { id: level.id, level, program }] as Subscription[]));
-                })
-                .catch(error => {
-                  handleErrorMessage(error);
-                }),
-          },
-          {
-            text: 'الغاء',
-            isPreferred: true,
-            style: 'cancel',
-          },
-        ]);
-      }}>
+    <View style={[styles.card, { backgroundColor: colors.SURFACE }]}>
       <Text style={[styles.programName, { color: colors.BLACK }]}>{level.name}</Text>
       <View style={styles.datesContainer}>
         <Text style={[styles.registrationText, { color: colors.BLACK }]}>انتهاء التسجيل: {parseRemaining(level.start)}</Text>
@@ -60,13 +34,14 @@ const ProgramCard = ({ level, program }: { level: Level; program: Program }) => 
       <View style={[styles.statusTag, { backgroundColor: registerd ? colors.SUCCESS : colors.DISABLED }]}>
         <Text style={[styles.statusText, { color: colors.WHITE }]}>{registerd ? 'مسجل' : 'غير مسجل'}</Text>
       </View>
-    </TouchableOpacity>
+    </View>
   );
 };
 
 function Program({ navigation, route }: RootScreenProps<Paths.Program>) {
   const program: Program = route.params || Program;
   const { items: subscriptionsState } = useAppSelector(state => state.subscriptions);
+  const dispatch = useAppDispatch();
 
   // useEffect(() => {
   //   navigation.setOptions({ title: program.name, headerShown: true, });
@@ -122,12 +97,44 @@ function Program({ navigation, route }: RootScreenProps<Paths.Program>) {
 
         <FlatList
           data={program.levels as Level[]}
-          renderItem={({ item }) => <ProgramCard level={item} program={program}/>}
+          renderItem={({ item }) => <ProgramCard level={item} program={program} />}
           keyExtractor={item => item.id}
           contentContainerStyle={styles.listContainer}
           showsVerticalScrollIndicator={false}
         />
       </View>
+
+      {/* FAB for subscription */}
+      <Pressable
+        style={[styles.fab, { backgroundColor: colors.PRIMARY_COLOR }]}
+        onPress={() => {
+          Alert.alert('سيتم تسجيلك فى برنامج', program.name, [
+            {
+              text: 'نعم',
+              onPress: () =>
+                POST('/api/students/subscriptions/v2/create', {
+                  programId: `${program.id}`,
+                })
+                  .then(res => {
+                    handleSuccessMessage(res.data.message ?? 'تم تسجيلك بنجاح');
+                    dispatch(
+                      setSubscriptions([...subscriptionsState, { id: program.id, program, level: program.levels[0] }] as Subscription[]),
+                    );
+                  })
+                  .catch(error => {
+                    handleErrorMessage(error);
+                  }),
+            },
+            {
+              text: 'الغاء',
+              isPreferred: true,
+              style: 'cancel',
+            },
+          ]);
+        }}
+        activeOpacity={0.8}>
+        <Text style={styles.fabText}>+</Text>
+      </Pressable>
     </SafeScreen>
   );
 }
@@ -215,5 +222,25 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     width: '100%',
+  },
+  fab: {
+    position: 'absolute',
+    bottom: 20,
+    right: 20,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    justifyContent: 'center',
+    alignItems: 'center',
+    elevation: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+  },
+  fabText: {
+    color: '#FFFFFF',
+    fontSize: 24,
+    fontWeight: 'bold',
   },
 });

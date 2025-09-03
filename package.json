@@ -17,6 +17,8 @@
     "postinstall": "npx patch-package"
   },
   "dependencies": {
+    "@ant-design/icons-react-native": "^2.3.2",
+    "@ant-design/react-native": "^5.4.2",
     "@nozbe/watermelondb": "^0.28.0",
     "@nozbe/with-observables": "^1.6.0",
     "@react-native-masked-view/masked-view": "^0.3.1",

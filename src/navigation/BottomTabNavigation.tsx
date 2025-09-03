@@ -1,22 +1,19 @@
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { useNavigation } from '@react-navigation/native';
-
-import React from 'react';
-import { useTranslation } from 'react-i18next';
-import Icon from 'react-native-vector-icons/dist/FontAwesome';
-
-import typography from '@/theme/typography';
 import { useI18n } from '@/hooks';
-
 import LibraryScreen from '@/screens/LibraryScreen';
 import MainScreen from '@/screens/MainScreen';
 import Menu from '@/screens/Menu';
 import Programs from '@/screens/Programs';
-
-import { Paths } from './paths';
+import TodayLessons from '@/screens/TodayLessons';
+import typography from '@/theme/typography';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { useNavigation } from '@react-navigation/native';
 import Book from 'assets/svg-app/book.svg';
 import Bookm from 'assets/svg-app/bookm.svg';
-import TodayLessons from '@/screens/TodayLessons';
+import React from 'react';
+import { useTranslation } from 'react-i18next';
+import Icon from 'react-native-vector-icons/dist/FontAwesome';
+import { Paths } from './paths';
+
 const Tab = createBottomTabNavigator();
 
 // Placeholder component for the Accessibility tab
@@ -57,7 +54,7 @@ const BottomTabNavigation = () => {
         name={Paths.Main}
         options={{
           tabBarLabel: t('navigation.Main'),
-          tabBarIcon: ({ focused, color, size }) => <Bookm fill={color} width={size} />,
+          tabBarIcon: ({ focused, color, size }) => <Bookm fill={color} width={size} height={size} />,
           tabBarAccessibilityLabel: 'Main tab',
         }}
       />
@@ -105,7 +102,7 @@ const BottomTabNavigation = () => {
         name="Menu"
         options={{
           tabBarLabel: 'Menu',
-          tabBarIcon: ({ color, size }) => <Icon name="coffee" color={color} size={size} />,
+          tabBarIcon: ({ color, size }) => <Icon name="coffee" color={color} size={size} height={size} width={size} />,
           tabBarAccessibilityLabel: 'Accessibility settings tab',
         }}
       />
