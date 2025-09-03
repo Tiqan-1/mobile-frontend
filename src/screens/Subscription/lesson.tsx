@@ -4,14 +4,16 @@ import { Paths } from '@/navigation/paths';
 import { useNavigation } from '@react-navigation/native';
 import { ActivityIndicator, StyleSheet, TouchableOpacity, View } from 'react-native';
 import YoutubePlayer from 'react-native-youtube-iframe';
+import { useTranslation } from 'react-i18next';
+import type { Lesson } from '@/types/program';
+
 
 const renderItem = ({ item }: { item: Lesson }) => {
   const navigation = useNavigation();
-  const dispatch = useAppDispatch();
- 
+  const { t } = useTranslation();
 
   if (item.type === 'pdf') {
-    const pdfDoc = { ...item, ...store.progressData[item.id] };
+    const pdfDoc = { ...item, currentPage: item.currentPage || 1, totalPages: item.totalPages || 1 };
     const handlePress = async () => {
       if (!pdfDoc.localPath) {
         // await dispatch(downloadDocument(pdfDoc));
@@ -25,7 +27,7 @@ const renderItem = ({ item }: { item: Lesson }) => {
       <TouchableOpacity style={styles.documentItem} onPress={handlePress}>
         <Text style={styles.title}>{pdfDoc.title}</Text>
         <Text style={styles.progress}>
-          {t('currentPage')}: {pdfDoc.currentPage}/{pdfDoc.totalPages}
+          {t('common:currentPage', { defaultValue: 'Current Page' })}: {pdfDoc.currentPage}/{pdfDoc.totalPages}
         </Text>
         {isDownloading && <ActivityIndicator style={styles.loader} />}
       </TouchableOpacity>

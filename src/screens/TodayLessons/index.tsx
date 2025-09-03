@@ -8,14 +8,15 @@ import type { RootScreenProps } from '@/navigation/types';
 import { useTheme } from '@/theme';
 import { useNavigation } from '@react-navigation/native';
 import moment from 'moment';
-import 'moment/locale/ar';
-import i18n from '@/translations';
 import React, { useMemo, useState } from 'react';
+import 'moment/locale/ar';
+import { SHADOW } from '@/theme/styles';
+import i18n from '@/translations';
+import type { Lesson, Level as LEVEL, Program, Task } from '@/types/program';
 import { useTranslation } from 'react-i18next';
 import { FlatList, Linking, StyleSheet, TouchableOpacity, View } from 'react-native';
 import type { DateData } from 'react-native-calendars';
 import { Calendar, LocaleConfig } from 'react-native-calendars';
-import { SHADOW } from '@/theme/styles';
 
 LocaleConfig.locales['ar'] = {
   monthNames: ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'],
@@ -48,7 +49,7 @@ function TodayLessons({ navigation }: RootScreenProps<Paths.TodayLessons>) {
     setSelectedDate(moment().format('YYYY-MM-DD'));
   }, []);
 
-  const LessonCard = ({ subscription }: { subscription: { currentLevel: Level; lesson: Lesson; program: Program; task: Task } }) => {
+  const LessonCard = ({ subscription }: { subscription: { currentLevel: LEVEL; lesson: Lesson; program: Program; task: Task } }) => {
     const { lesson, task, currentLevel: level, program } = subscription;
     const { colors } = useTheme();
     const navigation = useNavigation();
@@ -81,16 +82,23 @@ function TodayLessons({ navigation }: RootScreenProps<Paths.TodayLessons>) {
   };
 
   const allLessons = useMemo(() => {
-    return subscriptions.flatMap(subscription =>
-      subscription.currentLevel?.tasks?.flatMap(task =>
-        task.lessons.map(lesson => ({
-          lesson,
-          task,
-          program: subscription.program,
-          level: subscription.currentLevel,
-        })),
-      ),
-    );
+    return subscriptions
+      .flatMap(subscription => {
+        if (!subscription.currentLevel) {
+          return [];
+        }
+        return (
+          subscription.currentLevel.tasks?.flatMap((task: Task) =>
+            task.lessons.map((lesson: Lesson) => ({
+              lesson,
+              task,
+              program: subscription.program,
+              currentLevel: subscription.currentLevel!,
+            })),
+          ) || []
+        );
+      })
+      .filter(Boolean);
   }, [subscriptions]);
 
   const markedDates = useMemo(() => {
@@ -101,7 +109,7 @@ function TodayLessons({ navigation }: RootScreenProps<Paths.TodayLessons>) {
       }
       const date = moment(task.date).locale('en').format('YYYY-MM-DD');
       const dateStatus = moment(new Date(task.date)).diff(moment().startOf('day'), 'days');
-      let colorSelected = "";
+      let colorSelected = '';
       if (dateStatus < 0) {
         colorSelected = colors.ERROR;
       } else if (dateStatus === 0) {
@@ -111,7 +119,7 @@ function TodayLessons({ navigation }: RootScreenProps<Paths.TodayLessons>) {
       }
       if (!dates[date]) {
         dates[date] = {
-          dots: [{ color: colorSelected }]
+          dots: [{ color: colorSelected }],
         };
       } else {
         dates[date].dots.push({ color: colorSelected });
@@ -162,8 +170,8 @@ function TodayLessons({ navigation }: RootScreenProps<Paths.TodayLessons>) {
           ) : (
             <FlatList
               data={selectedDateLessons}
-              renderItem={({ item }) => <LessonCard subscription={item} />}
-              keyExtractor={(item, index) => `${item.lesson.id}-${index}`}
+              renderItem={({ item }) => (item ? <LessonCard subscription={item} /> : null)}
+              keyExtractor={(item, index) => (item ? `${item.lesson.id}-${index}` : `empty-${index}`)}
               contentContainerStyle={styles.listContainer}
               showsVerticalScrollIndicator={false}
             />

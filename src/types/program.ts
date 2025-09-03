@@ -1,4 +1,4 @@
-interface Program {
+export interface Program {
   createdBy: Record<string, unknown>;
   description: string;
   end: Date;
@@ -11,7 +11,7 @@ interface Program {
   thumbnail: string;
 }
 
-interface Level {
+export interface Level {
   end: Date;
   id: string;
   name: string;
@@ -19,12 +19,12 @@ interface Level {
   tasks?: Task[];
 }
 
-interface Task {
+export interface Task {
   date: Date;
   id: string;
   lessons: Lesson[];
 }
-interface Lesson {
+export interface Lesson {
   date: Date;
   id: string;
   title: string;
@@ -32,7 +32,7 @@ interface Lesson {
   url: string;
 }
 
-interface Subscription {
+export interface Subscription {
   currentLevel?: Level;
   id: string;
   program: Program;

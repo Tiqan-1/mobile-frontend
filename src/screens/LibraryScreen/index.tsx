@@ -137,7 +137,7 @@ const LibraryScreen = () => {
         <TouchableOpacity style={styles.documentItem} onPress={handlePress}>
           <Text style={styles.title}>{pdfDoc.title}</Text>
           <Text style={styles.progress}>
-            {t('currentPage')}: {pdfDoc.currentPage}/{pdfDoc.totalPages}
+            {t('common:currentPage', { defaultValue: 'Current Page' })}: {pdfDoc.currentPage}/{pdfDoc.totalPages}
           </Text>
           {isDownloading && <ActivityIndicator style={styles.loader} />}
         </TouchableOpacity>
