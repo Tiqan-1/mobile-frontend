@@ -151,3 +151,4 @@ const documentsSlice = createSlice({
 
 export const {setCurrentPage, resetDocuments} = documentsSlice.actions;
 export default documentsSlice.reducer;
+export type RootState = ReturnType<typeof documentsSlice.reducer>;

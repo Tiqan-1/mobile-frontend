@@ -40,3 +40,4 @@ export const authReducer = createSlice({
 export const { login, logout } = authReducer.actions;
 
 export default authReducer.reducer;
+export type RootState = ReturnType<typeof authReducer.reducer>;

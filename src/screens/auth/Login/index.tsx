@@ -19,7 +19,7 @@ import Eye from 'assets/svg/input-eye.svg';
 import { Formik } from 'formik';
 import React, { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ActivityIndicator, KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 import ActionSheet from 'react-native-actionsheet';
 import * as yup from 'yup';
 
@@ -33,7 +33,7 @@ function Login({ navigation }: RootScreenProps<Paths.Login>) {
   const sheet = useRef<ActionSheet>(null);
 
   const [apiState, setapiState] = useState<APISTATE<unknown>>(initStateAPIState);
-  const { translate, changeLanguage } = useI18n();
+  const { changeLanguage } = useI18n();
   const [secure, setsecure] = useState(true);
   const dispatch = useAppDispatch();
   const currentLanguage = i18n.language;

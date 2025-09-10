@@ -28,8 +28,7 @@ const AccessibilitySettings = () => {
     <ScrollView
       style={styles.container}
       contentContainerStyle={styles.contentContainer}
-      accessible={true}
-      accessibilityRole="scrollView">
+      accessible={true}>
       <Title style={styles.title} accessibilityRole="header">
         Accessibility Settings
       </Title>

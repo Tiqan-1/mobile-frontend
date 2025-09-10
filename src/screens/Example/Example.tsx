@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Alert, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 import { useTheme } from '@/theme';
 import { useI18n } from '@/hooks';
@@ -11,109 +11,84 @@ import { SafeScreen } from '@/components/templates';
 function Example() {
   const { t } = useTranslation();
   const { toggleLanguage } = useI18n();
-
-  const {
-    backgrounds,
-    changeTheme,
-    colors,
-    components,
-    fonts,
-    gutters,
-    layout,
-    variant,
-  } = useTheme();
-
+  const { colors, toggleTheme, isDark } = useTheme();
   const [currentId, setCurrentId] = useState(-1);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const fetchOneUserQuery = useFetchOneQuery(currentId);
-
-  useEffect(() => {
-    if (fetchOneUserQuery.isSuccess) {
-      Alert.alert(
-        t('screen_example.hello_user', { name: fetchOneUserQuery.data.name }),
-      );
+  const fetchUser = async () => {
+    setIsLoading(true);
+    try {
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      Alert.alert(t('screen_example.hello_user', { name: `User ${currentId}` }));
+    } catch {
+      Alert.alert('Error', 'Failed to fetch user');
+    } finally {
+      setIsLoading(false);
     }
-  }, [fetchOneUserQuery.isSuccess, fetchOneUserQuery.data, t]);
+  };
 
   const onChangeTheme = () => {
-    changeTheme(variant === 'default' ? 'dark' : 'default');
+    toggleTheme();
   };
 
   return (
-    <SafeScreen
-      isError={fetchOneUserQuery.isError}
-      onResetError={fetchOneUserQuery.refetch}
-    >
-      <ScrollView>
-        <View
-          style={[
-            layout.justifyCenter,
-            layout.itemsCenter,
-            gutters.marginTop_80,
-          ]}
-        >
-          <View
-            style={[layout.relative, backgrounds.gray100, components.circle250]}
-          />
-
-          <View style={[layout.absolute, gutters.paddingTop_80]}>
+    <SafeScreen>
+      <ScrollView style={styles.container}>
+        <View style={styles.header}>
+          <View style={styles.circle} />
+          <View style={styles.imageContainer}>
             <AssetByVariant
               path={'tom'}
               resizeMode={'contain'}
-              style={{ height: 300, width: 300 }}
+              style={styles.image}
             />
           </View>
         </View>
 
-        <View style={[gutters.paddingHorizontal_32, gutters.marginTop_40]}>
-          <View style={[gutters.marginTop_40]}>
-            <Text style={[fonts.size_40, fonts.gray800, fonts.bold]}>
+        <View style={styles.content}>
+          <View style={styles.textSection}>
+            <Text style={[styles.title, { color: colors.TEXT }]}>
               {t('screen_example.title')}
             </Text>
-            <Text
-              style={[fonts.size_16, fonts.gray200, gutters.marginBottom_40]}
-            >
+            <Text style={[styles.description, { color: colors.TEXT }]}>
               {t('screen_example.description')}
             </Text>
           </View>
 
-          <View
-            style={[
-              layout.row,
-              layout.justifyBetween,
-              layout.fullWidth,
-              gutters.marginTop_16,
-            ]}
-          >
+          <View style={styles.buttonRow}>
             <Skeleton
               height={64}
-              loading={fetchOneUserQuery.isLoading}
-              style={{ borderRadius: components.buttonCircle.borderRadius }}
+              loading={isLoading}
+              style={styles.skeletonButton}
               width={64}
             >
               <TouchableOpacity
-                onPress={() => setCurrentId(Math.ceil(Math.random() * 9 + 1))}
-                style={[components.buttonCircle, gutters.marginBottom_16]}
+                onPress={() => {
+                  setCurrentId(Math.ceil(Math.random() * 9 + 1));
+                  fetchUser();
+                }}
+                style={[styles.button, { backgroundColor: colors.BUTTON_MAIN_COLOR }]}
                 testID="fetch-user-button"
               >
-                <IconByVariant path={'send'} stroke={colors.purple500} />
+                <IconByVariant path={'send'} stroke={colors.WHITE} />
               </TouchableOpacity>
             </Skeleton>
 
             <TouchableOpacity
               onPress={onChangeTheme}
-              style={[components.buttonCircle, gutters.marginBottom_16]}
+              style={[styles.button, { backgroundColor: colors.BUTTON_MAIN_COLOR }]}
               testID="change-theme-button"
             >
-              <IconByVariant path={'theme'} stroke={colors.purple500} />
+              <IconByVariant path={'theme'} stroke={colors.WHITE} />
             </TouchableOpacity>
 
             <TouchableOpacity
               onPress={toggleLanguage}
-              style={[components.buttonCircle, gutters.marginBottom_16]}
+              style={[styles.button, { backgroundColor: colors.BUTTON_MAIN_COLOR }]}
               testID="change-language-button"
             >
-              <IconByVariant path={'language'} stroke={colors.purple500} />
+              <IconByVariant path={'language'} stroke={colors.WHITE} />
             </TouchableOpacity>
           </View>
         </View>
@@ -121,5 +96,64 @@ function Example() {
     </SafeScreen>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 16,
+  },
+  header: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 80,
+    position: 'relative',
+  },
+  circle: {
+    width: 250,
+    height: 250,
+    borderRadius: 125,
+    backgroundColor: '#f3f4f6',
+  },
+  imageContainer: {
+    position: 'absolute',
+    paddingTop: 80,
+  },
+  image: {
+    height: 300,
+    width: 300,
+  },
+  content: {
+    paddingHorizontal: 32,
+    marginTop: 40,
+  },
+  textSection: {
+    marginTop: 40,
+  },
+  title: {
+    fontSize: 40,
+    fontWeight: 'bold',
+  },
+  description: {
+    fontSize: 16,
+    marginBottom: 40,
+  },
+  buttonRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
+    marginTop: 16,
+  },
+  button: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  skeletonButton: {
+    borderRadius: 32,
+  },
+});
 
 export default Example;

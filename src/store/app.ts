@@ -8,7 +8,7 @@ const initialState: AppState = {
   isDark: null,
 };
 
-export const authReducer = createSlice({
+export const appReducer = createSlice({
   name: 'app',
   initialState,
   reducers: {
@@ -18,6 +18,7 @@ export const authReducer = createSlice({
   },
 });
 
-export const { setDark } = authReducer.actions;
+export const { setDark } = appReducer.actions;
 
-export default authReducer.reducer;
+export default appReducer.reducer;
+export type RootState = ReturnType<typeof appReducer.reducer>;

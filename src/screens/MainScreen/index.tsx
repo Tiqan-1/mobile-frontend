@@ -5,11 +5,11 @@ import { useAppDispatch, useAppSelector } from '@/hooks/useAppDispatch';
 import { Paths } from '@/navigation/paths';
 import type { RootScreenProps } from '@/navigation/types';
 import { GET, initStateAPIState } from '@/services/API';
-import { logger } from '@/services/logger';
-import { Pagination } from '@/services/Pagination';
+import { Pagination, type PaginationState } from '@/services/Pagination';
 import { setSubscriptions } from '@/store/subscriptionSlice';
 import { useTheme } from '@/theme';
 import { SHADOW } from '@/theme/styles';
+import type { Lesson, Subscription, Task } from '@/types/program';
 import { calculateProgress, parseRemaining } from '@/utils/dateTime';
 import { useNavigation } from '@react-navigation/native';
 import moment from 'moment';
@@ -125,15 +125,20 @@ const ProgramCardShimmer = () => {
 };
 
 function MainScreen({ navigation }: RootScreenProps<Paths.Main>) {
+  const { t } = useTranslation();
+  const dispatch = useAppDispatch();
+  const user = useAppSelector(state => state.auth) || { name: 'المستخدم' };
+  const { items: subscriptionsState } = useAppSelector(state => state.subscriptions) || {};
+  const { colors: themeColors } = useTheme();
+
   const [viewMode, setViewMode] = useState<ViewMode>('subscription');
-  const [apiState, setapiState] = useState<PaginationState<Subscription>>({ ...initStateAPIState, url: '/api/students/subscriptions/v2' });
+  const [apiState, setapiState] = useState<PaginationState<Subscription>>({
+    ...initStateAPIState,
+    url: '/api/students/subscriptions/v2',
+    pagination: { page: 1 },
+  });
 
   const ItemClass = useMemo(() => new Pagination<Subscription>(apiState, setapiState), [apiState]);
-
-  const dispatch = useAppDispatch();
-  const user = useAppSelector(state => state.auth);
-  const { items: subscriptionsState } = useAppSelector(state => state.subscriptions);
-  const { colors: themeColors } = useTheme();
 
   useEffect(() => {
     ItemClass.init();
@@ -148,7 +153,9 @@ function MainScreen({ navigation }: RootScreenProps<Paths.Main>) {
     if (apiState.loading) {
       return;
     }
-    ItemClass.next(apiState);
+    if (apiState.pagination?.page) {
+      ItemClass.next(apiState);
+    }
   };
 
   useEffect(() => {
@@ -163,25 +170,33 @@ function MainScreen({ navigation }: RootScreenProps<Paths.Main>) {
     }
 
     return subscriptionsState
-      .flatMap(subscription =>
-        subscription.currentLevel?.tasks?.flatMap(task =>
-          task.lessons.map(lesson => ({
+      .flatMap((subscription: Subscription) =>
+        subscription.currentLevel?.tasks?.flatMap((task: Task) =>
+          task.lessons.map((lesson: Lesson) => ({
             ...lesson,
             program: subscription,
             lesson: task,
           })),
         ),
       )
-      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+      .filter(Boolean)
+      .sort((a: Lesson & { program?: Subscription; lesson?: Task }, b: Lesson & { program?: Subscription; lesson?: Task }) => {
+        if (!a?.date || !b?.date) {
+          return 0;
+        }
+        return new Date(a.date).getTime() - new Date(b.date).getTime();
+      });
   };
 
   const goToToday = () => {
     const today = moment().startOf('day');
     const timelineData = getTimelineData();
-    const todayIndex = timelineData.findIndex(item => moment(item.date).startOf('day').isSame(today));
+    const todayIndex = timelineData.findIndex(
+      (item: Lesson & { program?: Subscription; lesson?: Task }) => item?.date && moment(item.date).startOf('day').isSame(today),
+    );
 
     if (todayIndex !== -1) {
-      // Scroll to today's lessons
+      // Scroll to today's lesson
       // Implementation depends on your FlatList ref
     }
   };
@@ -226,8 +241,8 @@ function MainScreen({ navigation }: RootScreenProps<Paths.Main>) {
         {viewMode === 'subscription' ? (
           <FlatList
             data={(apiState.results as Subscription[]) || subscriptionsState}
-            renderItem={({ item }) => <ProgramCard program={item} />}
-            keyExtractor={item => item.id}
+            renderItem={({ item }) => (item ? <ProgramCard program={item} /> : null)}
+            keyExtractor={(item, index) => item?.id || `item-${index}`}
             onEndReached={onEndReached}
             contentContainerStyle={styles.listContainer}
             showsVerticalScrollIndicator={false}
@@ -261,10 +276,13 @@ function MainScreen({ navigation }: RootScreenProps<Paths.Main>) {
             </TouchableOpacity>
             <FlatList
               data={getTimelineData()}
-              renderItem={({ item }) => (
-                <TimelineCard task={item?.lesson as Task} lesson={item as Lesson} program={item?.program as Subscription} />
-              )}
-              keyExtractor={(item, index) => `${item.id}-${index}`}
+              renderItem={({ item }) => {
+                if (!item) {
+                  return null;
+                }
+                return <TimelineCard task={item?.lesson as Task} lesson={item as Lesson} program={item?.program as Subscription} />;
+              }}
+              keyExtractor={(item, index) => (item?.id ? `${item.id}-${index}` : `timeline-${index}`)}
               contentContainerStyle={styles.listContainer}
               showsVerticalScrollIndicator={false}
               refreshing={apiState.loading && !apiState.results.length}

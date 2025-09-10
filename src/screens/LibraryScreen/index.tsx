@@ -17,7 +17,6 @@ import { useAppDispatch, useAppSelector } from '@/hooks/useAppDispatch';
 
 import { initStateAPIState } from '@/services/API';
 import { createDocumentService } from '@/services/documentService';
-import { fetchPDFsFromNotion } from '@/services/notionAPI';
 import {
   downloadDocument,
   fetchDocuments,
@@ -26,30 +25,7 @@ import {
 
 // import YouTube from 'react-native-youtube';
 
-const items: Document[] = [
-  {
-    id: '1',
-    title: 'Book Title 1',
-    url: 'https://drive.google.com/file/d/1DWA132f8IVMEaF2wqNwc8jEVzlOCbZiZ/view?usp=drive_link',
-    language: 'en',
-    type: 'pdf',
-  },
-  {
-    id: '2',
-    title: 'عنوان الكتاب ٢',
-    url: 'https://dn790007.ca.archive.org/0/items/FP126991/126991.pdf',
-    language: 'ar',
-    type: 'pdf',
-  },
-  {
-    id: '3',
-    title: 'Sample YouTube Video',
-    url: 'https://www.youtube.com/watch?v=BkRtyclmPvo',
-    language: 'en',
-    type: 'youtube',
-    // thumbnailUrl: 'https://img.youtube.com/vi/dQw4w9WgXcQ/hqdefault.jpg',
-  },
-];
+
 
 const LibraryScreen = () => {
   const { t } = useTranslation();
@@ -64,7 +40,7 @@ const LibraryScreen = () => {
     hasMore,
   } = useAppSelector((state) => state.documents);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
-  const [apiState, setapiState] = useState<APISTATE>(initStateAPIState);
+  const [apiState, setapiState] = useState<APISTATE<unknown>>(initStateAPIState);
 
   const documentService = createDocumentService({
     source: 'notion',

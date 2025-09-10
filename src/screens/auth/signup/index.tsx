@@ -12,7 +12,7 @@ import { useTheme } from '@/theme';
 import EyeClose from 'assets/svg/input-eye-close.svg';
 import Eye from 'assets/svg/input-eye.svg';
 import { Formik } from 'formik';
-import React, { useRef, useState } from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { StyleSheet, View } from 'react-native';
 import * as yup from 'yup';

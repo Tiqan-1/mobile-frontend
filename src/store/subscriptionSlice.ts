@@ -1,6 +1,7 @@
-import type { PayloadAction } from "@reduxjs/toolkit";
-import { createSlice } from "@reduxjs/toolkit";
-import { PURGE } from "redux-persist";
+import type { PayloadAction } from '@reduxjs/toolkit';
+import { createSlice } from '@reduxjs/toolkit';
+import { PURGE } from 'redux-persist';
+import type { Subscription } from '@/types/program';
 
 interface SubscriptionsState {
   items: Subscription[];
@@ -13,7 +14,7 @@ const initialState: SubscriptionsState = {
 };
 
 const subscriptionsSlice = createSlice({
-  name: "subscriptions",
+  name: 'subscriptions',
   initialState,
   reducers: {
     setSubscriptions: (state, action: PayloadAction<Subscription[]>) => {
@@ -30,3 +31,4 @@ const subscriptionsSlice = createSlice({
 
 export const { setSubscriptions, resetSubscriptions } = subscriptionsSlice.actions;
 export default subscriptionsSlice.reducer;
+export type RootState = ReturnType<typeof subscriptionsSlice.reducer>;
