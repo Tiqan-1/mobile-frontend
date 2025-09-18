@@ -8,6 +8,7 @@ export interface Program {
   registrationEnd: Date;
   registrationStart: Date;
   start: Date;
+  subscriptionId?: string;
   thumbnail: string;
 }
 
@@ -28,7 +29,7 @@ export interface Lesson {
   date: Date;
   id: string;
   title: string;
-  type: 'pdf' | 'video' | 'other';
+  type: 'other' | 'pdf' | 'video';
   url: string;
 }
 

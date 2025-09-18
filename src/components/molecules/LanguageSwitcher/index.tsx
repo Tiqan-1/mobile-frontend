@@ -49,7 +49,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   label: {
-    fontSize: 16,
     marginBottom: 16,
   },
   button: {
@@ -60,7 +59,6 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: 'white',
-    fontSize: 16,
     fontWeight: 'bold',
   },
 }); 

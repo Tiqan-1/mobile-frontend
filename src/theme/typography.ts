@@ -1,13 +1,12 @@
+import { isRTL } from '@/utils/constants';
 import { StyleSheet } from 'react-native';
 import { defaultSystemFonts } from 'react-native-render-html';
-
-import { isRTL } from '@/utils/constants';
 import { PALETTE } from './colors';
 
 export const getFonts = () =>
   StyleSheet.create({
     regular: {
-      fontFamily: 'Cairo-Light',
+      fontFamily: 'Cairo-Regular',
     },
     medium: {
       fontFamily: 'Cairo-Regular',
@@ -34,7 +33,7 @@ const St = StyleSheet.create({
     color: PALETTE.BLACK,
     overflow: 'visible',
     textAlignVertical: 'center',
-    textAlign:'left'
+    textAlign: 'left',
   },
   smallTitle: {
     ...fonts.semibold,
@@ -42,31 +41,31 @@ const St = StyleSheet.create({
     color: PALETTE.BLACK,
     overflow: 'visible',
     textAlignVertical: 'center',
-    textAlign:'left'
-  },
-  text: {
-    ...fonts.medium,
-    fontSize: sizeAdaptivity(16),
-    color: PALETTE.BLACK,
-    overflow: 'visible',
-    textAlignVertical: 'center',
-    textAlign:'left'
+    textAlign: 'left',
   },
   largeText: {
     ...fonts.medium,
-    fontSize: sizeAdaptivity(18),
+    fontSize: sizeAdaptivity(17),
     color: PALETTE.BLACK,
     overflow: 'visible',
     textAlignVertical: 'center',
-    textAlign:'left'
+    textAlign: 'left',
+  },
+  text: {
+    ...fonts.medium,
+    fontSize: sizeAdaptivity(15),
+    color: PALETTE.BLACK,
+    overflow: 'visible',
+    textAlignVertical: 'center',
+    textAlign: 'left',
   },
   smallText: {
     ...fonts.regular,
-    fontSize: sizeAdaptivity(13),
+    fontSize: sizeAdaptivity(14),
     color: PALETTE.BLACK,
     overflow: 'visible',
     textAlignVertical: 'center',
-    textAlign:'left'
+    textAlign: 'left',
   },
   extraSmallText: {
     ...fonts.regular,
@@ -74,7 +73,7 @@ const St = StyleSheet.create({
     color: PALETTE.BLACK,
     overflow: 'visible',
     textAlignVertical: 'center',
-    textAlign:'left'
+    textAlign: 'left',
   },
   superSmallText: {
     ...fonts.regular,
@@ -82,18 +81,11 @@ const St = StyleSheet.create({
     color: PALETTE.BLACK,
     overflow: 'visible',
     textAlignVertical: 'center',
-    textAlign:'left'
+    textAlign: 'left',
   },
 });
 
-export const systemFonts = [
-  ...defaultSystemFonts,
-  'Cairo-Regular',
-  'Cairo-Black',
-  'Cairo-SemiBold',
-  'Cairo-Bold',
-  'Cairo-Heavy',
-];
+export const systemFonts = [...defaultSystemFonts, 'Cairo-Regular', 'Cairo-Black', 'Cairo-SemiBold', 'Cairo-Bold', 'Cairo-Heavy'];
 
 export const tagsStylesHTML = {
   p: {

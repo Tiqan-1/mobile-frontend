@@ -198,7 +198,6 @@ const styles = StyleSheet.create({
     marginTop: 16,
   },
   dateHeader: {
-    fontSize: 18,
     fontWeight: '600',
     marginBottom: 16,
     marginHorizontal: 16,
@@ -222,7 +221,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   timeText: {
-    fontSize: 14,
     fontWeight: '600',
   },
   contentContainer: {
@@ -230,12 +228,10 @@ const styles = StyleSheet.create({
     marginLeft: 8,
   },
   title: {
-    fontSize: 16,
     fontWeight: '600',
     marginBottom: 4,
   },
   type: {
-    fontSize: 12,
   },
   emptyContainer: {
     flex: 1,
@@ -243,7 +239,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   emptyText: {
-    fontSize: 16,
     textAlign: 'center',
   },
 });

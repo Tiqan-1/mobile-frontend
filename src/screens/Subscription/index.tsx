@@ -10,6 +10,7 @@ import { Paths } from '@/navigation/paths';
 import type { RootScreenProps } from '@/navigation/types';
 import { useTheme } from '@/theme';
 import { PALETTE } from '@/theme/colors';
+import type { Lesson, Task } from '@/types/program';
 import { remaingDays } from '@/utils/dateTime';
 import moment from 'moment';
 import React, { useEffect, useState } from 'react';
@@ -25,9 +26,9 @@ function Subscription({ navigation, route }: RootScreenProps<Paths.Subscription>
   }, [navigation, subscription]);
 
   const lesson =
-    subscription.currentLevel?.tasks?.reduce((acc, task) => {
+    subscription.currentLevel?.tasks?.reduce((acc: number, task: Task) => {
       return acc + task.lessons.length;
-    }, 0) || [];
+    }, 0) || 0;
 
   const flatLessons =
     subscription.currentLevel?.tasks?.flatMap((task: Task) =>
@@ -72,20 +73,20 @@ function Subscription({ navigation, route }: RootScreenProps<Paths.Subscription>
         <View style={styles.header}>
           <SmallTitle bgColor={styles.header.backgroundColor}>{subscription.program.name}</SmallTitle>
           <Title bgColor={styles.header.backgroundColor}>{subscription.program.name}</Title>
-          <Text style={{ color: colors.WARNING }}>يبدا فى {moment(new Date(subscription.program.start)).format('YYYY/MM/DD')}</Text>
+          <Text style={{ color: colors.WHITE }}>يبدا فى {moment(new Date(subscription.program.start)).format('YYYY/MM/DD')}</Text>
           <View style={styles.element}>
             <Level />
-            <Text bgColor={styles.header.backgroundColor}>{subscription.currentLevel?.name}</Text>
+            <Text bgColor={styles.header.backgroundColor}> {subscription.currentLevel?.name}</Text>
           </View>
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
             <View style={styles.element}>
               <Video />
-              <Text bgColor={styles.header.backgroundColor}>{` ${lesson} محاضرة `}</Text>
+              <Text bgColor={styles.header.backgroundColor}> {` ${lesson} محاضرة `}</Text>
             </View>
             <Student />
             <View style={styles.element}>
               <Clock />
-              <Text bgColor={styles.header.backgroundColor}>{remaingDays(subscription.program.end)} يوم</Text>
+              <Text bgColor={styles.header.backgroundColor}> {remaingDays(subscription.program.end)} يوم</Text>
             </View>
           </View>
         </View>
@@ -143,7 +144,6 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   description: {
-    fontSize: 14,
     marginBottom: 12,
     lineHeight: 20,
   },

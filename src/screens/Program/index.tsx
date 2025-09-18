@@ -1,18 +1,19 @@
 import Clock from '@/assets/svg-app/clock.svg';
-import Level from '@/assets/svg-app/level.svg';
+import Levels from '@/assets/svg-app/level.svg';
 import List from '@/assets/svg-app/list.svg';
 import Video from '@/assets/svg-app/video.svg';
 import { handleErrorMessage, handleSuccessMessage } from '@/components/atoms/FlashMessage';
-import { Text, Title } from '@/components/atoms/Text';
+import { SmallText, Text, Title } from '@/components/atoms/Text';
 import { SafeScreen } from '@/components/templates';
 import { useAppDispatch, useAppSelector } from '@/hooks/useAppDispatch';
 import { Paths } from '@/navigation/paths';
 import type { RootScreenProps } from '@/navigation/types';
-import { POST } from '@/services/API';
+import { DELETE, POST } from '@/services/API';
 import { logger } from '@/services/logger';
 import { setSubscriptions } from '@/store/subscriptionSlice';
 import { useTheme } from '@/theme';
 import { PALETTE } from '@/theme/colors';
+import type { Level, Program, Subscription } from '@/types/program';
 import { calculateProgress, parseRemaining, remaingDays } from '@/utils/dateTime';
 import moment from 'moment';
 import React from 'react';
@@ -28,11 +29,11 @@ const ProgramCard = ({ level, program }: { level: Level; program: Program }) => 
     <View style={[styles.card, { backgroundColor: colors.SURFACE }]}>
       <Text style={[styles.programName, { color: colors.BLACK }]}>{level.name}</Text>
       <View style={styles.datesContainer}>
-        <Text style={[styles.registrationText, { color: colors.BLACK }]}>انتهاء التسجيل: {parseRemaining(level.start)}</Text>
-        <Text style={[styles.dateText, { color: colors.BLACK }]}>بدء البرنامج {parseRemaining(level.start)}</Text>
+        <SmallText style={[styles.registrationText, { color: colors.BLACK }]}>انتهاء التسجيل: {parseRemaining(level.start)}</SmallText>
+        <SmallText style={[styles.dateText, { color: colors.BLACK }]}>بدء البرنامج {parseRemaining(level.start)}</SmallText>
       </View>
       <View style={[styles.statusTag, { backgroundColor: registerd ? colors.SUCCESS : colors.DISABLED }]}>
-        <Text style={[styles.statusText, { color: colors.WHITE }]}>{registerd ? 'مسجل' : 'غير مسجل'}</Text>
+        <SmallText style={[styles.statusText, { color: colors.WHITE }]}>{registerd ? 'مسجل' : 'غير مسجل'}</SmallText>
       </View>
     </View>
   );
@@ -48,22 +49,23 @@ function Program({ navigation, route }: RootScreenProps<Paths.Program>) {
   // }, []);
   const { colors } = useTheme();
   //count program.levels.task
-  const subjects = program.levels.reduce<number>((acc: number, level) => {
+  const subjects = program.levels?.reduce<number>((acc: number, level) => {
     const typedLevel = level as Level;
-    return acc + typedLevel.tasks.length;
+    return acc + (typedLevel.tasks?.length || 0);
   }, 0);
 
-  const video = program.levels.reduce<number>((acc: number, level: unknown) => {
+  const video = program.levels?.reduce<number>((acc: number, level: unknown) => {
     const typedLevel = level as Level;
     return (
       acc +
-      typedLevel.tasks.reduce((acc, task) => {
-        return acc + task.lessons.length;
+      typedLevel.tasks?.reduce((acc, task) => {
+        return acc + (task.lessons?.length || 0);
       }, 0)
     );
   }, 0);
 
   const progress = calculateProgress(program.registrationStart, program.registrationEnd);
+  const isRegisterd = program?.subscriptionId || subscriptionsState.find(sub => sub.program.id === program.id);
 
   return (
     <SafeScreen>
@@ -74,12 +76,12 @@ function Program({ navigation, route }: RootScreenProps<Paths.Program>) {
 
           <View style={styles.row}>
             <View style={styles.element}>
-              <Level style={{ marginHorizontal: 3 }} />
+              <Levels style={{ marginHorizontal: 3 }} />
               <Text bgColor={styles.header.backgroundColor}>{` ${program.levels.length} مستويات `}</Text>
             </View>
             <View style={styles.element}>
               <List style={{ marginHorizontal: 3 }} />
-              <Text bgColor={styles.header.backgroundColor}>{` ${subjects} مواد `}</Text>
+              <Text bgColor={styles.header.backgroundColor}>{` ${subjects} مهام `}</Text>
             </View>
             <View style={styles.element}>
               <Video style={{ marginHorizontal: 3 }} />
@@ -105,17 +107,42 @@ function Program({ navigation, route }: RootScreenProps<Paths.Program>) {
       </View>
 
       {/* FAB for subscription or navigation */}
+      {isRegisterd && (
+        <TouchableOpacity
+          style={[styles.fab2, { backgroundColor: colors.ERROR }]}
+          onPress={() => {
+            Alert.alert('سيتم الغاء تسجيلك فى برنامج', program.name, [
+              {
+                text: 'نعم',
+                onPress: () =>
+                  DELETE('/api/students/subscriptions/' + `${program.subscriptionId}`, {})
+                    .then(res => {
+                      handleSuccessMessage(res.data?.message ?? 'تم الغاء تسجيلك بنجاح');
+                      const newSubscriptions = subscriptionsState.filter(sub => sub.id !== program.id);
+                      dispatch(setSubscriptions([...newSubscriptions] as Subscription[]));
+                    })
+                    .catch(error => {
+                      handleErrorMessage(error);
+                    }),
+              },
+              {
+                text: 'الغاء',
+                isPreferred: true,
+                style: 'cancel',
+              },
+            ]);
+          }}>
+          <Text style={styles.fabText}>x</Text>
+        </TouchableOpacity>
+      )}
+
       <TouchableOpacity
         style={[styles.fab, { backgroundColor: colors.PRIMARY_COLOR }]}
         onPress={() => {
-          const enrolledSubscription = subscriptionsState.find(sub => sub.program.id === program.id);
-          
-          if (enrolledSubscription) {
-            // Navigate to subscription screen if enrolled
-            navigation.navigate(Paths.Subscription, enrolledSubscription);
+          if (isRegisterd) {
+            navigation.navigate(Paths.Subscription, isRegisterd);
           } else {
-            // Show enrollment dialog if not enrolled
-            Alert.alert('سيتم تسجيلك فى برنامج', program.name,  [
+            Alert.alert('سيتم تسجيلك فى برنامج', program.name, [
               {
                 text: 'نعم',
                 onPress: () =>
@@ -123,10 +150,8 @@ function Program({ navigation, route }: RootScreenProps<Paths.Program>) {
                     programId: `${program.id}`,
                   })
                     .then(res => {
-                      handleSuccessMessage(res.data.message ?? 'تم تسجيلك بنجاح');
-                      dispatch(
-                        setSubscriptions([...subscriptionsState, { id: program.id, program, level: program.levels[0] }] as Subscription[]),
-                      );
+                      handleSuccessMessage(res.data?.message ?? 'تم تسجيلك بنجاح');
+                      dispatch(setSubscriptions([...subscriptionsState, { ...program }] as Subscription[]));
                     })
                     .catch(error => {
                       handleErrorMessage(error);
@@ -180,12 +205,10 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
   },
   programName: {
-    fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 8,
   },
   description: {
-    fontSize: 14,
     marginBottom: 12,
     lineHeight: 20,
   },
@@ -205,7 +228,6 @@ const styles = StyleSheet.create({
     zIndex: 1,
   },
   statusText: {
-    fontSize: 12,
     fontWeight: '600',
   },
 
@@ -232,7 +254,22 @@ const styles = StyleSheet.create({
   },
   fab: {
     position: 'absolute',
-    bottom: 20,
+    bottom: 40,
+    right: 20,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    justifyContent: 'center',
+    alignItems: 'center',
+    elevation: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+  },
+  fab2: {
+    position: 'absolute',
+    bottom: 40 + 60,
     right: 20,
     width: 56,
     height: 56,
@@ -247,7 +284,6 @@ const styles = StyleSheet.create({
   },
   fabText: {
     color: '#FFFFFF',
-    fontSize: 24,
     fontWeight: 'bold',
   },
 });

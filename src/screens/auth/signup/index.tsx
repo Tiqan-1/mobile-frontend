@@ -1,6 +1,6 @@
 import Button from '@/components/atoms/Button';
 import RadioButton from '@/components/atoms/RadioButton';
-import { SmallTitle, Text } from '@/components/atoms/Text';
+import { ExSmallText, SmallText, SmallTitle, Text } from '@/components/atoms/Text';
 import TextInput from '@/components/atoms/TextInput';
 import { SafeScreen } from '@/components/templates';
 import { useAppDispatch } from '@/hooks/useAppDispatch';
@@ -38,12 +38,12 @@ function SignUp({ navigation }: RootScreenProps<Paths.SignUp>) {
     email: yup.string().email(t('auth.email_invalid')).required(t('auth.email_required')),
     password: yup
       .string()
-      .matches(/\w*[a-z]\w*/, 'Password must have a small letter')
-      .matches(/\w*[A-Z]\w*/, 'Password must have a capital letter')
-      .matches(/\d/, 'Password must have a number')
-      .matches(/[!@#$%^&*()\-_"=+{}; :,<.>]/, 'Password must have a special character')
-      .min(8, ({ min }) => `Password must be at least ${min} characters`)
-      .required('Password is required'),
+      .matches(/\w*[a-z]\w*/, 'كلمة المرور يجب أن تحتوي علي حرف صغير')
+      .matches(/\w*[A-Z]\w*/, 'كلمة المرور يجب أن تحتوي علي حرف كبير')
+      .matches(/\d/, 'كلمة المرور يجب أن تحتوي علي رقم')
+      .matches(/[!@#$%^&*()\-_"=+{}; :,<.>]/, 'كلمة المرور يجب أن تحتوي علي حرف خاص')
+      .min(8, ({ min }) => `كلمة المرور يجب أن تحتوي علي  ${min} حروف`)
+      .required('كلمة المرور مطلوبة'),
   });
 
   const handleSubmit = (values: typeof initialValues) => {
@@ -83,7 +83,7 @@ function SignUp({ navigation }: RootScreenProps<Paths.SignUp>) {
                   placeholder={t('auth.enter_email')}
                   value={values.email}
                   keyboardType="email-address"
-                  errors={touched.email ? errors.email : undefined}
+                  errors={errors.email ? errors.email : undefined}
                 />
               </View>
 
@@ -106,11 +106,11 @@ function SignUp({ navigation }: RootScreenProps<Paths.SignUp>) {
                   value={values.password}
                   Icon={secure ? Eye : EyeClose}
                   onPressIcon={() => setsecure(!secure)}
-                  errors={touched.password ? errors.password : undefined}
+                  errors={errors.password ? errors.password : undefined}
                 />
               </View>
 
-              {apiState.error && <Text style={{ color: colors.ERROR }}>{t('common_error')}</Text>}
+              {apiState.error && <ExSmallText style={{ color: colors.ERROR }}>{apiState.error || t('common_error')}</ExSmallText>}
 
               <Button
                 type="main"

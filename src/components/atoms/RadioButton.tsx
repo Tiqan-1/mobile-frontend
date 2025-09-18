@@ -53,7 +53,6 @@ const styles = StyleSheet.create({
     borderRadius: 5,
   },
   label: {
-    fontSize: 16,
   },
   disabledText: {
     color: '#A1A1A1',

@@ -99,12 +99,10 @@ const styles = StyleSheet.create({
     backgroundColor: '#fee',
   },
   title: {
-    fontSize: 16,
     fontWeight: '600',
     flex: 1,
   },
   progress: {
-    fontSize: 14,
     color: '#666',
     marginTop: 4,
   },

@@ -1,39 +1,41 @@
 /* eslint-disable perfectionist/sort-object-types */
-import { Text } from '@/components/atoms/Text';
+import { SmallText, Text } from '@/components/atoms/Text';
 import { SafeScreen } from '@/components/templates';
-import { useAppDispatch, useAppSelector } from '@/hooks/useAppDispatch';
+import { useAppSelector } from '@/hooks/useAppDispatch';
 import { Paths } from '@/navigation/paths';
 import type { RootScreenProps } from '@/navigation/types';
-import { GET, initStateAPIState, POST } from '@/services/API';
-import { logger } from '@/services/logger';
+import { initStateAPIState } from '@/services/API';
 import { Pagination } from '@/services/Pagination';
 import { useTheme } from '@/theme';
 import { SHADOW } from '@/theme/styles';
+import type { Program } from '@/types/program';
 import { calculateProgress, parseRemaining } from '@/utils/dateTime';
 import { useNavigation } from '@react-navigation/native';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ActivityIndicator, FlatList, RefreshControl, ScrollView, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
+import { FlatList, ScrollView, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
 
 const ProgramCard = ({ program }: { program: Program }) => {
   const { colors } = useTheme();
   const navigation = useNavigation();
   const { items: subscriptionsState } = useAppSelector(state => state.subscriptions);
-  const registerd = subscriptionsState.find(sub => sub.program.id === program.id);
+  const isRegisterd = program?.subscriptionId || subscriptionsState.find(sub => sub.program.id === program.id);
 
   const progress = calculateProgress(program.registrationStart, program.registrationEnd);
-  
+
   return (
     <TouchableOpacity
       style={[styles.card, { backgroundColor: colors.SURFACE }]}
       onPress={() => {
         navigation.navigate(Paths.Program, program);
       }}>
-      <View style={[styles.statusTag, { backgroundColor: registerd ? colors.SUCCESS : colors.DISABLED }]}>
-        <Text style={[styles.statusText, { color: colors.WHITE }]}>{registerd ? 'مسجل' : 'غير مسجل'}</Text>
+      <View style={[styles.statusTag, { backgroundColor: isRegisterd ? colors.SUCCESS : colors.DISABLED }]}>
+        <SmallText style={[styles.statusText, { color: isRegisterd ? colors.WHITE : colors.BLACK }]}>
+          {isRegisterd ? 'مسجل' : 'غير مسجل'}
+        </SmallText>
       </View>
-      
+
       <View style={styles.cardContent}>
         <FastImage
           resizeMode="contain"
@@ -43,24 +45,29 @@ const ProgramCard = ({ program }: { program: Program }) => {
         />
         <View style={styles.programInfo}>
           <Text style={[styles.programName, { color: colors.BLACK }]}>{program.name}</Text>
-          <Text numberOfLines={2} style={[styles.description, { color: colors.BLACK }]}>
+          <SmallText numberOfLines={2} style={[styles.description, { color: colors.BLACK }]}>
             {program.description}
-          </Text>
+          </SmallText>
         </View>
       </View>
-      
-      <View style={styles.progressContainer}>
+
+      {/* <View style={styles.progressContainer}>
         <View style={styles.progressLabels}>
           <Text style={[styles.registrationText, { color: colors.BLACK }]}>انتهاء التسجيل: {parseRemaining(program.registrationEnd)}</Text>
           <Text style={[styles.dateText, { color: colors.BLACK }]}>بدء البرنامج {parseRemaining(program?.start)}</Text>
         </View>
         <View style={[styles.progressBar, { backgroundColor: colors.GREY }]}>
-          <View style={[styles.progressFill, { 
-            backgroundColor: progress>100 ? colors.ERROR : colors.WARNING, 
-            width: `${progress}%` 
-          }]} />
+          <View
+            style={[
+              styles.progressFill,
+              {
+                backgroundColor: progress > 100 ? colors.ERROR : colors.WARNING,
+                width: `${progress}%`,
+              },
+            ]}
+          />
         </View>
-      </View>
+      </View> */}
     </TouchableOpacity>
   );
 };
@@ -68,7 +75,7 @@ const ProgramCard = ({ program }: { program: Program }) => {
 // Loading shimmer for program cards
 const ProgramCardShimmer = () => {
   const { colors } = useTheme();
-  
+
   return (
     <View style={[styles.card, { backgroundColor: colors.SURFACE }]}>
       <View style={styles.cardContent}>
@@ -105,6 +112,26 @@ type ProgramQuery = {
   // pageSize?: number;
   // skip?: number;
   // limit?: number;
+};
+// Format date for display and API
+const formatDateForInput = (dateString?: string): string => {
+  if (!dateString) {
+    return '';
+  }
+  try {
+    const date = new Date(dateString);
+    return date.toISOString().split('T')[0]; // Returns YYYY-MM-DD format
+  } catch {
+    return dateString;
+  }
+};
+
+// Format filter value for display
+const formatFilterValue = (key: string, value: string): string => {
+  if (key.includes('Start') || key.includes('End') || key === 'start' || key === 'end') {
+    return formatDateForInput(value);
+  }
+  return value;
 };
 
 function Programs({ navigation }: RootScreenProps<Paths.Programs>) {
@@ -172,25 +199,6 @@ function Programs({ navigation }: RootScreenProps<Paths.Programs>) {
 
   const toggleFilters = () => {
     setShowFilters(!showFilters);
-  };
-
-  // Format date for display and API
-  const formatDateForInput = (dateString?: string): string => {
-    if (!dateString) return '';
-    try {
-      const date = new Date(dateString);
-      return date.toISOString().split('T')[0]; // Returns YYYY-MM-DD format
-    } catch (e) {
-      return dateString;
-    }
-  };
-
-  // Format filter value for display
-  const formatFilterValue = (key: string, value: string): string => {
-    if (key.includes('Start') || key.includes('End') || key === 'start' || key === 'end') {
-      return formatDateForInput(value);
-    }
-    return value;
   };
 
   // Get filter display name
@@ -295,9 +303,7 @@ function Programs({ navigation }: RootScreenProps<Paths.Programs>) {
           </View>
 
           <View style={styles.buttonRow}>
-            <TouchableOpacity 
-              style={[styles.button, { backgroundColor: colors.PRIMARY_COLOR }]} 
-              onPress={() => applyFilters(localFilters)}>
+            <TouchableOpacity style={[styles.button, { backgroundColor: colors.PRIMARY_COLOR }]} onPress={() => applyFilters(localFilters)}>
               <Text style={[styles.buttonText, { color: colors.WHITE }]}>تطبيق</Text>
             </TouchableOpacity>
 
@@ -320,17 +326,10 @@ function Programs({ navigation }: RootScreenProps<Paths.Programs>) {
       <View style={styles.container}>
         <View style={styles.headerContainer}>
           <Text style={[styles.headerTitle, { color: colors.BLACK }]}>البرامج المتاحة</Text>
-          <TouchableOpacity 
-            style={[
-              styles.filterButton, 
-              { backgroundColor: showFilters ? colors.SURFACE : colors.PRIMARY_COLOR }
-            ]} 
+          <TouchableOpacity
+            style={[styles.filterButton, { backgroundColor: showFilters ? colors.SURFACE : colors.PRIMARY_COLOR }]}
             onPress={toggleFilters}>
-            <Text 
-              style={[
-                styles.buttonText, 
-                { color: showFilters ? colors.PRIMARY_COLOR : colors.WHITE }
-              ]}>
+            <Text style={[styles.buttonText, { color: showFilters ? colors.PRIMARY_COLOR : colors.WHITE }]}>
               {showFilters ? 'إخفاء التصفية' : 'تصفية'}
             </Text>
           </TouchableOpacity>
@@ -386,21 +385,13 @@ function Programs({ navigation }: RootScreenProps<Paths.Programs>) {
               <View style={styles.emptyContainer}>
                 {apiState.error ? (
                   <>
-                    <FastImage 
-                      source={require('@/assets/images/warning.png')} 
-                      style={styles.emptyStateImage} 
-                      resizeMode="contain"
-                    />
+                    <FastImage source={require('@/assets/images/warning.png')} style={styles.emptyStateImage} resizeMode="contain" />
                     <Text style={[styles.emptyStateTitle, { color: colors.ERROR }]}>يوجد مشكله فى الوصول الى المعلومات</Text>
                     <Text style={[styles.emptyStateText, { color: colors.BLACK }]}>حاول مرة اخرى لاحقا</Text>
                   </>
                 ) : (
                   <>
-                    <FastImage 
-                      source={require('@/assets/images/noImage.png')} 
-                      style={styles.emptyStateImage} 
-                      resizeMode="contain"
-                    />
+                    <FastImage source={require('@/assets/images/noImage.png')} style={styles.emptyStateImage} resizeMode="contain" />
                     <Text style={[styles.emptyStateTitle, { color: colors.BLACK }]}>لا يوجد برامج متاحة</Text>
                     <Text style={[styles.emptyStateText, { color: colors.BLACK }]}>حاول البحث بمعايير أخرى</Text>
                   </>
@@ -432,7 +423,6 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   headerTitle: {
-    fontSize: 24,
     fontWeight: 'bold',
   },
   filterButton: {
@@ -454,7 +444,6 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   filterTitle: {
-    fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 16,
     textAlign: 'center',
@@ -485,7 +474,6 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   buttonText: {
-    fontSize: 15,
     fontWeight: '600',
   },
   activeFiltersContainer: {
@@ -521,7 +509,7 @@ const styles = StyleSheet.create({
   cardContent: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 16,
+    // marginBottom: 16,
   },
   programImage: {
     width: 70,
@@ -534,12 +522,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
   },
   programName: {
-    fontSize: 18,
     fontWeight: 'bold',
-    marginBottom: 8,
+    marginBottom: 10,
   },
   description: {
-    fontSize: 14,
     marginBottom: 12,
     lineHeight: 20,
     opacity: 0.7,
@@ -548,11 +534,9 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   dateText: {
-    fontSize: 13,
     fontWeight: '500',
   },
   registrationText: {
-    fontSize: 13,
     fontWeight: '500',
   },
   emptyContainer: {
@@ -563,13 +547,13 @@ const styles = StyleSheet.create({
   },
   statusTag: {
     paddingHorizontal: 12,
-    paddingVertical: 6,
+    paddingVertical: 4,
     borderRadius: 20,
     alignSelf: 'flex-start',
     marginTop: 4,
     position: 'absolute',
-    right: 16,
-    top: 16,
+    right: 10,
+    top: 10,
     zIndex: 1,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
@@ -578,7 +562,6 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   statusText: {
-    fontSize: 12,
     fontWeight: '600',
   },
   progressContainer: {
@@ -601,7 +584,6 @@ const styles = StyleSheet.create({
     borderRadius: 4,
   },
   filterLabel: {
-    fontSize: 14,
     fontWeight: '500',
     width: 100,
   },
@@ -622,13 +604,11 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   emptyStateTitle: {
-    fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 10,
     textAlign: 'center',
   },
   emptyStateText: {
-    fontSize: 14,
     opacity: 0.7,
     textAlign: 'center',
   },

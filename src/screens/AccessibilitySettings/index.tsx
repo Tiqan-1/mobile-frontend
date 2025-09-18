@@ -114,7 +114,6 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   title: {
-    fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 16,
   },
@@ -131,11 +130,9 @@ const styles = StyleSheet.create({
     borderBottomColor: '#eee',
   },
   settingTitle: {
-    fontSize: 16,
     fontWeight: '500',
   },
   settingValue: {
-    fontSize: 16,
   },
   button: {
     marginTop: 32,

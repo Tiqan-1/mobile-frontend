@@ -5,7 +5,7 @@ import { useTheme } from '@/theme';
 import YoutubePlayer from 'react-native-youtube-iframe';
 import { Linking } from 'react-native';
 
-
+//[ ] Allow landscape for lesson
 interface VideoModalProps {
   onClose: () => void;
   selectedVideo: Lesson | null;
@@ -76,7 +76,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   modalTitle: {
-    fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 15,
   },

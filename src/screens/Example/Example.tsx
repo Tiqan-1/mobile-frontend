@@ -130,11 +130,9 @@ const styles = StyleSheet.create({
     marginTop: 40,
   },
   title: {
-    fontSize: 40,
     fontWeight: 'bold',
   },
   description: {
-    fontSize: 16,
     marginBottom: 40,
   },
   buttonRow: {

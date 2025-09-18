@@ -51,7 +51,7 @@ const ProgramCard = ({ program }: { program: Subscription }) => {
           </Text>
         </View>
       </View>
-      <View style={styles.progressContainer}>
+      {/* <View style={styles.progressContainer}>
         <View style={styles.progressLabels}>
           <Text style={[styles.dateText, { color: colors.BLACK }]}>بدء البرنامج {parseRemaining(program.currentLevel?.start)}</Text>
           <Text style={[styles.registrationText, { color: colors.BLACK }]}>
@@ -69,7 +69,7 @@ const ProgramCard = ({ program }: { program: Subscription }) => {
             ]}
           />
         </View>
-      </View>
+      </View> */}
     </TouchableOpacity>
   );
 };
@@ -111,7 +111,7 @@ const ProgramCardShimmer = () => {
           <View style={[styles.shimmerText, { backgroundColor: colors.DISABLED, width: '60%', marginTop: 8 }]} />
         </View>
       </View>
-      <View style={styles.progressContainer}>
+      {/* <View style={styles.progressContainer}>
         <View style={styles.progressLabels}>
           <View style={[styles.shimmerText, { backgroundColor: colors.DISABLED, width: '40%' }]} />
           <View style={[styles.shimmerText, { backgroundColor: colors.DISABLED, width: '40%' }]} />
@@ -119,7 +119,7 @@ const ProgramCardShimmer = () => {
         <View style={[styles.progressBar, { backgroundColor: colors.DISABLED }]}>
           <View style={[styles.progressFill, { backgroundColor: colors.GREY, width: '60%' }]} />
         </View>
-      </View>
+      </View> */}
     </View>
   );
 };
@@ -217,9 +217,10 @@ function MainScreen({ navigation }: RootScreenProps<Paths.Main>) {
                 },
               ]}
               onPress={() => setViewMode('subscription')}>
-              <Text style={[styles.buttonText, { color: viewMode === 'subscription' ? themeColors.WHITE : themeColors.PRIMARY_COLOR }]}>
+              <SmallText
+                style={[styles.buttonText, { color: viewMode === 'subscription' ? themeColors.WHITE : themeColors.PRIMARY_COLOR }]}>
                 الاشتراكات
-              </Text>
+              </SmallText>
             </TouchableOpacity>
             <TouchableOpacity
               style={[
@@ -231,9 +232,9 @@ function MainScreen({ navigation }: RootScreenProps<Paths.Main>) {
                 },
               ]}
               onPress={() => setViewMode('timeline')}>
-              <Text style={[styles.buttonText, { color: viewMode === 'timeline' ? themeColors.WHITE : themeColors.PRIMARY_COLOR }]}>
+              <SmallText style={[styles.buttonText, { color: viewMode === 'timeline' ? themeColors.WHITE : themeColors.PRIMARY_COLOR }]}>
                 الجدول الزمني
-              </Text>
+              </SmallText>
             </TouchableOpacity>
           </View>
         </View>
@@ -333,21 +334,17 @@ const styles = StyleSheet.create({
     marginHorizontal: 16,
   },
   programName: {
-    fontSize: 16,
     fontWeight: 'bold',
     marginBottom: 8,
   },
   description: {
-    fontSize: 14,
     marginBottom: 12,
     lineHeight: 20,
   },
   dateText: {
-    fontSize: 13,
     fontWeight: '500',
   },
   registrationText: {
-    fontSize: 13,
     fontWeight: '500',
   },
   progressContainer: {
@@ -386,22 +383,20 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   todayButton: {
-    paddingHorizontal: 4,
-    paddingVertical: 8,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
     borderRadius: 8,
-    marginBottom: 8,
-    marginRight: 8,
+    marginRight: 16,
     alignSelf: 'flex-end',
-    ...SHADOW,
+    marginTop: -8,
+    marginBottom: 4,
   },
   todayButtonText: {
-    fontSize: 14,
     fontWeight: '600',
   },
   cardContent: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 16,
   },
   progressLabels: {
     flexDirection: 'row',
@@ -436,13 +431,11 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   emptyStateTitle: {
-    fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 10,
     textAlign: 'center',
   },
   emptyStateText: {
-    fontSize: 14,
     opacity: 0.7,
     textAlign: 'center',
     marginBottom: 20,
@@ -462,11 +455,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   dateDayText: {
-    fontSize: 20,
     fontWeight: 'bold',
   },
   dateMonthText: {
-    fontSize: 12,
     marginTop: 2,
   },
   lessonInfo: {
@@ -474,11 +465,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
   },
   programLabel: {
-    fontSize: 12,
     marginBottom: 4,
   },
   lessonTitle: {
-    fontSize: 16,
     fontWeight: '600',
   },
   emptyStateButton: {
@@ -489,11 +478,10 @@ const styles = StyleSheet.create({
     ...SHADOW,
   },
   emptyStateButtonText: {
-    fontSize: 16,
     fontWeight: '600',
   },
   timelineContainer: {
     flex: 1,
-    paddingTop: 10,
+    // paddingTop: 10,
   },
 });

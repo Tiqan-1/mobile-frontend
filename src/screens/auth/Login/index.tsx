@@ -70,7 +70,7 @@ function Login({ navigation }: RootScreenProps<Paths.Login>) {
           paddingHorizontal: 20,
           backgroundColor: PALETTE.APP_BACKGROUND,
         }}>
-        <Pressable onPress={() => sheet.current?.show?.()} style={style.row}>
+        {/* <Pressable onPress={() => sheet.current?.show?.()} style={style.row}>
           <Text>{currentLanguage}</Text>
           <IconDown />
         </Pressable>
@@ -79,7 +79,7 @@ function Login({ navigation }: RootScreenProps<Paths.Login>) {
             toggleTheme();
           }}
           value={isDark}
-        />
+        /> */}
         <View style={style.header}>
           <MainLogo />
 
