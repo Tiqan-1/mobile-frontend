@@ -1,4 +1,3 @@
-/** @type {import('ts-jest').JestConfigWithTsJest} */
 module.exports = {
   plugins: [
     [
@@ -13,7 +12,8 @@ module.exports = {
     ],
     ["@babel/plugin-proposal-decorators", { "legacy": true }],
     'inline-dotenv',
-    'react-native-reanimated/plugin', // needs to be last
+    '@babel/plugin-proposal-export-namespace-from',
+    'react-native-worklets/plugin',
   ],
   presets: ['module:@react-native/babel-preset'],
   "env": {

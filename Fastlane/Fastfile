@@ -33,11 +33,12 @@ platform :android do
 		project_dir: "./android/"
 	)
 
-	internalVersionCode = google_play_track_version_codes(
-		track: 'internal',
-		json_key: "fastlane/gplayKey.json",
-		package_name: AND_APP_SPECIFIER,
-	)
+	# internalVersionCode = google_play_track_version_codes(
+	# 	track: 'internal',
+	# 	json_key: "fastlane/gplayKey.json",
+	# 	package_name: AND_APP_SPECIFIER,
+	# )
+	internalVersionCode=5
 	
 	print "### Increasing Android \n"
 	nextVersionCode = internalVersionCode.max + 1

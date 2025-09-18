@@ -3,7 +3,7 @@ module.exports = {
     ios: {},
     android: {},
   },
-  assets: ['./src/assets/fonts/cairo', 'node_modules/@ant-design/icons-react-native/fonts'],
+  assets: ['./src/assets/fonts/cairo'],
   dependencies: {
     'react-native-vector-icons': {
       platforms: {
