@@ -7,7 +7,7 @@ declare global {
   type APISTATE<a> = APISTATEType<a> | PaginationStateType<a>;
   // type APISTATE = APISTATE<unknown>;
   type PaginationState<a> = PaginationStateType<a>;
-  type PaginationState = PaginationStateType<unknown>;
+  // type PaginationState = PaginationStateType<unknown>;
   
   type APIResponseError = {
     [key: string]: unknown;
