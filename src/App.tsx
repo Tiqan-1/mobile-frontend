@@ -8,22 +8,14 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
 import '@/translations';
-import * as Sentry from '@sentry/react-native';
 import React from 'react';
-import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
+import {
+  SafeAreaProvider,
+  useSafeAreaInsets,
+} from 'react-native-safe-area-context';
 
 function initSentry() {
-  Sentry.init({
-    dsn: 'https://03c561f706f33bd93950556b709e7366@o4509213076160512.ingest.de.sentry.io/4509213096083536',
 
-    // Configure Session Replay
-    replaysSessionSampleRate: 0.1,
-    replaysOnErrorSampleRate: 1,
-    integrations: [Sentry.mobileReplayIntegration()],
-
-    // uncomment the line below to enable Spotlight (https://spotlightjs.com)
-    // spotlight: __DEV__,
-  });
 }
 
 // eslint-disable-next-line no-unused-expressions
@@ -60,4 +52,4 @@ function AppWrapper() {
   );
 }
 
-export default Sentry.wrap(AppWrapper);
+export default AppWrapper;

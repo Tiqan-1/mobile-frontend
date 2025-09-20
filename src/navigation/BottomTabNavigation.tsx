@@ -11,7 +11,6 @@ import Book from 'assets/svg-app/book.svg';
 import Bookm from 'assets/svg-app/bookm.svg';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import Icon from 'react-native-vector-icons/dist/FontAwesome';
 import { Paths } from './paths';
 
 const Tab = createBottomTabNavigator();
@@ -48,13 +47,16 @@ const BottomTabNavigation = () => {
       screenOptions={{
         ...TAB_SCREEN_OPTIONS,
         tabBarAccessibilityLabel: 'Bottom navigation tabs',
-      }}>
+      }}
+    >
       <Tab.Screen
         component={MainScreen}
         name={Paths.Main}
         options={{
           tabBarLabel: t('navigation.Main'),
-          tabBarIcon: ({ focused, color, size }) => <Bookm fill={color} width={size} height={size} />,
+          tabBarIcon: ({ focused, color, size }) => (
+            <Bookm fill={color} width={size} height={size} />
+          ),
           tabBarAccessibilityLabel: 'Main tab',
         }}
       />
@@ -63,7 +65,9 @@ const BottomTabNavigation = () => {
         name={Paths.TodayLessons}
         options={{
           tabBarLabel: t('navigation.TodayLessons'),
-          tabBarIcon: ({ focused, color, size }) => <Book fill={color} height={size} width={size} />,
+          tabBarIcon: ({ focused, color, size }) => (
+            <Book fill={color} height={size} width={size} />
+          ),
           tabBarAccessibilityLabel: 'TodayLessons tab',
           title: t('navigation.TodayLessons'),
         }}
@@ -73,7 +77,9 @@ const BottomTabNavigation = () => {
         name={Paths.Programs}
         options={{
           tabBarLabel: t('navigation.Programs'),
-          tabBarIcon: ({ focused, color, size }) => <Book fill={color} height={size} width={size} />,
+          tabBarIcon: ({ focused, color, size }) => (
+            <Book fill={color} height={size} width={size} />
+          ),
           tabBarAccessibilityLabel: 'Library tab',
           title: t('navigation.Programs'),
         }}
@@ -102,7 +108,9 @@ const BottomTabNavigation = () => {
         name="Menu"
         options={{
           tabBarLabel: 'Menu',
-          tabBarIcon: ({ color, size }) => <Icon name="coffee" color={color} size={size} height={size} width={size} />,
+          tabBarIcon: ({ color, size }) => (
+            <Book fill={color} height={size} width={size} />
+          ),
           tabBarAccessibilityLabel: 'Accessibility settings tab',
         }}
       />
