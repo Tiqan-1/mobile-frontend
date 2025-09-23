@@ -84,7 +84,7 @@ const St = StyleSheet.create({
     textAlign: 'left',
   },
 });
-
+export const bold = {...fonts.bold};
 export const systemFonts = [...defaultSystemFonts, 'Cairo-Regular', 'Cairo-Black', 'Cairo-SemiBold', 'Cairo-Bold', 'Cairo-Heavy'];
 
 export const tagsStylesHTML = {

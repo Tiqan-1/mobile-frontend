@@ -4,11 +4,12 @@ import MainScreen from '@/screens/MainScreen';
 import Menu from '@/screens/Menu';
 import Programs from '@/screens/Programs';
 import TodayLessons from '@/screens/TodayLessons';
-import typography from '@/theme/typography';
+import typography, { fonts } from '@/theme/typography';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { useNavigation } from '@react-navigation/native';
 import Book from 'assets/svg-app/book.svg';
 import Bookm from 'assets/svg-app/bookm.svg';
+import Student from '@/assets/svg-app/student.svg';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Paths } from './paths';
@@ -35,10 +36,18 @@ const BottomTabNavigation = () => {
     drawerPosition: 'right',
     headerLeft: () => false,
     headerShown: false,
-    headerTitleStyle: typography['text'],
+    headerTitleStyle: {
+      ...typography['extraSmallText'],
+      fontFamily: fonts.regular.fontFamily,
+    },
     headerBackTitle: translate('back'),
     labelStyle: {
-      ...typography['text'],
+      ...typography['extraSmallText'],
+      fontFamily: fonts.regular.fontFamily,
+    },
+    tabBarLabelStyle: {
+      ...typography['superSmallText'],
+      fontFamily: fonts.regular.fontFamily,
     },
   };
 
@@ -47,6 +56,10 @@ const BottomTabNavigation = () => {
       screenOptions={{
         ...TAB_SCREEN_OPTIONS,
         tabBarAccessibilityLabel: 'Bottom navigation tabs',
+        tabBarLabelStyle: {
+          ...typography['superSmallText'],
+          fontFamily: fonts.regular.fontFamily,
+        },
       }}
     >
       <Tab.Screen
@@ -105,13 +118,13 @@ const BottomTabNavigation = () => {
       /> */}
       <Tab.Screen
         component={Menu}
-        name="Menu"
+        name={Paths.Menu}
         options={{
-          tabBarLabel: 'Menu',
+          tabBarLabel: t('القائمة'),
           tabBarIcon: ({ color, size }) => (
-            <Book fill={color} height={size} width={size} />
+            <Student style={{ color: color }} fill={color} height={size} width={size} />
           ),
-          tabBarAccessibilityLabel: 'Accessibility settings tab',
+          tabBarAccessibilityLabel: 'Menu tab',
         }}
       />
     </Tab.Navigator>

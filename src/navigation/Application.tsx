@@ -8,7 +8,7 @@ import PDFViewerScreen from '@/screens/PDFViewerScreen/PDFViewer';
 import Program from '@/screens/Program';
 import Subscription from '@/screens/Subscription';
 import { useTheme } from '@/theme';
-import typography from '@/theme/typography';
+import typography, { fonts } from '@/theme/typography';
 import { DarkTheme, DefaultTheme, NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { useTranslation } from 'react-i18next';
@@ -46,7 +46,24 @@ function ApplicationNavigator() {
 
   const navigationTheme = {
     dark: isDark,
-
+    fonts: {
+      regular: {
+        fontFamily: fonts.regular.fontFamily,
+        fontWeight: 'normal',
+      },
+      medium: {
+        fontFamily: fonts.medium.fontFamily,
+        fontWeight: '500',
+      },
+      bold: {
+        fontFamily: fonts.bold.fontFamily,
+        fontWeight: 'bold',
+      },
+      heavy: {
+        fontFamily: fonts.extrabold.fontFamily,
+        fontWeight: '900',
+      },
+    },
     colors: {
       ...(isDark ? DarkTheme.colors : DefaultTheme.colors),
       background: colors.gray50,

@@ -13,6 +13,7 @@ import { logger } from '@/services/logger';
 import { setSubscriptions } from '@/store/subscriptionSlice';
 import { useTheme } from '@/theme';
 import { PALETTE } from '@/theme/colors';
+import { bold } from '@/theme/typography';
 import type { Level, Program, Subscription } from '@/types/program';
 import { calculateProgress, parseRemaining, remaingDays } from '@/utils/dateTime';
 import moment from 'moment';
@@ -27,7 +28,7 @@ const ProgramCard = ({ level, program }: { level: Level; program: Program }) => 
 
   return (
     <View style={[styles.card, { backgroundColor: colors.SURFACE }]}>
-      <Text style={[styles.programName, { color: colors.BLACK }]}>{level.name}</Text>
+      <Text isBold style={[styles.programName, { color: colors.BLACK }]}>{level.name}</Text>
       <View style={styles.datesContainer}>
         <SmallText style={[styles.registrationText, { color: colors.BLACK }]}>انتهاء التسجيل: {parseRemaining(level.start)}</SmallText>
         <SmallText style={[styles.dateText, { color: colors.BLACK }]}>بدء البرنامج {parseRemaining(level.start)}</SmallText>
@@ -165,7 +166,7 @@ function Program({ navigation, route }: RootScreenProps<Paths.Program>) {
             ]);
           }
         }}>
-        <Text style={styles.fabText}>{subscriptionsState.some(sub => sub.program.id === program.id) ? '→' : '+'}</Text>
+        <Text isBold style={styles.fabText}>{subscriptionsState.some(sub => sub.program.id === program.id) ? '→' : '+'}</Text>
       </TouchableOpacity>
     </SafeScreen>
   );
@@ -205,7 +206,6 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
   },
   programName: {
-    fontWeight: 'bold',
     marginBottom: 8,
   },
   description: {
@@ -284,6 +284,5 @@ const styles = StyleSheet.create({
   },
   fabText: {
     color: '#FFFFFF',
-    fontWeight: 'bold',
   },
 });

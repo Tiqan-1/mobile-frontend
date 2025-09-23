@@ -10,7 +10,7 @@ import { useTranslation } from 'react-i18next';
 import { Text as RNTXT } from 'react-native';
 
 import { useTheme } from '@/theme';
-import typography from '@/theme/typography';
+import typography, { bold } from '@/theme/typography';
 
 import { isRTL } from '@/utils/constants';
 import { isLight } from '@/utils/helpers';
@@ -51,6 +51,7 @@ interface Txt extends TextProps {
   dotted?: boolean;
   style?: StyleProp<TextStyle>;
   type?: TextTypes;
+  isBold?: boolean;
 }
 
 const TextBlock = React.forwardRef<RNText, Txt>(
@@ -68,6 +69,7 @@ const TextBlock = React.forwardRef<RNText, Txt>(
       accessibilityRole,
       accessibilityState,
       bgColor,
+      isBold = false,
       ...rest
     },
     ref
@@ -133,7 +135,7 @@ const TextBlock = React.forwardRef<RNText, Txt>(
         accessibilityRole={defaultAccessibilityRole}
         accessibilityState={accessibilityState}
         {...rest}
-        style={[typography[type], { color: TextBestColor }, override]}>
+        style={[typography[type], { color: TextBestColor }, override, isBold && bold]}>
         {isRTL ? '\u2067' : ''}
         {textContent()}
         {isRTL ? '\u2069' : ''}

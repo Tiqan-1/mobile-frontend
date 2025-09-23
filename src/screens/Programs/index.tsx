@@ -8,8 +8,9 @@ import { initStateAPIState } from '@/services/API';
 import { Pagination } from '@/services/Pagination';
 import { useTheme } from '@/theme';
 import { SHADOW } from '@/theme/styles';
+import { bold } from '@/theme/typography';
 import type { Program } from '@/types/program';
-import { calculateProgress, parseRemaining } from '@/utils/dateTime';
+import { calculateProgress } from '@/utils/dateTime';
 import { useNavigation } from '@react-navigation/native';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -44,7 +45,7 @@ const ProgramCard = ({ program }: { program: Program }) => {
           style={styles.programImage}
         />
         <View style={styles.programInfo}>
-          <Text style={[styles.programName, { color: colors.BLACK }]}>{program.name}</Text>
+          <Text isBold style={[styles.programName, { color: colors.BLACK }]}>{program.name}</Text>
           <SmallText numberOfLines={2} style={[styles.description, { color: colors.BLACK }]}>
             {program.description}
           </SmallText>
@@ -223,7 +224,7 @@ function Programs({ navigation }: RootScreenProps<Paths.Programs>) {
     return (
       <View style={[styles.filterContainer, { backgroundColor: colors.SURFACE }]}>
         <ScrollView style={styles.filterScroll} showsVerticalScrollIndicator={false}>
-          <Text style={[styles.filterTitle, { color: colors.BLACK }]}>تصفية البرامج</Text>
+          <Text isBold style={[styles.filterTitle, { color: colors.BLACK }]}>تصفية البرامج</Text>
 
           <View style={styles.filterRow}>
             <Text style={[styles.filterLabel, { color: colors.BLACK }]}>اسم البرنامج:</Text>
@@ -325,7 +326,7 @@ function Programs({ navigation }: RootScreenProps<Paths.Programs>) {
     <SafeScreen>
       <View style={styles.container}>
         <View style={styles.headerContainer}>
-          <Text style={[styles.headerTitle, { color: colors.BLACK }]}>البرامج المتاحة</Text>
+          <Text isBold style={[styles.headerTitle, { color: colors.BLACK }]}>البرامج المتاحة</Text>
           <TouchableOpacity
             style={[styles.filterButton, { backgroundColor: showFilters ? colors.SURFACE : colors.PRIMARY_COLOR }]}
             onPress={toggleFilters}>
@@ -392,7 +393,7 @@ function Programs({ navigation }: RootScreenProps<Paths.Programs>) {
                 ) : (
                   <>
                     <FastImage source={require('@/assets/images/noImage.png')} style={styles.emptyStateImage} resizeMode="contain" />
-                    <Text style={[styles.emptyStateTitle, { color: colors.BLACK }]}>لا يوجد برامج متاحة</Text>
+                    <Text isBold style={[styles.emptyStateTitle, { color: colors.BLACK }]}>لا يوجد برامج متاحة</Text>
                     <Text style={[styles.emptyStateText, { color: colors.BLACK }]}>حاول البحث بمعايير أخرى</Text>
                   </>
                 )}
@@ -423,7 +424,7 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   headerTitle: {
-    fontWeight: 'bold',
+    
   },
   filterButton: {
     ...SHADOW,
@@ -444,7 +445,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   filterTitle: {
-    fontWeight: 'bold',
+    
     marginBottom: 16,
     textAlign: 'center',
   },
@@ -522,7 +523,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
   },
   programName: {
-    fontWeight: 'bold',
+    
     marginBottom: 10,
   },
   description: {
@@ -604,7 +605,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   emptyStateTitle: {
-    fontWeight: 'bold',
+    
     marginBottom: 10,
     textAlign: 'center',
   },

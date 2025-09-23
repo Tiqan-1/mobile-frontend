@@ -8,6 +8,7 @@ import { GET, POST } from '@/services/API';
 import { useTheme } from '@/theme';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { connectPusher, disconnectPusher, getSocketId, initializePusher, pusherClient } from '@/config/pusher';
+import { bold } from '@/theme/typography';
 
 moment.locale('ar');
 
@@ -195,7 +196,7 @@ export const LessonChat: React.FC<LessonChatProps> = ({ chatRoomId, visible, onC
         <View style={styles.messageWrapper}>
           {!isCurrentUser && (
             <View style={[styles.avatar, { backgroundColor: colors.PRIMARY_COLOR }]}>
-              <Text style={styles.avatarText}>{item.sender.name.charAt(0).toUpperCase()}</Text>
+              <Text isBold style={styles.avatarText}>{item.sender.name.charAt(0).toUpperCase()}</Text>
             </View>
           )}
           <View style={styles.messageContent}>
@@ -236,7 +237,7 @@ export const LessonChat: React.FC<LessonChatProps> = ({ chatRoomId, visible, onC
     if (isError) {
       return (
         <View style={styles.centered}>
-          <Text style={[styles.errorText, { color: colors.ERROR }]}>
+          <Text isBold style={[styles.errorText, { color: colors.ERROR }]}>
             خطأ في تحميل المحادثة
           </Text>
           <Text style={[styles.errorDescription, { color: colors.GREY }]}>
@@ -276,7 +277,7 @@ export const LessonChat: React.FC<LessonChatProps> = ({ chatRoomId, visible, onC
       <View style={[styles.header, { borderBottomColor: colors.LINE }]}>
         <Title style={[styles.headerTitle, { color: colors.BLACK }]}>محادثة المهمة</Title>
         <TouchableOpacity onPress={onClose} style={styles.closeButton} accessibilityLabel="إخفاء المحادثة">
-          <Text style={[styles.closeButtonText, { color: colors.BLACK }]}>×</Text>
+          <Text isBold style={[styles.closeButtonText, { color: colors.BLACK }]}>×</Text>
         </TouchableOpacity>
       </View>
 
@@ -313,7 +314,7 @@ export const LessonChat: React.FC<LessonChatProps> = ({ chatRoomId, visible, onC
           {isSending ? (
             <ActivityIndicator size="small" color={colors.WHITE} />
           ) : (
-            <Text style={[styles.sendButtonText, { color: colors.WHITE }]}>إرسال</Text>
+            <Text isBold style={[styles.sendButtonText, { color: colors.WHITE }]}>إرسال</Text>
           )}
         </TouchableOpacity>
       </View>
@@ -344,7 +345,6 @@ const styles = StyleSheet.create({
   },
   closeButtonText: {
     fontSize: 24,
-    fontWeight: 'bold',
   },
   chatContent: {
     flex: 1,
@@ -360,7 +360,6 @@ const styles = StyleSheet.create({
   },
   errorText: {
     fontSize: 16,
-    fontWeight: 'bold',
     marginBottom: 8,
   },
   errorDescription: {
@@ -400,7 +399,6 @@ const styles = StyleSheet.create({
   avatarText: {
     color: 'white',
     fontSize: 14,
-    fontWeight: 'bold',
   },
   messageContent: {
     flex: 1,
@@ -449,6 +447,5 @@ const styles = StyleSheet.create({
   },
   sendButtonText: {
     fontSize: 14,
-    fontWeight: 'bold',
   },
 });

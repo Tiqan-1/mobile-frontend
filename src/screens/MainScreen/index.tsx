@@ -9,6 +9,7 @@ import { Pagination, type PaginationState } from '@/services/Pagination';
 import { setSubscriptions } from '@/store/subscriptionSlice';
 import { useTheme } from '@/theme';
 import { SHADOW } from '@/theme/styles';
+import { bold } from '@/theme/typography';
 import type { Lesson, Subscription, Task } from '@/types/program';
 import { calculateProgress, parseRemaining } from '@/utils/dateTime';
 import { useNavigation } from '@react-navigation/native';
@@ -43,7 +44,7 @@ const ProgramCard = ({ program }: { program: Subscription }) => {
           style={styles.programImage}
         />
         <View style={styles.programInfo}>
-          <Text style={[styles.programName, { color: colors.BLACK }]}>
+          <Text isBold style={[styles.programName, { color: colors.BLACK }]}>
             {program.program.name} - {program.currentLevel?.name}
           </Text>
           <Text numberOfLines={2} style={[styles.description, { color: colors.BLACK, opacity: 0.7 }]}>
@@ -83,7 +84,7 @@ const TimelineCard = ({ lesson, program, task }: { lesson: Lesson; program: Subs
       style={[styles.timelineCard, { backgroundColor: colors.SURFACE }]}
       onPress={() => navigation.navigate(Paths.Subscription, program)}>
       <View style={styles.dateContainer}>
-        <SmallTitle style={[styles.dateDayText, { color: colors.BLACK }]}>{moment(new Date(task.date)).format('DD')}</SmallTitle>
+        <SmallTitle isBold style={[styles.dateDayText, { color: colors.BLACK }]}>{moment(new Date(task.date)).format('DD')}</SmallTitle>
         <Text style={[styles.dateMonthText, { color: colors.GREY }]}>{moment(new Date(task.date)).format('MMM')}</Text>
       </View>
       <CircleStatus Dtstatus={lesson.date} />
@@ -205,7 +206,7 @@ function MainScreen({ navigation }: RootScreenProps<Paths.Main>) {
     <SafeScreen>
       <View style={styles.container}>
         <View style={styles.headerContainer}>
-          <Text style={styles.welcomeText}>اهلا, {user.name}</Text>
+          <Text isBold style={styles.welcomeText}>اهلا, {user.name}</Text>
           <View style={styles.buttonContainer}>
             <TouchableOpacity
               style={[
@@ -291,7 +292,7 @@ function MainScreen({ navigation }: RootScreenProps<Paths.Main>) {
               ListEmptyComponent={() => (
                 <View style={styles.emptyStateContainer}>
                   <FastImage source={require('@/assets/images/noImage.png')} style={styles.emptyStateImage} resizeMode="contain" />
-                  <Text style={[styles.emptyStateTitle, { color: themeColors.BLACK }]}>لا يوجد دروس</Text>
+                  <Text isBold style={[styles.emptyStateTitle, { color: themeColors.BLACK }]}>لا يوجد دروس</Text>
                   <Text style={[styles.emptyStateText, { color: themeColors.GREY }]}>سجل في برامج جديدة لمشاهدة الدروس المتاحة لك</Text>
                 </View>
               )}
@@ -334,7 +335,6 @@ const styles = StyleSheet.create({
     marginHorizontal: 16,
   },
   programName: {
-    fontWeight: 'bold',
     marginBottom: 8,
   },
   description: {
@@ -431,7 +431,6 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   emptyStateTitle: {
-    fontWeight: 'bold',
     marginBottom: 10,
     textAlign: 'center',
   },
@@ -448,14 +447,12 @@ const styles = StyleSheet.create({
     paddingVertical: 40,
   },
   welcomeText: {
-    fontWeight: 'bold',
   },
   dateContainer: {
     paddingHorizontal: 10,
     alignItems: 'center',
   },
   dateDayText: {
-    fontWeight: 'bold',
   },
   dateMonthText: {
     marginTop: 2,

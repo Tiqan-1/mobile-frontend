@@ -18,7 +18,7 @@ type Props = PropsWithChildren<
 function SafeScreen({ children = undefined, isError = false, onResetError = undefined, style, isScroll = false, ...props }: Props) {
   const { isDark, colors } = useTheme();
   return isScroll ? (
-    <SafeAreaView {...props} mode="padding" style={[{ flex: 1, backgroundColor: colors.APP_BACKGROUND }, style]}>
+    <SafeAreaView {...props} mode="padding" style={[{ flex: 1, backgroundColor: colors.APP_BACKGROUND, paddingTop: 8 }, style]}>
       <StatusBar backgroundColor={colors.APP_BACKGROUND} barStyle={isDark ? 'light-content' : 'dark-content'} />
       <ErrorBoundary onReset={onResetError}>
         {isError ? (
@@ -36,7 +36,7 @@ function SafeScreen({ children = undefined, isError = false, onResetError = unde
       </ErrorBoundary>
     </SafeAreaView>
   ) : (
-    <SafeAreaView {...props} mode="padding" style={[{ flex: 1, backgroundColor: colors.APP_BACKGROUND }, style]}>
+    <SafeAreaView {...props} mode="padding" style={[{ flex: 1, backgroundColor: colors.APP_BACKGROUND, paddingTop: 8  }, style]}>
       <StatusBar backgroundColor={colors.APP_BACKGROUND} barStyle={isDark ? 'light-content' : 'dark-content'} />
       <ErrorBoundary onReset={onResetError}>{isError ? <DefaultError onReset={onResetError} /> : children}</ErrorBoundary>
     </SafeAreaView>

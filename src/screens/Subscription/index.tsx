@@ -60,8 +60,8 @@ function Subscription({ navigation, route }: RootScreenProps<Paths.Subscription>
         </View>
         <CircleStatus Dtstatus={item.date} />
         <View style={{ paddingHorizontal: 2 }}>
-          <Text style={[styles.programName, { color: colors.BLACK }]}>{item.title}</Text>
-          <SmallText style={[styles.programName, { color: colors.GREY }]}>{item.title}</SmallText>
+          <Text isBold style={[styles.programName, { color: colors.BLACK }]}>{item.title}</Text>
+          <SmallText isBold style={[styles.programName, { color: colors.GREY }]}>{item.title}</SmallText>
         </View>
       </TouchableOpacity>
     );
@@ -140,7 +140,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   programName: {
-    fontWeight: 'bold',
     marginBottom: 8,
   },
   description: {
