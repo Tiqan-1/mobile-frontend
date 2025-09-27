@@ -3,8 +3,10 @@ import { createSlice } from '@reduxjs/toolkit';
 export interface AuthState {
   email: string;
   isAuth: boolean;
+  isSU: boolean;
   name: string;
   refreshToken: null | string;
+  server: string;
   token: null | string;
 }
 
@@ -14,6 +16,8 @@ const initialState: AuthState = {
   refreshToken: null,
   name: '',
   email: '',
+  isSU: false,
+  server: 'production',
 };
 
 export const authReducer = createSlice({
@@ -34,10 +38,16 @@ export const authReducer = createSlice({
       state.name = '';
       state.email = '';
     },
+    setisSUAuth: (draft, action) => {
+      draft.isSU = action.payload;
+    },
+    setAuthServer: (draft, action) => {
+      draft.server = action.payload;
+    },
   },
 });
 
-export const { login, logout } = authReducer.actions;
+export const { login, logout, setAuthServer, setisSUAuth } = authReducer.actions;
 
 export default authReducer.reducer;
 export type RootState = ReturnType<typeof authReducer.reducer>;

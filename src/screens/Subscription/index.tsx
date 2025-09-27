@@ -21,8 +21,10 @@ function Subscription({ navigation, route }: RootScreenProps<Paths.Subscription>
   const [selectedVideo, setSelectedVideo] = useState<Lesson | null>(null);
 
   const subscription = route.params;
+  console.log('subscription', subscription);
+  
   useEffect(() => {
-    navigation.setOptions({ title: subscription.program.name });
+    navigation.setOptions({ title: subscription.program?.name });
   }, [navigation, subscription]);
 
   const lesson =
@@ -60,8 +62,12 @@ function Subscription({ navigation, route }: RootScreenProps<Paths.Subscription>
         </View>
         <CircleStatus Dtstatus={item.date} />
         <View style={{ paddingHorizontal: 2 }}>
-          <Text isBold style={[styles.programName, { color: colors.BLACK }]}>{item.title}</Text>
-          <SmallText isBold style={[styles.programName, { color: colors.GREY }]}>{item.title}</SmallText>
+          <Text isBold style={[styles.programName, { color: colors.BLACK }]}>
+            {item.title}
+          </Text>
+          <SmallText isBold style={[styles.programName, { color: colors.GREY }]}>
+            {item.title}
+          </SmallText>
         </View>
       </TouchableOpacity>
     );
@@ -71,8 +77,8 @@ function Subscription({ navigation, route }: RootScreenProps<Paths.Subscription>
     <SafeScreen>
       <View style={styles.container}>
         <View style={styles.header}>
-          <SmallTitle bgColor={styles.header.backgroundColor}>{subscription.program.name}</SmallTitle>
-          <Title bgColor={styles.header.backgroundColor}>{subscription.program.name}</Title>
+          <SmallTitle bgColor={styles.header.backgroundColor}>{subscription.program?.name}</SmallTitle>
+          <Title bgColor={styles.header.backgroundColor}>{subscription.program?.name}</Title>
           <Text style={{ color: colors.WHITE }}>يبدا فى {moment(new Date(subscription.program.start)).format('YYYY/MM/DD')}</Text>
           <View style={styles.element}>
             <Level />

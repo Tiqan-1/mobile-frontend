@@ -160,10 +160,10 @@ function MainScreen({ navigation }: RootScreenProps<Paths.Main>) {
   };
 
   useEffect(() => {
-    if (apiState.results.length) {
+    if (apiState.results && !!apiState.error) {
       dispatch(setSubscriptions(apiState.results as Subscription[]));
     }
-  }, [apiState.results, dispatch]);
+  }, [apiState, dispatch]);
 
   const getTimelineData = () => {
     if (!subscriptionsState) {

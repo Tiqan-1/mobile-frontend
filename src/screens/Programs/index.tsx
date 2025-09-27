@@ -21,7 +21,7 @@ const ProgramCard = ({ program }: { program: Program }) => {
   const { colors } = useTheme();
   const navigation = useNavigation();
   const { items: subscriptionsState } = useAppSelector(state => state.subscriptions);
-  const isRegisterd = program?.subscriptionId || subscriptionsState.find(sub => sub.program.id === program.id);
+  const isRegisterd = program?.subscriptionId || subscriptionsState.find(sub => sub.program?.id === program.id);
 
   const progress = calculateProgress(program.registrationStart, program.registrationEnd);
 

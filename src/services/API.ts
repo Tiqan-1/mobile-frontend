@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/ban-types */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { IsIOS } from '@/utils/constants';
 import type { ApiResponse } from 'apisauce';
@@ -6,10 +5,9 @@ import { create } from 'apisauce';
 import type { Dispatch, SetStateAction } from 'react';
 import { logger } from './logger';
 
-// import * as DataBase from './AsyncStorage';
-// import {isTestAPI} from './constants';
-export const baseURLProd = 'https://mubadarah.ce-svcs.cc';
-// export const baseURLProd = Config.API_URL;
+export const baseURLProd1 = 'https://mubadarah.ce-svcs.cc';
+export const baseURLTest = 'https://dev-mubadarah.ce-svcs.cc';
+export const baseURLProd = baseURLProd1;
 
 export type PARAMS = {
   Append?: boolean;

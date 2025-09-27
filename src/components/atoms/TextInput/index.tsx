@@ -1,27 +1,14 @@
-import type { TextInputProps, TextStyle, ViewStyle } from 'react-native';
-
-import _debounce from 'lodash/debounce';
-import React, { forwardRef, useState } from 'react';
-import {
-  Platform,
-  Pressable,
-  StyleSheet,
-  TextInput as TextInputReact,
-  View,
-} from 'react-native';
-
-import typography from '@/theme/typography';
-
-import Text, { ExSmallText } from '@/components/atoms/Text';
-
 import Clear from '@/assets/svg/input-clear.svg';
-import {
-  DEVICE_WIDTH,
-  isRTL,
-} from '@/utils/constants';
-import { sizeY } from '@/utils/helpers';
+import Text, { ExSmallText } from '@/components/atoms/Text';
 import { PALETTE } from '@/theme/colors';
 import { SHADOWINPUT } from '@/theme/styles';
+import typography from '@/theme/typography';
+import { DEVICE_WIDTH, isRTL } from '@/utils/constants';
+import { sizeY } from '@/utils/helpers';
+import _debounce from 'lodash/debounce';
+import React, { forwardRef, useState } from 'react';
+import type { TextInputProps, TextStyle, ViewStyle } from 'react-native';
+import { Platform, Pressable, StyleSheet, TextInput as TextInputReact, View } from 'react-native';
 
 const isIOS = Platform.OS === 'ios';
 
@@ -55,7 +42,7 @@ export interface TI extends TextInputProps {
 const checkNestedArray = (el: unknown): boolean => {
   if (Array.isArray(el) && el.length > 0) {
     const flatted = el.flat(1);
-    return flatted.some((error) => {
+    return flatted.some(error => {
       return typeof error === 'string' && !!error;
     });
   } else {
@@ -110,19 +97,18 @@ const TextInput = forwardRef<TextInputReact, TI>((props, ref) => {
   const haveError = checkNestedArray(errors);
 
   const _renderErrorFlat = () => {
-    
     const errrorFlat =
       Array.isArray(errors) && errors.length > 0
         ? errors
             .flat(1)
-            .filter((el) => !!el)
+            .filter(el => !!el)
             .join(' ')
         : errors;
 
     if (typeof errrorFlat === 'string' && !!errrorFlat) {
       return (
         <View
-          onLayout={(event) => {
+          onLayout={event => {
             setHeight(event.nativeEvent.layout?.height);
           }}
           style={styles.error}>
@@ -152,12 +138,9 @@ const TextInput = forwardRef<TextInputReact, TI>((props, ref) => {
     }
     return null;
   };
-  
+
   // Calculate width properly with type safety
-  const containerWidth = 
-    typeof containerStyle.width === 'number' 
-      ? containerStyle.width 
-      : DEVICE_WIDTH - 40;
+  const containerWidth = typeof containerStyle.width === 'number' ? containerStyle.width : DEVICE_WIDTH - 40;
   const width = containerWidth + 3;
 
   return (
@@ -169,11 +152,7 @@ const TextInput = forwardRef<TextInputReact, TI>((props, ref) => {
               styles.phoneContainer,
               multiline
                 ? {
-                    height: sizeY(
-                      numberOfLines < 2
-                        ? numberOfLines * 60
-                        : numberOfLines * 50
-                    ),
+                    height: sizeY(numberOfLines < 2 ? numberOfLines * 60 : numberOfLines * 50),
                   }
                 : {},
               shadow ? { ...SHADOWINPUT } : {},
@@ -181,9 +160,7 @@ const TextInput = forwardRef<TextInputReact, TI>((props, ref) => {
             ]}>
             {!!value && enablePlaceHolder ? (
               <View style={styles.placeholder}>
-                <Text
-                  style={{ color: '#C5C5C5' }}
-                  type="extraSmallText">
+                <Text style={{ color: '#C5C5C5' }} type="extraSmallText">
                   {placeholderUpper ? placeholderUpper : placeholder}
                 </Text>
               </View>
@@ -212,23 +189,17 @@ const TextInput = forwardRef<TextInputReact, TI>((props, ref) => {
               multiline={secureTextEntry ? false : multiline}
               numberOfLines={numberOfLines}
               onBlur={onBlur}
-              onChangeText={
-                debounce > 0 ? _debounce(onChangeText, debounce) : onChangeText
-              }
+              onChangeText={debounce > 0 ? _debounce(onChangeText, debounce) : onChangeText}
               onSubmitEditing={onSubmitEditing}
               placeholder={placeholder}
-              placeholderTextColor={
-                placeholderTextColor ? placeholderTextColor : PALETTE.GREY
-              }
+              placeholderTextColor={placeholderTextColor ? placeholderTextColor : PALETTE.GREY}
               spellCheck={autoCorrect}
               style={[
                 // Use a type-safe approach for typography
                 typography['text'] || {},
                 style,
                 styles.textInput,
-                !!value && enablePlaceHolder
-                  ? { paddingTop: isIOS ? 15 : 15 }
-                  : {},
+                !!value && enablePlaceHolder ? { paddingTop: isIOS ? 15 : 15 } : {},
               ]}
               textAlign={isRTL ? 'right' : 'left'}
             />
@@ -297,7 +268,12 @@ const styles = StyleSheet.create({
     textAlign: 'left',
     marginLeft: 20,
   },
-  textInput: { flex: 7, padding: 0 },
+  textInput: {
+    flex: 7,
+    padding: 0,
+    textAlign: isRTL ? 'left' : undefined,
+    writingDirection: 'rtl',
+  },
   dropDownImage: {
     height: 14,
     width: 12,

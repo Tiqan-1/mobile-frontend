@@ -42,7 +42,7 @@ const persistConfig = {
   key: 'root',
   storage: reduxStorage,
   // Optionally blacklist some state that you don't want to persist
-  blacklist: ['currentDownloading', 'accessibility'], // Don't persist accessibility state
+  blacklist: ['currentDownloading', 'accessibility', 'subscriptions'], // Don't persist accessibility state
 };
 
 const rootReducer = combineReducers({

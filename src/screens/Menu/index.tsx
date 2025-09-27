@@ -4,15 +4,16 @@ import { useAppDispatch } from '@/hooks/useAppDispatch';
 import { Paths } from '@/navigation/paths';
 import type { RootScreenProps } from '@/navigation/types';
 import { initStateAPIState } from '@/services/API';
-import { logout } from '@/store/auth';
+import { persistor } from '@/store';
+import { logout, setisSUAuth } from '@/store/auth';
 import { resetDocuments } from '@/store/documentsSlice';
 import { resetSubscriptions } from '@/store/subscriptionSlice';
 import { useTheme } from '@/theme';
+import { CommonActions } from '@react-navigation/native';
+import _ from 'lodash';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, Pressable, StyleSheet, View } from 'react-native';
-import { CommonActions } from '@react-navigation/native';
-import { persistor } from '@/store';
 
 interface MenuElementProps {
   title: string;
@@ -20,9 +21,21 @@ interface MenuElementProps {
 
 function MenuElement({ title }: MenuElementProps) {
   const { colors } = useTheme();
+  const dispatch = useAppDispatch();
+
+  const [Swipe, setSwipe] = useState([]);
+  const [Admin, setAdmin] = useState('');
+  const activateD = __DEV__
+    ? ['SWIPE_UP']
+    : ['SWIPE_UP', 'SWIPE_UP', 'SWIPE_UP', 'SWIPE_DOWN', 'SWIPE_DOWN', 'SWIPE_UP', 'SWIPE_UP', 'SWIPE_DOWN'];
+  if (_.isEqual(Swipe, activateD)) {
+    console.log('Activated');
+    setAdmin('Activated');
+    dispatch(setisSUAuth(true));
+    setSwipe([]);
+  }
   // const { t, i18n } = useTranslation();
   // const [apiState, setapiState] = useState<APISTATE>(initStateAPIState);
-  const dispatch = useAppDispatch();
   return (
     <View
       style={{
@@ -53,16 +66,16 @@ function Menu({ navigation }: RootScreenProps<Paths.Menu>) {
     dispatch(logout());
     dispatch(resetDocuments());
     dispatch(resetSubscriptions());
-    
+
     // Purge persisted data
     await persistor.purge();
-    
+
     // Reset navigation stack to Auth screen
     navigation.dispatch(
       CommonActions.reset({
         index: 0,
         routes: [{ name: Paths.Auth }],
-      })
+      }),
     );
   };
 

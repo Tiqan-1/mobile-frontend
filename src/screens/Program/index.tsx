@@ -9,32 +9,29 @@ import { useAppDispatch, useAppSelector } from '@/hooks/useAppDispatch';
 import { Paths } from '@/navigation/paths';
 import type { RootScreenProps } from '@/navigation/types';
 import { DELETE, POST } from '@/services/API';
-import { logger } from '@/services/logger';
 import { setSubscriptions } from '@/store/subscriptionSlice';
 import { useTheme } from '@/theme';
 import { PALETTE } from '@/theme/colors';
-import { bold } from '@/theme/typography';
 import type { Level, Program, Subscription } from '@/types/program';
 import { calculateProgress, parseRemaining, remaingDays } from '@/utils/dateTime';
 import moment from 'moment';
-import React from 'react';
+import React, { useState } from 'react';
 import { Alert, FlatList, StyleSheet, TouchableOpacity, View } from 'react-native';
 
 const ProgramCard = ({ level, program }: { level: Level; program: Program }) => {
   const { colors } = useTheme();
   const { items: subscriptionsState } = useAppSelector(state => state.subscriptions);
 
-  const registerd = subscriptionsState.find(sub => sub.currentLevel?.id === level.id);
+  // const registerd = subscriptionsState.find(sub => sub.currentLevel?.id === level.id);
 
   return (
     <View style={[styles.card, { backgroundColor: colors.SURFACE }]}>
-      <Text isBold style={[styles.programName, { color: colors.BLACK }]}>{level.name}</Text>
+      <Text isBold style={[styles.programName, { color: colors.BLACK }]}>
+        {level.name}
+      </Text>
       <View style={styles.datesContainer}>
         <SmallText style={[styles.registrationText, { color: colors.BLACK }]}>انتهاء التسجيل: {parseRemaining(level.start)}</SmallText>
         <SmallText style={[styles.dateText, { color: colors.BLACK }]}>بدء البرنامج {parseRemaining(level.start)}</SmallText>
-      </View>
-      <View style={[styles.statusTag, { backgroundColor: registerd ? colors.SUCCESS : colors.DISABLED }]}>
-        <SmallText style={[styles.statusText, { color: colors.WHITE }]}>{registerd ? 'مسجل' : 'غير مسجل'}</SmallText>
       </View>
     </View>
   );
@@ -66,7 +63,8 @@ function Program({ navigation, route }: RootScreenProps<Paths.Program>) {
   }, 0);
 
   const progress = calculateProgress(program.registrationStart, program.registrationEnd);
-  const isRegisterd = program?.subscriptionId || subscriptionsState.find(sub => sub.program.id === program.id);
+
+  const [isRegisterd, setIsRegisterd] = useState<boolean>(!!program?.subscriptionId || !!subscriptionsState?.find(sub => sub.program?.id === program.id));
 
   return (
     <SafeScreen>
@@ -78,7 +76,7 @@ function Program({ navigation, route }: RootScreenProps<Paths.Program>) {
           <View style={styles.row}>
             <View style={styles.element}>
               <Levels style={{ marginHorizontal: 3 }} />
-              <Text bgColor={styles.header.backgroundColor}>{` ${program.levels.length} مستويات `}</Text>
+              <Text bgColor={styles.header.backgroundColor}>{` ${program.levels?.length || 0} مستويات `}</Text>
             </View>
             <View style={styles.element}>
               <List style={{ marginHorizontal: 3 }} />
@@ -121,6 +119,8 @@ function Program({ navigation, route }: RootScreenProps<Paths.Program>) {
                       handleSuccessMessage(res.data?.message ?? 'تم الغاء تسجيلك بنجاح');
                       const newSubscriptions = subscriptionsState.filter(sub => sub.id !== program.id);
                       dispatch(setSubscriptions([...newSubscriptions] as Subscription[]));
+                      program.subscriptionId = '';
+                      setIsRegisterd(false);
                     })
                     .catch(error => {
                       handleErrorMessage(error);
@@ -141,7 +141,7 @@ function Program({ navigation, route }: RootScreenProps<Paths.Program>) {
         style={[styles.fab, { backgroundColor: colors.PRIMARY_COLOR }]}
         onPress={() => {
           if (isRegisterd) {
-            navigation.navigate(Paths.Subscription, isRegisterd);
+            navigation.navigate(Paths.Subscription, { program });
           } else {
             Alert.alert('سيتم تسجيلك فى برنامج', program.name, [
               {
@@ -153,6 +153,8 @@ function Program({ navigation, route }: RootScreenProps<Paths.Program>) {
                     .then(res => {
                       handleSuccessMessage(res.data?.message ?? 'تم تسجيلك بنجاح');
                       dispatch(setSubscriptions([...subscriptionsState, { ...program }] as Subscription[]));
+                      program.subscriptionId = res.data?.id;
+                      setIsRegisterd(true);
                     })
                     .catch(error => {
                       handleErrorMessage(error);
@@ -166,7 +168,9 @@ function Program({ navigation, route }: RootScreenProps<Paths.Program>) {
             ]);
           }
         }}>
-        <Text isBold style={styles.fabText}>{subscriptionsState.some(sub => sub.program.id === program.id) ? '→' : '+'}</Text>
+        <Text isBold style={styles.fabText}>
+          {isRegisterd ? '→' : '+'}
+        </Text>
       </TouchableOpacity>
     </SafeScreen>
   );
