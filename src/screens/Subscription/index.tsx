@@ -102,6 +102,11 @@ function Subscription({ navigation, route }: RootScreenProps<Paths.Subscription>
           keyExtractor={(item, index) => `${item.id}-${index}`}
           contentContainerStyle={styles.listContainer}
           showsVerticalScrollIndicator={false}
+          ListEmptyComponent={() => (
+            <View style={{ alignItems: 'center', justifyContent: 'center', padding: 20 }}>
+              <Text style={{ color: colors.GREY }}>لا يوجد محاضرات متاحة</Text>
+            </View>
+          )}
         />
         <VideoModal selectedVideo={selectedVideo} onClose={() => setSelectedVideo(null)} />
       </View>

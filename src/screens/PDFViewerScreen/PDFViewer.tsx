@@ -1,5 +1,6 @@
 import { useAppDispatch } from '@/hooks/useAppDispatch';
 import { setCurrentPage } from '@/store/documentsSlice';
+import type { Lesson } from '@/types/program';
 import { useRoute } from '@react-navigation/native';
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, Dimensions, StyleSheet, View } from 'react-native';
@@ -19,6 +20,7 @@ const PDFViewerScreen = () => {
   const [fileUrl, setFileUrl] = useState<null | string>(null);
   const [loading, setLoading] = useState(true);
   const dispatch = useAppDispatch();
+  // console.log(document, fileUrl);
 
   useEffect(() => {
     const loadFile = async () => {
@@ -72,6 +74,8 @@ const PDFViewerScreen = () => {
       <Pdf
         source={{ uri: fileUrl }}
         style={styles.pdf}
+        trustAllCerts={true}
+        onError={e => console.log(e)}
         page={document.currentPage || 1}
         onPageChanged={onPageChanged}
         enablePaging={true}

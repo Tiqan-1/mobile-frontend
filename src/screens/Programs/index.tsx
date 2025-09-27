@@ -11,8 +11,8 @@ import { SHADOW } from '@/theme/styles';
 import { bold } from '@/theme/typography';
 import type { Program } from '@/types/program';
 import { calculateProgress } from '@/utils/dateTime';
-import { useNavigation } from '@react-navigation/native';
-import React, { useEffect, useState } from 'react';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FlatList, ScrollView, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
@@ -161,6 +161,15 @@ function Programs({ navigation }: RootScreenProps<Paths.Programs>) {
     ItemClass.init();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Refresh data when screen comes into focus
+  useFocusEffect(
+    useCallback(() => {
+      // Reload data when screen is focused
+      ItemClass.reload(apiState);
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [])
+  );
 
   // Apply filters when they change
   useEffect(() => {

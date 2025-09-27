@@ -8,6 +8,7 @@ import { GET, initStateAPIState } from '@/services/API';
 import { Pagination, type PaginationState } from '@/services/Pagination';
 import { setSubscriptions } from '@/store/subscriptionSlice';
 import { useTheme } from '@/theme';
+import { PALETTE } from '@/theme/colors';
 import { SHADOW } from '@/theme/styles';
 import { bold } from '@/theme/typography';
 import type { Lesson, Subscription, Task } from '@/types/program';
@@ -377,6 +378,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 4,
+    backgroundColor:PALETTE.WHITE,
     ...SHADOW,
   },
   buttonText: {
