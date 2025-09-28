@@ -17,7 +17,7 @@ import { useNavigation } from '@react-navigation/native';
 import moment from 'moment';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { FlatList, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { FlatList, Pressable, StyleSheet, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
 
 type ViewMode = 'subscription' | 'timeline';
@@ -28,7 +28,7 @@ const ProgramCard = ({ program }: { program: Subscription }) => {
   const navigation = useNavigation();
 
   return (
-    <TouchableOpacity
+    <Pressable
       style={[styles.card, { backgroundColor: colors.SURFACE }]}
       onPress={() => {
         navigation.navigate(Paths.Subscription, program);
@@ -72,7 +72,7 @@ const ProgramCard = ({ program }: { program: Subscription }) => {
           />
         </View>
       </View> */}
-    </TouchableOpacity>
+    </Pressable>
   );
 };
 
@@ -81,11 +81,13 @@ const TimelineCard = ({ lesson, program, task }: { lesson: Lesson; program: Subs
   const navigation = useNavigation();
   const { t } = useTranslation();
   return (
-    <TouchableOpacity
+    <Pressable
       style={[styles.timelineCard, { backgroundColor: colors.SURFACE }]}
       onPress={() => navigation.navigate(Paths.Subscription, program)}>
       <View style={styles.dateContainer}>
-        <SmallTitle isBold style={[styles.dateDayText, { color: colors.BLACK }]}>{moment(new Date(task.date)).format('DD')}</SmallTitle>
+        <SmallTitle isBold style={[styles.dateDayText, { color: colors.BLACK }]}>
+          {moment(new Date(task.date)).format('DD')}
+        </SmallTitle>
         <Text style={[styles.dateMonthText, { color: colors.GREY }]}>{moment(new Date(task.date)).format('MMM')}</Text>
       </View>
       <CircleStatus Dtstatus={lesson.date} />
@@ -95,7 +97,7 @@ const TimelineCard = ({ lesson, program, task }: { lesson: Lesson; program: Subs
         </Text>
         <Text style={[styles.lessonTitle, { color: colors.BLACK }]}>{lesson.title}</Text>
       </View>
-    </TouchableOpacity>
+    </Pressable>
   );
 };
 
@@ -207,9 +209,11 @@ function MainScreen({ navigation }: RootScreenProps<Paths.Main>) {
     <SafeScreen>
       <View style={styles.container}>
         <View style={styles.headerContainer}>
-          <Text isBold style={styles.welcomeText}>اهلا, {user.name}</Text>
+          <Text isBold style={styles.welcomeText}>
+            اهلا, {user.name}
+          </Text>
           <View style={styles.buttonContainer}>
-            <TouchableOpacity
+            <Pressable
               style={[
                 styles.viewButton,
                 {
@@ -223,8 +227,8 @@ function MainScreen({ navigation }: RootScreenProps<Paths.Main>) {
                 style={[styles.buttonText, { color: viewMode === 'subscription' ? themeColors.WHITE : themeColors.PRIMARY_COLOR }]}>
                 الاشتراكات
               </SmallText>
-            </TouchableOpacity>
-            <TouchableOpacity
+            </Pressable>
+            <Pressable
               style={[
                 styles.viewButton,
                 {
@@ -237,7 +241,7 @@ function MainScreen({ navigation }: RootScreenProps<Paths.Main>) {
               <SmallText style={[styles.buttonText, { color: viewMode === 'timeline' ? themeColors.WHITE : themeColors.PRIMARY_COLOR }]}>
                 الجدول الزمني
               </SmallText>
-            </TouchableOpacity>
+            </Pressable>
           </View>
         </View>
 
@@ -263,20 +267,20 @@ function MainScreen({ navigation }: RootScreenProps<Paths.Main>) {
                   <FastImage source={require('@/assets/images/noImage.png')} style={styles.emptyStateImage} resizeMode="contain" />
                   <Text style={[styles.emptyStateTitle, { color: themeColors.BLACK }]}>لا يوجد اشتراكات</Text>
                   <Text style={[styles.emptyStateText, { color: themeColors.GREY }]}>يمكنك اضافة اشتراك جديد من خلال البرامج المتاحة</Text>
-                  <TouchableOpacity
+                  <Pressable
                     style={[styles.emptyStateButton, { backgroundColor: themeColors.PRIMARY_COLOR }]}
                     onPress={() => navigation.navigate(Paths.Programs)}>
                     <Text style={[styles.emptyStateButtonText, { color: themeColors.WHITE }]}>عرض البرامج المتاحة</Text>
-                  </TouchableOpacity>
+                  </Pressable>
                 </View>
               )
             }
           />
         ) : (
           <View style={styles.timelineContainer}>
-            <TouchableOpacity style={[styles.todayButton, { backgroundColor: themeColors.PRIMARY_COLOR }]} onPress={goToToday}>
+            <Pressable style={[styles.todayButton, { backgroundColor: themeColors.PRIMARY_COLOR }]} onPress={goToToday}>
               <SmallText style={[styles.todayButtonText, { color: themeColors.WHITE }]}>دروس اليوم</SmallText>
-            </TouchableOpacity>
+            </Pressable>
             <FlatList
               data={getTimelineData()}
               renderItem={({ item }) => {
@@ -293,7 +297,9 @@ function MainScreen({ navigation }: RootScreenProps<Paths.Main>) {
               ListEmptyComponent={() => (
                 <View style={styles.emptyStateContainer}>
                   <FastImage source={require('@/assets/images/noImage.png')} style={styles.emptyStateImage} resizeMode="contain" />
-                  <Text isBold style={[styles.emptyStateTitle, { color: themeColors.BLACK }]}>لا يوجد دروس</Text>
+                  <Text isBold style={[styles.emptyStateTitle, { color: themeColors.BLACK }]}>
+                    لا يوجد دروس
+                  </Text>
                   <Text style={[styles.emptyStateText, { color: themeColors.GREY }]}>سجل في برامج جديدة لمشاهدة الدروس المتاحة لك</Text>
                 </View>
               )}
@@ -378,7 +384,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 4,
-    backgroundColor:PALETTE.WHITE,
+    backgroundColor: PALETTE.WHITE,
     ...SHADOW,
   },
   buttonText: {
@@ -448,14 +454,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 40,
   },
-  welcomeText: {
-  },
+  welcomeText: {},
   dateContainer: {
     paddingHorizontal: 10,
     alignItems: 'center',
   },
-  dateDayText: {
-  },
+  dateDayText: {},
   dateMonthText: {
     marginTop: 2,
   },
