@@ -5,6 +5,7 @@ export type RootStackParamList = {
   [Paths.AccessibilitySettings]: undefined;
   [Paths.Auth]: undefined;
   [Paths.Example]: undefined;
+  [Paths.ForgotPassword]: undefined;
   [Paths.Login]: undefined;
   [Paths.Main]: undefined;
   [Paths.Menu]: undefined;

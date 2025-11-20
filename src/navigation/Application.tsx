@@ -3,6 +3,7 @@ import { Paths } from '@/navigation/paths';
 import type { RootStackParamList } from '@/navigation/types';
 import { Example, Login, Startup } from '@/screens';
 import AccessibilitySettings from '@/screens/AccessibilitySettings';
+import ForgotPassword from '@/screens/auth/ForgotPassword';
 import SignUp from '@/screens/auth/signup';
 import PDFViewerScreen from '@/screens/PDFViewerScreen/PDFViewer';
 import Program from '@/screens/Program';
@@ -34,6 +35,15 @@ function AuthNavigation() {
           headerShown: true,
           title: translate('auth.sign_up'),
           headerBackAccessibilityLabel: translate('auth.sign_up'),
+        }}
+      />
+      <Stack.Screen
+        name={Paths.ForgotPassword}
+        component={ForgotPassword}
+        options={{
+          headerShown: true,
+          title: translate('auth.forgot_password'),
+          headerBackAccessibilityLabel: translate('auth.forgot_password'),
         }}
       />
     </Stack.Navigator>

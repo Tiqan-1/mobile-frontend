@@ -37,7 +37,11 @@
       "password_invalid": "كلمة المرور غير صحيحة ",
       "confirm_password": "تأكيد كلمة المرور",
       "confirm_password_required": "تأكيد كلمة المرور مطلوب",
-      "password_not_match": "كلمة المرور غير متطابقة"
+      "password_not_match": "كلمة المرور غير متطابقة",
+      "send_reset_link": "إرسال رابط إعادة التعيين",
+      "reset_link_sent": "تم إرسال رابط إعادة التعيين إلى بريدك الإلكتروني",
+      "back_to_login": "العودة لتسجيل الدخول",
+      "remember_password": "تذكرت كلمة المرور؟"
     },
     "navigation": {
       "Programs": "البرامج",

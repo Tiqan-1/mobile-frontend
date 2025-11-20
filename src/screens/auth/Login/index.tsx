@@ -121,7 +121,9 @@ function Login({ navigation }: RootScreenProps<Paths.Login>) {
                 title={t('auth.forgot_password')}
                 disabled={!isValid || apiState.loading}
                 buttonStyle={{ alignSelf: 'flex-end' }}
-                onPress={() => {}}
+                onPress={() => {
+                  navigation.navigate(Paths.ForgotPassword);
+                }}
               />
 
               <Button

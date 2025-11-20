@@ -87,7 +87,11 @@ function Menu({ navigation }: RootScreenProps<Paths.Menu>) {
         <MenuElement title={'Contact'} />
         <MenuElement title={'Settings'} />
         <MenuElement title={'AccessibilitySettings'} /> */}
-        <Button onPress={logOut} title="Logout" />
+        <Button onPress={() => {
+          navigation.navigate(Paths.ChangeLanguage);
+        }} title="حذف الحساب" />
+
+        <Button onPress={logOut} title="تسجيل الخروج" />
       </View>
     </SafeScreen>
   );

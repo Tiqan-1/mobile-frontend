@@ -2,6 +2,9 @@ import Clock from '@/assets/svg-app/clock.svg';
 import Levels from '@/assets/svg-app/level.svg';
 import List from '@/assets/svg-app/list.svg';
 import Video from '@/assets/svg-app/video.svg';
+import Enroll from '@/assets/svg/enroll.svg';
+import Sub from '@/assets/svg/subscribe.svg';
+import Unsub from '@/assets/svg/unsubscribe.svg';
 import { handleErrorMessage, handleSuccessMessage } from '@/components/atoms/FlashMessage';
 import { SmallText, Text, Title } from '@/components/atoms/Text';
 import { SafeScreen } from '@/components/templates';
@@ -64,14 +67,25 @@ function Program({ navigation, route }: RootScreenProps<Paths.Program>) {
 
   const progress = calculateProgress(program.registrationStart, program.registrationEnd);
 
-  const [isRegisterd, setIsRegisterd] = useState<boolean>(!!program?.subscriptionId || !!subscriptionsState?.find(sub => sub.program?.id === program.id));
+  const [isRegisterd, setIsRegisterd] = useState<boolean>(
+    !!program?.subscriptionId || !!subscriptionsState?.find(sub => sub.program?.id === program.id),
+  );
 
   return (
     <SafeScreen>
       <View style={styles.container}>
         <View style={styles.header}>
           <Title bgColor={styles.header.backgroundColor}>{program.name}</Title>
-          <Text bgColor={styles.header.backgroundColor}>يبدا فى {moment(new Date(program.start)).format('YYYY/MM/DD')}</Text>
+
+          <View style={styles.row}>
+            <View style={styles.element}>
+              <Text bgColor={styles.header.backgroundColor}>يبدا فى {moment(new Date(program.start)).format('YYYY/MM/DD')}</Text>
+            </View>
+            <View style={styles.element}>
+              <Clock style={{ marginHorizontal: 3 }} />
+              <Text bgColor={styles.header.backgroundColor}>{remaingDays(program.end) - remaingDays(program.start)} يوم</Text>
+            </View>
+          </View>
 
           <View style={styles.row}>
             <View style={styles.element}>
@@ -85,13 +99,6 @@ function Program({ navigation, route }: RootScreenProps<Paths.Program>) {
             <View style={styles.element}>
               <Video style={{ marginHorizontal: 3 }} />
               <Text bgColor={styles.header.backgroundColor}>{` ${video} محاضرة `}</Text>
-            </View>
-          </View>
-
-          <View style={styles.row}>
-            <View style={styles.element}>
-              <Clock style={{ marginHorizontal: 3 }} />
-              <Text bgColor={styles.header.backgroundColor}>{remaingDays(program.end) - remaingDays(program.start)} يوم</Text>
             </View>
           </View>
         </View>
@@ -108,7 +115,7 @@ function Program({ navigation, route }: RootScreenProps<Paths.Program>) {
       {/* FAB for subscription or navigation */}
       {isRegisterd && (
         <TouchableOpacity
-          style={[styles.fab2, { backgroundColor: colors.ERROR }]}
+          style={[styles.fab2, { backgroundColor: colors.WHITE }]}
           onPress={() => {
             Alert.alert('سيتم الغاء تسجيلك فى برنامج', program.name, [
               {
@@ -127,18 +134,18 @@ function Program({ navigation, route }: RootScreenProps<Paths.Program>) {
                     }),
               },
               {
-                text: 'الغاء',
+                text: 'لا',
                 isPreferred: true,
                 style: 'cancel',
               },
             ]);
           }}>
-          <Text style={styles.fabText}>x</Text>
+          <Unsub /> 
         </TouchableOpacity>
       )}
 
       <TouchableOpacity
-        style={[styles.fab, { backgroundColor: colors.PRIMARY_COLOR }]}
+        style={[styles.fab, { backgroundColor: colors.WHITE }]}
         onPress={() => {
           if (isRegisterd) {
             navigation.navigate(Paths.Subscription, { program });
@@ -168,9 +175,7 @@ function Program({ navigation, route }: RootScreenProps<Paths.Program>) {
             ]);
           }
         }}>
-        <Text isBold style={styles.fabText}>
-          {isRegisterd ? '→' : '+'}
-        </Text>
+        {isRegisterd ? <Enroll /> : <Sub />}
       </TouchableOpacity>
     </SafeScreen>
   );
