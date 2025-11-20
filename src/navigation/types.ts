@@ -6,7 +6,7 @@ export type RootStackParamList = {
   [Paths.Auth]: undefined;
   [Paths.Example]: undefined;
   [Paths.ForgotPassword]: undefined;
-  [Paths.Login]: undefined;
+  [Paths.Login]: { email?: string } | undefined;
   [Paths.Main]: undefined;
   [Paths.Menu]: undefined;
   [Paths.PDF]: Lesson;

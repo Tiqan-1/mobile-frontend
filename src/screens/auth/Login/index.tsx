@@ -27,7 +27,7 @@ function onChangeLocale(nextlocale: string) {
   api.setHeader('X-localization', nextlocale);
 }
 
-function Login({ navigation }: RootScreenProps<Paths.Login>) {
+function Login({ navigation, route }: RootScreenProps<Paths.Login>) {
   const { isDark, colors, toggleTheme } = useTheme();
   const { t, i18n } = useTranslation();
   const sheet = useRef<ActionSheet>(null);
@@ -37,6 +37,9 @@ function Login({ navigation }: RootScreenProps<Paths.Login>) {
   const [secure, setsecure] = useState(true);
   const dispatch = useAppDispatch();
   const currentLanguage = i18n.language;
+
+  // Get email from route params if available
+  const emailFromParams = route.params?.email || '';
 
   const changeLang = (index: number) => {
     if (index === 0) {
@@ -48,7 +51,10 @@ function Login({ navigation }: RootScreenProps<Paths.Login>) {
     }
   };
 
-  const initialValues = { email: __DEV__ ? 'm@m.com' : '', password: __DEV__ ? 'Aa@123123' : '' };
+  const initialValues = { 
+    email: emailFromParams || (__DEV__ ? 'm@m.com' : ''), 
+    password: __DEV__ ? 'Aa@123123' : '' 
+  };
   const loginValidationSchema = yup.object().shape({
     email: yup.string().email(t('auth.email_invalid')).required(t('auth.email_required')),
     password: yup.string().required(t('auth.password_required')),
@@ -86,7 +92,11 @@ function Login({ navigation }: RootScreenProps<Paths.Login>) {
           <SmallTitle>{t('screen_example.title')}</SmallTitle>
         </View>
 
-        <Formik initialValues={initialValues} onSubmit={handleSubmit} validationSchema={loginValidationSchema}>
+        <Formik 
+          initialValues={initialValues} 
+          onSubmit={handleSubmit} 
+          validationSchema={loginValidationSchema}
+          enableReinitialize={true}>
           {({ handleBlur, handleChange, values, errors, touched, handleSubmit, isValid }) => (
             <>
               <View style={style.inputGroup}>

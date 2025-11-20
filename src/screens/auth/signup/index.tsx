@@ -1,20 +1,18 @@
 import Button from '@/components/atoms/Button';
 import RadioButton from '@/components/atoms/RadioButton';
-import { ExSmallText, SmallText, SmallTitle, Text } from '@/components/atoms/Text';
+import { ExSmallText, SmallTitle, Text } from '@/components/atoms/Text';
 import TextInput from '@/components/atoms/TextInput';
 import { SafeScreen } from '@/components/templates';
-import { useAppDispatch } from '@/hooks/useAppDispatch';
 import { Paths } from '@/navigation/paths';
 import type { RootScreenProps } from '@/navigation/types';
-import api, { initStateAPIState, POST } from '@/services/API';
-import { login } from '@/store/auth';
+import { initStateAPIState, POST } from '@/services/API';
 import { useTheme } from '@/theme';
 import EyeClose from 'assets/svg/input-eye-close.svg';
 import Eye from 'assets/svg/input-eye.svg';
 import { Formik } from 'formik';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { StyleSheet, View } from 'react-native';
+import { Modal, StyleSheet, View } from 'react-native';
 import * as yup from 'yup';
 
 function SignUp({ navigation }: RootScreenProps<Paths.SignUp>) {
@@ -24,7 +22,8 @@ function SignUp({ navigation }: RootScreenProps<Paths.SignUp>) {
   const [apiState, setapiState] = useState<APISTATE<unknown>>(initStateAPIState);
 
   const [secure, setsecure] = useState(true);
-  const dispatch = useAppDispatch();
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [registeredEmail, setRegisteredEmail] = useState('');
 
   const initialValues = {
     name: '',
@@ -41,18 +40,22 @@ function SignUp({ navigation }: RootScreenProps<Paths.SignUp>) {
       .matches(/\w*[a-z]\w*/, 'كلمة المرور يجب أن تحتوي علي حرف صغير')
       .matches(/\w*[A-Z]\w*/, 'كلمة المرور يجب أن تحتوي علي حرف كبير')
       .matches(/\d/, 'كلمة المرور يجب أن تحتوي علي رقم')
-      .matches(/[!@#$%^&*()\-_"=+{}; :,<.>]/, 'كلمة المرور يجب أن تحتوي علي حرف خاص')
+      .matches(/[ !"#$%&()*+,.:;<=>@^_{}\-]/, 'كلمة المرور يجب أن تحتوي علي حرف خاص')
       .min(8, ({ min }) => `كلمة المرور يجب أن تحتوي علي  ${min} حروف`)
       .required('كلمة المرور مطلوبة'),
   });
 
   const handleSubmit = (values: typeof initialValues) => {
     POST('/api/students/sign-up', values, setapiState).then(res => {
-      const token = res.accessToken;
-      api.setHeader('Authorization', `bearer ${token}`);
-      dispatch(login(res));
-      navigation.navigate(Paths.TabNav);
+      // Show success modal with email instead of navigating directly
+      setRegisteredEmail(values.email);
+      setShowSuccessModal(true);
     });
+  };
+
+  const handleGoToLogin = () => {
+    setShowSuccessModal(false);
+    navigation.navigate(Paths.Login, { email: registeredEmail });
   };
   return (
     <SafeScreen isScroll>
@@ -135,6 +138,32 @@ function SignUp({ navigation }: RootScreenProps<Paths.SignUp>) {
           />
         </View>
       </View>
+
+      <Modal
+        visible={showSuccessModal}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setShowSuccessModal(false)}>
+        <View style={style.modalOverlay}>
+          <View style={[style.modalContent, { backgroundColor: colors.SURFACE }]}>
+            <SmallTitle style={{ marginBottom: 16, textAlign: 'center' }}>
+              تحقق من بريدك الإلكتروني
+            </SmallTitle>
+            <Text style={{ marginBottom: 8, textAlign: 'center' }}>
+              يرجى التحقق من بريدك الإلكتروني وتأكيد حسابك قبل تسجيل الدخول.
+            </Text>
+            <Text style={{ marginBottom: 16, textAlign: 'center', fontWeight: 'bold', color: colors.PRIMARY_COLOR }}>
+              {registeredEmail}
+            </Text>
+            <Button
+              type="main"
+              title={t('auth.login')}
+              onPress={handleGoToLogin}
+              buttonStyle={{ marginTop: 10 }}
+            />
+          </View>
+        </View>
+      </Modal>
     </SafeScreen>
   );
 }
@@ -171,5 +200,19 @@ const style = StyleSheet.create({
     flex: 2,
     flexDirection: 'row',
     justifyContent: 'space-around',
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+  },
+  modalContent: {
+    width: '100%',
+    maxWidth: 400,
+    padding: 24,
+    borderRadius: 12,
+    alignItems: 'center',
   },
 });

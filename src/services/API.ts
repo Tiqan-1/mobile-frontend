@@ -7,7 +7,7 @@ import { logger } from './logger';
 
 export const baseURLProd1 = 'https://mubadarah.ce-svcs.cc';
 export const baseURLTest = 'https://dev-mubadarah.ce-svcs.cc';
-export const baseURLProd = baseURLTest;
+export const baseURLProd = baseURLProd1;
 
 export type PARAMS = {
   Append?: boolean;
