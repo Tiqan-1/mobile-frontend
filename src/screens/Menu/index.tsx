@@ -1,9 +1,10 @@
+import { handleErrorMessage, handleSuccessMessage } from '@/components/atoms/FlashMessage';
 import { Text } from '@/components/atoms/Text';
 import { SafeScreen } from '@/components/templates';
 import { useAppDispatch } from '@/hooks/useAppDispatch';
 import { Paths } from '@/navigation/paths';
 import type { RootScreenProps } from '@/navigation/types';
-import { initStateAPIState } from '@/services/API';
+import { DELETE, initStateAPIState } from '@/services/API';
 import { persistor } from '@/store';
 import { logout, setisSUAuth } from '@/store/auth';
 import { resetDocuments } from '@/store/documentsSlice';
@@ -13,7 +14,7 @@ import { CommonActions } from '@react-navigation/native';
 import _ from 'lodash';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button, Pressable, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, Alert, Button, Pressable, StyleSheet, View } from 'react-native';
 
 interface MenuElementProps {
   title: string;
@@ -60,6 +61,8 @@ function Menu({ navigation }: RootScreenProps<Paths.Menu>) {
   // const { t, i18n } = useTranslation();
   // const [apiState, setapiState] = useState<APISTATE>(initStateAPIState);
   const dispatch = useAppDispatch();
+  const { colors } = useTheme();
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const logOut = async () => {
     // Clear all store data
@@ -79,6 +82,35 @@ function Menu({ navigation }: RootScreenProps<Paths.Menu>) {
     );
   };
 
+  const handleDeleteAccount = () => {
+    Alert.alert(
+      'حذف الحساب',
+      'هل أنت متأكد من حذف حسابك؟ سيتم حذف جميع بياناتك بشكل نهائي.',
+      [
+        {
+          text: 'إلغاء',
+          style: 'cancel',
+          isPreferred: true,
+        },
+        {
+          text: 'حذف',
+          style: 'destructive',
+          onPress: async () => {
+            setIsDeleting(true);
+            try {
+              await DELETE('/api/students', {});
+              handleSuccessMessage('تم حذف الحساب بنجاح');
+              await logOut();
+            } catch (error) {
+              handleErrorMessage(error as object);
+              setIsDeleting(false);
+            }
+          },
+        },
+      ],
+    );
+  };
+
   return (
     <SafeScreen>
       <View style={styles.container}>
@@ -87,12 +119,15 @@ function Menu({ navigation }: RootScreenProps<Paths.Menu>) {
         <MenuElement title={'Contact'} />
         <MenuElement title={'Settings'} />
         <MenuElement title={'AccessibilitySettings'} /> */}
-        <Button onPress={() => {
-          navigation.navigate(Paths.ChangeLanguage);
-        }} title="حذف الحساب" />
+        <Button onPress={handleDeleteAccount} title="حذف الحساب" />
 
         <Button onPress={logOut} title="تسجيل الخروج" />
       </View>
+      {isDeleting && (
+        <View style={styles.loadingOverlay}>
+          <ActivityIndicator size="large" color={colors.PRIMARY_COLOR} />
+        </View>
+      )}
     </SafeScreen>
   );
 }
@@ -105,5 +140,16 @@ const styles = StyleSheet.create({
   title: {
     fontWeight: 'bold',
     marginBottom: 16,
+  },
+  loadingOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 9999,
   },
 });
