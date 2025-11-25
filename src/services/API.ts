@@ -4,10 +4,10 @@ import type { ApiResponse } from 'apisauce';
 import { create } from 'apisauce';
 import type { Dispatch, SetStateAction } from 'react';
 import { logger } from './logger';
-
+export const isTest = true;
 export const baseURLProd1 = 'https://mubadarah.ce-svcs.cc';
 export const baseURLTest = 'https://dev-mubadarah.ce-svcs.cc';
-export const baseURLProd = baseURLProd1;
+export const baseURLProd = isTest ? baseURLTest : baseURLProd1;
 
 export type PARAMS = {
   Append?: boolean;

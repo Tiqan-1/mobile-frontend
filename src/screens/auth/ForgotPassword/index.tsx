@@ -5,7 +5,7 @@ import TextInput from '@/components/atoms/TextInput';
 import { SafeScreen } from '@/components/templates';
 import { Paths } from '@/navigation/paths';
 import type { RootScreenProps } from '@/navigation/types';
-import { initStateAPIState, POST } from '@/services/API';
+import { GET, initStateAPIState, POST } from '@/services/API';
 import { useTheme } from '@/theme';
 import { PALETTE } from '@/theme/colors';
 import { Formik } from 'formik';
@@ -28,7 +28,7 @@ function ForgotPassword({ navigation }: RootScreenProps<Paths.ForgotPassword>) {
 
   const handleSubmit = (values: typeof initialValues) => {
     setSuccessMessage('');
-    POST(`/api/authentication/forgot-password/${values.email}`, values, setapiState).then(res => {
+    GET(`/api/authentication/forgot-password/${values.email}`, {}, setapiState).then(res => {
       setSuccessMessage(t('auth.reset_link_sent'));
       // Navigate back to login after a delay
       setTimeout(() => {

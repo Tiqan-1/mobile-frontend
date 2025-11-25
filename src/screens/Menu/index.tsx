@@ -14,7 +14,8 @@ import { CommonActions } from '@react-navigation/native';
 import _ from 'lodash';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ActivityIndicator, Alert, Button, Pressable, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, Alert,  Pressable, StyleSheet, View } from 'react-native';
+import Button from '@/components/atoms/Button';
 
 interface MenuElementProps {
   title: string;
@@ -119,9 +120,9 @@ function Menu({ navigation }: RootScreenProps<Paths.Menu>) {
         <MenuElement title={'Contact'} />
         <MenuElement title={'Settings'} />
         <MenuElement title={'AccessibilitySettings'} /> */}
-        <Button onPress={handleDeleteAccount} title="حذف الحساب" />
+        <Button buttonStyle={{ marginTop: 10 }} type="main" onPress={handleDeleteAccount} title="حذف الحساب" />
 
-        <Button onPress={logOut} title="تسجيل الخروج" />
+        <Button buttonStyle={{ marginTop: 10 }} type="outline" onPress={logOut} title="تسجيل الخروج" />
       </View>
       {isDeleting && (
         <View style={styles.loadingOverlay}>

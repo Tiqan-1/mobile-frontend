@@ -2,7 +2,7 @@ import MainLogo from '@/assets/logo/main-logo.svg';
 import IconDown from '@/assets/svg/icon-down.svg';
 import Button from '@/components/atoms/Button';
 import Switch from '@/components/atoms/Switch';
-import { SmallTitle, Text } from '@/components/atoms/Text';
+import { SmallTitle, Text, Title } from '@/components/atoms/Text';
 import TextInput from '@/components/atoms/TextInput';
 import { SafeScreen } from '@/components/templates';
 import { useI18n } from '@/hooks';
@@ -10,7 +10,7 @@ import { LANG_AR, LANG_EN } from '@/hooks/language/useI18n';
 import { useAppDispatch } from '@/hooks/useAppDispatch';
 import { Paths } from '@/navigation/paths';
 import type { RootScreenProps } from '@/navigation/types';
-import api, { initStateAPIState, POST } from '@/services/API';
+import api, { initStateAPIState, isTest, POST } from '@/services/API';
 import { login } from '@/store/auth';
 import { useTheme } from '@/theme';
 import { PALETTE } from '@/theme/colors';
@@ -51,9 +51,9 @@ function Login({ navigation, route }: RootScreenProps<Paths.Login>) {
     }
   };
 
-  const initialValues = { 
-    email: emailFromParams || (__DEV__ ? 'm@m.com' : ''), 
-    password: __DEV__ ? 'Aa@123123' : '' 
+  const initialValues = {
+    email: emailFromParams || (__DEV__ ? 'm@m.com' : ''),
+    password: __DEV__ ? 'Aa@123123' : '',
   };
   const loginValidationSchema = yup.object().shape({
     email: yup.string().email(t('auth.email_invalid')).required(t('auth.email_required')),
@@ -92,11 +92,7 @@ function Login({ navigation, route }: RootScreenProps<Paths.Login>) {
           <SmallTitle>{t('screen_example.title')}</SmallTitle>
         </View>
 
-        <Formik 
-          initialValues={initialValues} 
-          onSubmit={handleSubmit} 
-          validationSchema={loginValidationSchema}
-          enableReinitialize={true}>
+        <Formik initialValues={initialValues} onSubmit={handleSubmit} validationSchema={loginValidationSchema} enableReinitialize={true}>
           {({ handleBlur, handleChange, values, errors, touched, handleSubmit, isValid }) => (
             <>
               <View style={style.inputGroup}>
@@ -158,7 +154,7 @@ function Login({ navigation, route }: RootScreenProps<Paths.Login>) {
           />
         </View>
       </View>
-
+      {isTest && <Title style={{ color: colors.ERROR, alignSelf: 'center' }}>Test API</Title>}
       {__DEV__ && (
         <Button
           type="underline"
