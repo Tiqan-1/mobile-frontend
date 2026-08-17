@@ -1,6 +1,6 @@
 # Task briefs — Binaa upgrade, refactor, and Family feature
 
-Fifteen self-contained briefs. Each one names the files it owns, what it depends on, the work, and how it's judged done. They're written to be handed to an agent or a developer cold — no other context required beyond `CLAUDE.md`.
+Fifteen self-contained briefs, plus a workflow reference ([T5](T5-parallel-workflow.md)). Each one names the files it owns, what it depends on, the work, and how it's judged done. They're written to be handed to an agent or a developer cold — no other context required beyond `CLAUDE.md`.
 
 Full reasoning behind the sequencing lives in the plan this was generated from; you shouldn't need it to execute a brief.
 
@@ -100,8 +100,11 @@ The version-choice guidance in [T1c](T1c-js-deps.md#which-version-to-target) is 
 | T3c | [Parent screens](T3c-parent-screens.md) | `src/features/family/screens/**` | T3b | T3d |
 | T3d | [Learner side + progress sync](T3d-learner-sync.md) | `src/features/family/sync/**`, `screens/TodayLessons/**` | T3b, T3a | T3c |
 | T4 | [Migrate to Expo (SDK 57 / CNG)](T4-expo-migration.md) 👤 | `app.json`, `metro.config.js`, `android/**`, `ios/**`, `package.json` | a verifiable baseline | **nothing** — conflicts with T1b/T1c |
+| T5 | [Parallel workflow across Claude Code / opencode / Trae](T5-parallel-workflow.md) | *reference doc — no deliverable* | — | n/a |
 
 👤 = Mahmoud is running these personally.
+
+**Running more than one tool at once?** Read [T5](T5-parallel-workflow.md) first — it covers worktree setup, which briefs are safe to run concurrently, and the cross-tool review protocol. Short version: **T0 must land alone first**, because its CI is the only objective arbiter between two disagreeing models.
 
 **T4 (Expo) is now recommended** — the WatermelonDB blocker turned out to be dead code and was removed, and RN 0.86.2 matches Expo SDK 57 exactly, so no version movement is required. If you adopt it, T4 **replaces** most of T1b: `android/` and `ios/` become generated and the AGP/Gradle/Kotlin work stops being your problem. Decide between them before starting either.
 

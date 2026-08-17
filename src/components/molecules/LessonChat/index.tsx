@@ -1,14 +1,19 @@
 import moment from 'moment';
 import 'moment/locale/ar';
 import type React from 'react';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { ActivityIndicator, Alert, Dimensions, FlatList, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
 import { Text, Title } from '@/components/atoms/Text';
 import { GET, POST } from '@/services/API';
 import { useTheme } from '@/theme';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { connectPusher, disconnectPusher, getSocketId, initializePusher, pusherClient } from '@/config/pusher';
 import { bold } from '@/theme/typography';
+
+// TODO(T4): Pusher was removed during the Expo migration (unproven autolinking
+// under CNG). Real-time delivery is stubbed out with polling below until a
+// replacement (config plugin, or a plain WebSocket client against Pusher's
+// protocol) is chosen. See docs/tasks/T4-expo-migration.md.
+const CHAT_POLL_INTERVAL_MS = 5000;
 
 moment.locale('ar');
 
@@ -44,7 +49,7 @@ const chatApi = {
     // Replace with actual API call using GET
     return GET(`/chat/${chatRoomId}/join`);
   },
-  send: async (chatRoomId: string, data: { message: string; socketId?: string }) => {
+  send: async (chatRoomId: string, data: { message: string }) => {
     // Replace with actual API call using POST
     return POST(`/chat/${chatRoomId}/send`, data);
   },
@@ -58,63 +63,6 @@ export const LessonChat: React.FC<LessonChatProps> = ({ chatRoomId, visible, onC
   const isInitialLoad = useRef(true);
   const { colors } = useTheme();
 
-  // Handle new message from Pusher
-  const handleNewMessage = useCallback((data: Message) => {
-    queryClient.setQueryData(chatQueryKey(chatRoomId), (oldData: { messages?: Message[] }) => {
-      if (!oldData) {
-        return oldData;
-      }
-      
-      // Check if message already exists to avoid duplicates
-      const messageExists = oldData.messages?.some((msg: Message) => msg.id === data.id);
-      if (messageExists) {
-        return oldData;
-      }
-      
-      return {
-        ...oldData,
-        messages: [...(oldData.messages || []), data],
-      };
-    });
-  }, [queryClient, chatRoomId]);
-
-  // Initialize Pusher and handle real-time messages
-  useEffect(() => {
-    if (!visible || !chatRoomId) {
-      return;
-    }
-
-    let channel: any = null; // eslint-disable-line @typescript-eslint/no-explicit-any
-
-    const setupPusher = async () => {
-      try {
-        await initializePusher();
-        await connectPusher();
-        
-        // Subscribe to the chat room channel
-        channel = pusherClient.subscribe(`chat.${chatRoomId}`);
-        
-        // Handle new message events
-        channel.bind('new-message', handleNewMessage);
-        
-        console.log(`Subscribed to channel: chat.${chatRoomId}`); // eslint-disable-line no-console
-      } catch (error) {
-        console.error('Failed to setup Pusher:', error); // eslint-disable-line no-console
-      }
-    };
-
-    setupPusher();
-
-    // Cleanup function
-    return () => {
-      if (channel) {
-        channel.unbind('new-message', handleNewMessage);
-        pusherClient.unsubscribe(`chat.${chatRoomId}`);
-      }
-      disconnectPusher().catch(console.error); // eslint-disable-line no-console
-    };
-  }, [visible, chatRoomId, handleNewMessage]);
-
   const {
     data: chatData,
     isLoading,
@@ -125,7 +73,8 @@ export const LessonChat: React.FC<LessonChatProps> = ({ chatRoomId, visible, onC
     queryKey: chatQueryKey(chatRoomId),
     queryFn: () => chatApi.join(chatRoomId),
     enabled: !!chatRoomId && visible,
-    staleTime: Number.POSITIVE_INFINITY,
+    // Was real-time via Pusher; polling stand-in until T4's Pusher decision lands.
+    refetchInterval: visible ? CHAT_POLL_INTERVAL_MS : false,
   });
 
   const messages = useMemo(() => chatData?.messages ?? [], [chatData?.messages]);
@@ -138,9 +87,7 @@ export const LessonChat: React.FC<LessonChatProps> = ({ chatRoomId, visible, onC
 
   const { mutate: sendMessage, isPending: isSending } = useMutation({
     mutationFn: async (text: string) => {
-      // Get socket ID from Pusher connection
-      const socketId = await pusherClient.getSocketId();
-      return chatApi.send(chatRoomId, { message: text, socketId: socketId || 'fallback-socket-id' });
+      return chatApi.send(chatRoomId, { message: text });
     },
     onSuccess: (_data, sentText) => {
       setInputText('');
