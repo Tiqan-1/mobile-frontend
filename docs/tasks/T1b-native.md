@@ -1,27 +1,39 @@
-# T1b — Native upgrade (Android + iOS)
+# T1b — Native upgrade (Android + iOS) — 🟣 SUPERSEDED
 
-> **Mahmoud is doing the RN upgrade personally.** T1a–T1d are a runbook for him, not agent tasks.
+> # ⛔ Do not execute this brief.
 >
-> Target version is decided by [T1a](T1a-spike.md) — 0.87.0 preferred, 0.83.10 fallback. Everything below applies to either; only the specific AGP/Kotlin/NDK numbers change, and those come from the matching RN template.
+> **[T4](T4-expo-migration.md) superseded it on 2026-08-17.** This project is now Expo CNG: `android/` and `ios/` are **generated build output**, gitignored, and absent from a fresh checkout. Editing them is not just unnecessary — `expo prebuild --clean` deletes whatever you write. See [`CLAUDE.md` §0.3](../../CLAUDE.md).
+>
+> **`Owns`: nothing.** There is no file in this repository this brief may touch.
+>
+> The *problems* it identified were real. They didn't go away — they moved. Here is where each one now lives:
 
-**Depends on:** T0. **Parallel-safe with:** T1a.
+| Original item | Where it lives now |
+|---|---|
+| **AGP 8.1.2 → current**, Kotlin / NDK / buildTools alignment | Gone. `expo prebuild` generates all of it at the versions SDK 57 pins. Nothing to choose, nothing to align. |
+| `android.enableJetifier`, duplicate `kotlin-android`, duplicate `includeBuild`, duplicate `useAndroidX` | Gone with the generated directory. Do **not** re-add them to a regenerated `android/`. |
+| **`edgeToEdgeEnabled`** | `app.json` → `expo.android.edgeToEdgeEnabled`, currently **`false`**. Flipping it is still a real decision with real layout fallout — see the note below, it's the one item here with live work in it. |
+| **iOS deployment target** (`platform :ios` + the `post_install` loop) | The `post_install` override is gone with the generated Podfile. Set `ios.deploymentTarget` via the **`expo-build-properties`** plugin — which is **not yet in `app.json`**; add it if you need to move off the SDK default. |
+| `simdjson` pod | Moot. It existed only for WatermelonDB, which was removed as dead code. |
+| **Sentry Android symbol upload had never been wired** (this brief's best find) | ✅ **Fixed as a side effect of T4.** The `@sentry/react-native/expo` plugin in `app.json` handles both platforms. Verify on the first release build rather than assuming. |
+| `ios/sentry.properties` + Fastlane dSYM upload must survive | Still true, still unverified. Fastlane needs `android/`/`ios/` to exist, so **run `expo prebuild` before any Fastlane lane** (`CLAUDE.md` §2). |
+| `MYAPP_UPLOAD_*` signing config | Regenerate via EAS credentials or a gitignored local override. **Never plaintext passwords** — the old one (`12345678`) is in git history and needs a Play Console upload-key reset. |
+| `enableProguardInReleaseBuilds` | Now an `expo-build-properties` setting. Still a separate decision with its own testing burden; leave it. |
+| Template-diff-against-a-clean-`init` method | Obsolete. The generated projects *are* the template. If your native surface isn't expressible in `app.json` + plugins, that's the finding to report. |
+| `newArchEnabled` / `hermesEnabled` | `app.json` → `expo.newArchEnabled: true`. Hermes is the SDK 57 default. Both stay on. |
 
-> **Worth knowing before you start:** the AGP fix in this brief (8.1.2 → current) is **overdue for the RN version already installed**. Even if you decide to postpone the RN upgrade entirely, this part is worth landing on its own.
+### The one item with live work left: edge-to-edge
 
-## Goal
+`app.json` has `expo.android.edgeToEdgeEnabled: false`. targetSdk 36 forces edge-to-edge on Android 15+ regardless, so this is deferred, not avoided. Turning it on **will** change layout on every screen. The app already uses `react-native-safe-area-context` and a `SafeScreen` template, which should absorb most of it.
 
-Bring the native projects up to what RN 0.87 expects. The Android build config is currently **under-spec for the RN version already installed**, so some of this is overdue regardless of the upgrade.
-
-## Owns
-
-```
-android/**    (except gradle.properties secrets, already handled in T0)
-ios/**
-```
-
-Not `package.json` — that's T1c. You may need to bump JS deps locally to test; hand the required versions to T1c rather than committing them.
+Whoever flips it: do it as its own change, check every screen for content sliding under the status/nav bars, and **hand the screen fixes to T2e/T2f** rather than editing screens yourself. Log it in [README's unowned open items](README.md#unowned-open-items) — right now it belongs to nobody.
 
 ---
+
+<details>
+<summary><strong>Historical detail</strong> — the original brief, kept for the reasoning only. None of it is executable.</summary>
+
+**Original framing:** Mahmoud running the RN upgrade personally; target decided by T1a (0.87.0 preferred, 0.83.10 fallback); owned `android/**` and `ios/**`; depended on T0; parallel-safe with T1a.
 
 ## Android
 
@@ -98,3 +110,5 @@ Not `package.json` — that's T1c. You may need to bump JS deps locally to test;
 - **Edge-to-edge fallout**: which screens need layout fixes, so T2e/T2f can pick them up.
 - Any dependency that failed to compile natively — that's T1c's problem, but it needs to hear about it from you.
 - Anything in the template diff you deliberately did *not* apply, and why.
+
+</details>

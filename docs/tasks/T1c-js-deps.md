@@ -1,16 +1,68 @@
-# T1c — JS dependency upgrades
+# T1c — JS dependency upgrades — ✅ mostly done
 
-> **Mahmoud is doing the RN upgrade personally.** T1a–T1d are written as a runbook for him, not as agent tasks. An agent should only pick one up if explicitly handed it.
-
-**Depends on:** T1a (verdicts), T1b (native ready). **Parallel-safe with:** nothing — this touches the dependency graph everyone else builds on.
-
-## Goal
-
-Move `react-native` off 0.81.4 and bring every dependency to a version that works with the target.
+> **Before you start:** read [`CLAUDE.md` §0](../../CLAUDE.md) — the working agreement. In short: **don't commit or push unless asked in this session**; never hand-edit `android/`/`ios/` (they're generated — `app.json` + config plugins instead); install with `npx expo install`, not `yarn add`; stay inside your `Owns` list and report anything outside it rather than fixing it; keep changes surgical (§0.8).
+>
+> **Keep the Status & checkpoints block below current as you work** — it lives in this file, not in a central tracker. Set the status when you start, tick each checkpoint only once you've *verified* it, and update it again when you stop. If you stop mid-brief, name the exact checkpoint you stopped at.
 
 ---
 
-## Which version to target
+## Status & checkpoints
+
+| | |
+|---|---|
+| **Status** | ✅ mostly done — residuals open |
+| **Owner** | Mahmoud |
+| **Branch** | `feat/expo` (uncommitted) |
+| **Last updated** | 2026-08-17 |
+
+RN 0.81.4 → 0.86.2 landed by hand. Everything below the revision block is historical.
+
+**Legend:** ⚪ not started · 🔵 in progress · ⏸️ blocked · ✅ done · 🟣 superseded
+
+Tick a box only when you have **verified** it, not when you've written the code. Add a checkpoint if this brief turns out to need one — don't silently widen the one you're on. This brief is `✅ done` only when every box is ticked **and** the Acceptance criteria below pass.
+
+- [x] RN 0.86.2 + React 19.2.3 landed
+- [x] `@react-native/*` and `@react-native-community/cli` aligned
+- [x] Legacy decorators plugin removed
+- [ ] `@react-navigation/*` v6 → v7 — **this is [T1d](T1d-navigation.md)**
+- [ ] `react-native-mmkv` 3 → 4
+- [ ] `react-native-pdf` 6 → 7
+- [ ] `@sentry/react-native` 7 → 8
+- [ ] `react-native-fast-image` → `expo-image` — **this is T4 Phase F**
+- [ ] `npx expo-doctor` clean
+
+---
+
+> ## Revision, 2026-08-17 — read before anything below
+>
+> **The RN upgrade in this brief has already happened.** Mahmoud landed **0.81.4 → 0.86.2** by hand. 0.87.0 was attempted and abandoned. Everything below about *choosing* a version is spent — 0.86.2 is also exactly what Expo SDK 57 pins, which is what made [T4](T4-expo-migration.md) free.
+>
+> ### Landed
+>
+> `react-native@0.86.2` · `react@19.2.3` · `@react-native/*` and `@react-native-community/cli@20.1.0` aligned · `reanimated@4.5.1` + `worklets@0.10.1` · `gesture-handler@~2.32.0` · `screens@~4.26.0` · `safe-area-context@~5.7.0` · `webview@13.16.1`. `@babel/plugin-proposal-decorators` removed (it existed only for WatermelonDB).
+>
+> ### Residual — still open, each one small
+>
+> | Dep | From → to | Note |
+> |---|---|---|
+> | `@react-navigation/*` | `^6` → `7.x` | This is **[T1d](T1d-navigation.md)**, not here. |
+> | `react-native-mmkv` | `^3.3.2` → `4.x` | Pulls in `react-native-nitro-modules`. Verify it autolinks under CNG. T0 also adds an `encryptionKey` — test with one set. |
+> | `react-native-pdf` | `^6.7.7` → `7.x` | Major, actively maintained. |
+> | `@sentry/react-native` | `^7.2.0` → `8.x` | Check the `withSentryConfig` metro wrapper and the `@sentry/react-native/expo` plugin still line up. |
+> | `react-native-fast-image` | → **`expo-image`** | Abandoned since 2022. This is **T4 Phase F**. |
+> | `react-native-actionsheet` | → *something maintained* | Abandoned 2022, but **live** in `Login`. Not T0's job, not scoped anywhere yet. |
+>
+> ### The rule that changed
+>
+> **Use `npx expo install <pkg>`, never `yarn add`.** Expo pins versions per SDK; `yarn add` fetches `latest` and will hand you something SDK 57 doesn't support. `npx expo install --check` audits what's already installed, and `npx expo-doctor` is the gate to finish on. See [`CLAUDE.md` §0.3](../../CLAUDE.md).
+>
+> Also: `metro.config.js` is now built on **`expo/metro-config`**, and this brief's `mergeConfig` advice would break it. See `CLAUDE.md` §3 — two silent-failure traps are documented there, both of which were hit for real.
+>
+> Everything from here down is **historical**, kept because the version-choice reasoning would apply again on a future jump.
+
+---
+
+## Which version to target *(historical — decided: 0.86.2)*
 
 **Attempt 0.87.0. Fall back to 0.83.10 without hesitation if it fights back.**
 

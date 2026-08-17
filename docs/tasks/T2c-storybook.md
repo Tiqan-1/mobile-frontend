@@ -1,5 +1,35 @@
 # T2c — Storybook
 
+> **Before you start:** read [`CLAUDE.md` §0](../../CLAUDE.md) — the working agreement. In short: **don't commit or push unless asked in this session**; never hand-edit `android/`/`ios/` (they're generated — `app.json` + config plugins instead); install with `npx expo install`, not `yarn add`; stay inside your `Owns` list and report anything outside it rather than fixing it; keep changes surgical (§0.8).
+>
+> **Keep the Status & checkpoints block below current as you work** — it lives in this file, not in a central tracker. Set the status when you start, tick each checkpoint only once you've *verified* it, and update it again when you stop. If you stop mid-brief, name the exact checkpoint you stopped at.
+
+---
+
+## Status & checkpoints
+
+| | |
+|---|---|
+| **Status** | ⚪ not started |
+| **Owner** | — |
+| **Branch** | — |
+| **Last updated** | 2026-08-17 |
+
+Metro wiring notes updated for `expo/metro-config` — read the trap box before touching the config.
+
+**Legend:** ⚪ not started · 🔵 in progress · ⏸️ blocked · ✅ done · 🟣 superseded
+
+Tick a box only when you have **verified** it, not when you've written the code. Add a checkpoint if this brief turns out to need one — don't silently widen the one you're on. This brief is `✅ done` only when every box is ticked **and** the Acceptance criteria below pass.
+
+- [ ] `.rnstorybook/` config
+- [ ] `STORYBOOK_ENABLED` flag; production bundle verified clean
+- [ ] Metro wrapper added without breaking SVG / Reanimated / Sentry
+- [ ] A story per atom, light + dark, RTL + LTR, with real Arabic text
+- [ ] Token stories: colour swatches, type ramp, spacing ruler
+- [ ] `yarn start` / `yarn android` / `yarn ios` unaffected with the flag off
+
+---
+
 **Depends on:** T2b. **Parallel-safe with:** T2d.
 
 ## Goal
@@ -46,7 +76,16 @@ Add `STORYBOOK_ENABLED` to `src/config/index.ts`, resolved at bundle time by a `
 
 `metro.config.js` already stacks `wrapWithReanimatedMetroConfig`, `withSentryConfig`, and the SVG transformer. **Order matters** — add the Storybook wrapper without disturbing them, and verify a normal `yarn start` still resolves SVGs and Reanimated after your change.
 
-Add scripts: `yarn storybook` (enabled) and confirm plain `yarn android`/`yarn ios` still build with it off.
+> ### ⚠️ The metro config is Expo's now — two traps, both of which have already bitten
+>
+> Since the T4 migration, `metro.config.js` is built on **`expo/metro-config`**, and it mutates the object `getDefaultConfig()` returns rather than merging. Both details matter:
+>
+> 1. **Do not introduce `mergeConfig`** from `metro-config` or `@react-native/metro-config`. Expo's default config isn't safe to merge that way — you get a `Bundler` whose `_transformer` is never set, which fails *silently* and surfaces much later as an unrelated-looking `Cannot read properties of undefined (reading 'transformFile')`. Extend the returned object in place (spread `defaultConfig.transformer` / `defaultConfig.resolver`).
+> 2. **`react-native-svg-transformer` must stay on its `/expo` entry point**, not `/react-native`. The `/react-native` variant replaces Expo's transformer wrapper instead of composing with it — same silent failure.
+>
+> Full detail in `CLAUDE.md` §3 under "Native config". If your Storybook wrapper causes a `transformFile` crash, this is why — don't go hunting Storybook.
+
+Add scripts: `yarn storybook` (enabled) and confirm plain `yarn android`/`yarn ios` — now `expo run:android` / `expo run:ios` — still build with it off. Note that those commands **prebuild** if `android/`/`ios/` are missing, so a first run is slow; that's expected, not a Storybook regression.
 
 ### 3. Decorators — the whole point
 
@@ -63,7 +102,7 @@ Without the theme and direction toggles this task delivers very little — that'
 
 One `*.stories.tsx` per atom (12–13 after T2b's deletions), colocated. Cover for each: default, every variant, disabled/loading where applicable, long-text overflow, and **Arabic text** — not lorem ipsum. Arabic has different line heights and shaping, which is exactly what breaks.
 
-Then the molecules. `LessonChat` needs mocked Pusher and query state — if that's disproportionate, skip it and say so.
+Then the molecules. `LessonChat` needs mocked query state — Pusher is gone, so there's no realtime client to stub; it polls react-query on a 5s `refetchInterval` instead. Mock the query and make sure your story doesn't leave a poll running. If that's disproportionate, skip it and say so.
 
 Also add stories for the **token scales** from T2a: a color swatch sheet (light and dark side by side), a type ramp, a spacing ruler. These are the fastest way to review the token work.
 

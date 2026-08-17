@@ -1,5 +1,32 @@
 # T3d — Learner side and progress sync
 
+> **Before you start:** read [`CLAUDE.md` §0](../../CLAUDE.md) — the working agreement. In short: **don't commit or push unless asked in this session**; never hand-edit `android/`/`ios/` (they're generated — `app.json` + config plugins instead); install with `npx expo install`, not `yarn add`; stay inside your `Owns` list and report anything outside it rather than fixing it; keep changes surgical (§0.8).
+>
+> **Keep the Status & checkpoints block below current as you work** — it lives in this file, not in a central tracker. Set the status when you start, tick each checkpoint only once you've *verified* it, and update it again when you stop. If you stop mid-brief, name the exact checkpoint you stopped at.
+
+---
+
+## Status & checkpoints
+
+| | |
+|---|---|
+| **Status** | ⚪ not started |
+| **Owner** | — |
+| **Branch** | — |
+| **Last updated** | 2026-08-17 |
+
+**Legend:** ⚪ not started · 🔵 in progress · ⏸️ blocked · ✅ done · 🟣 superseded
+
+Tick a box only when you have **verified** it, not when you've written the code. Add a checkpoint if this brief turns out to need one — don't silently widen the one you're on. This brief is `✅ done` only when every box is ticked **and** the Acceptance criteria below pass.
+
+- [ ] `TodayLessons` surfaces personal curricula alongside org programs
+- [ ] Progress telemetry on lesson open / close / finish
+- [ ] PDF read position bridged from the Redux `documents` slice
+- [ ] Sync worker with an offline queue
+- [ ] End-to-end on two simulators: parent authors → learner consumes → parent sees completion
+
+---
+
 **Depends on:** T3b, T3a. **Parallel-safe with:** T3c.
 
 ## Goal

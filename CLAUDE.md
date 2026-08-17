@@ -4,19 +4,153 @@ Guidance for Claude Code and other agents working in this repository.
 
 ---
 
-## 1. Identity — read this first
+## 0. Working agreement — applies to every agent, every task
+
+**These are binding. They apply whether or not you were handed a brief, and they override any habit to the contrary.**
+
+### 0.1 Do not commit, push, or open a PR unless explicitly asked
+
+The repo owner reviews every change himself before it lands. So:
+
+- **Never run `git commit`, `git push`, `git tag`, or `gh pr create` on your own initiative.** Leave your work in the working tree.
+- Finish by *reporting* what you changed — a file list and a one-line why for each. Let the owner stage it.
+- If a brief tells you to "land several reviewable commits", that means **structure** the work so it *can* be split that way, and say where the boundaries are. Still ask before committing.
+- `git status`, `git diff`, `git log`, `git stash list` and other read-only commands are always fine, and you should use them freely.
+
+The only exception is an explicit, current instruction from the owner in that session — "commit this", "make the PR". Approval given for one commit does not carry to the next one.
+
+### 0.2 Keep your brief's status and checkpoints current
+
+**Every brief in `docs/tasks/` carries its own `## Status & checkpoints` block near the top.** Progress is tracked *there*, in the brief itself — not in a central tracker. That way the work and its state are one file, and there's nothing to keep in sync.
+
+- **Starting work:** set `Status` to `🔵 in progress` and fill in Owner, Branch, and the date.
+- **During work:** tick each checkpoint as you *verify* it. Not when you write the code — when you've confirmed it does what it claims.
+- **Finishing or stopping:** update the block. If you stopped mid-brief, say in the notes line **exactly which checkpoint you stopped at** and what the next one needs.
+- **Never tick a box you didn't verify.** `⏸️ blocked` with a reason is worth more than an optimistic `✅`. A brief is `✅ done` only when every checkpoint is ticked *and* its Acceptance criteria pass.
+- If you discover a checkpoint the brief missed, **add it** rather than quietly widening the one you're on.
+
+Two things live outside the briefs, both in [`docs/tasks/README.md`](docs/tasks/README.md): the **unowned open items** list (real work no brief owns — add to it when you find something, and don't let a finding evaporate into a report nobody re-reads) and the **History** log (one line when something lands). The status column in that README is a convenience snapshot and is expected to go stale; the brief is authoritative.
+
+This applies to ad-hoc work too: if you change something a brief owns, note it in that brief's block.
+
+### 0.3 This is an Expo (CNG) project — the native rules are absolute
+
+`android/` and `ios/` are **generated build output**. They are gitignored and absent from a fresh checkout.
+
+- **Never hand-edit anything under `android/` or `ios/`.** `expo prebuild --clean` deletes it. If you find yourself patching a generated file, you have found a **missing config plugin** — write one, or report it. Never patch and move on.
+- **`app.json`'s `expo` key is the source of truth** for bundle IDs, permissions, fonts, Info.plist keys, Sentry, icons, `newArchEnabled`, `edgeToEdgeEnabled`. Native config changes go there.
+- Native *build* settings that `app.json` doesn't expose (deployment target, NDK, Proguard, compileSdk) go through **`expo-build-properties`**, not a gradle or Podfile edit.
+- **Install dependencies with `npx expo install <pkg>`, not `yarn add`.** Expo pins versions per SDK; `yarn add` grabs `latest` and will silently give you something SDK 57 doesn't support. `npx expo install --check` audits what's already there.
+- Any new native module must **support the New Architecture** (`newArchEnabled: true`) and should have an Expo config plugin or be autolink-clean under CNG. If it has neither, say so before adding it.
+- To verify native work: `npx expo prebuild -p android --no-install` (or `--clean` to regenerate from scratch), then build. Don't assume prebuild output is current — it usually isn't.
+- Env vars reach the bundle via **`EXPO_PUBLIC_*`**, which `babel-preset-expo` inlines at build time. There is no `react-native-config` and no `babel-plugin-inline-dotenv` any more. Remember that `EXPO_PUBLIC_*` values **ship inside the app** — they are not secrets.
+
+### 0.4 Stay inside your `Owns` list
+
+Every brief in `docs/tasks/` names the files it owns. Parallel work is only safe because of it.
+
+- **Do not edit a file outside your `Owns` list.** If a change there looks necessary, **stop and report it** — don't make it. Another brief owns it and will conflict with you.
+- This includes tempting one-liners: an unused import, a type error, a stray `console.log` in someone else's file. Report, don't fix.
+- Don't reformat another brief's files to satisfy a linter. Disable the rule with a comment and report it instead.
+
+### 0.5 Measure, don't assume
+
+- Capture the **before** state before you change anything: `npx tsc --noEmit` error count, `yarn test` suite/test counts, whether `yarn lint` runs at all. Compare after.
+- The baselines written in this file and in the briefs were true when measured (2026-08-17). **Confirm them; don't trust them.** They are a starting point, not a guarantee.
+- Never report a build or a device check as passing if you didn't run it. If you can't run it, say so and hand it back explicitly.
+
+### 0.6 Report honestly
+
+- If a step is blocked, skipped, or partially done, say that plainly. Partial success reported as done is the one failure mode that costs more than the bug.
+- If you find a problem outside your scope, list it in your report. That list is valuable; a silent fix is not.
+- Correct your own earlier claims when you find them wrong, in the doc where they live — the briefs carry explicit correction notes for exactly this reason.
+
+### 0.7 Do not open `/Users/mshokry/PWS/ReactNative/SDC/DesignSystem`
+
+It is a separate production app, not a library — not installable by any mechanism. Everything worth taking from it is restated in §4 of this file or copied by T2a. Reading it costs tokens and yields nothing.
+
+### 0.8 Karpathy guidelines
+
+Behavioural guidelines that reduce common LLM coding mistakes, from [Andrej Karpathy's observations](https://x.com/karpathy/status/2015883857489522876) on where models go wrong.
+
+**Tradeoff:** these bias toward caution over speed. For trivial tasks, use judgement.
+
+#### 1. Think before coding
+
+**Don't assume. Don't hide confusion. Surface tradeoffs.**
+
+- State your assumptions explicitly. If uncertain, ask.
+- If multiple interpretations exist, present them — don't pick silently.
+- If a simpler approach exists, say so. Push back when warranted.
+- If something is unclear, stop. Name what's confusing. Ask.
+
+#### 2. Simplicity first
+
+**Minimum code that solves the problem. Nothing speculative.**
+
+- No features beyond what was asked.
+- No abstractions for single-use code.
+- No "flexibility" or "configurability" that wasn't requested.
+- No error handling for impossible scenarios.
+- If you write 200 lines and it could be 50, rewrite it.
+
+Ask yourself: "would a senior engineer say this is overcomplicated?" If yes, simplify.
+
+#### 3. Surgical changes
+
+**Touch only what you must. Clean up only your own mess.**
+
+When editing existing code:
+
+- Don't "improve" adjacent code, comments, or formatting.
+- Don't refactor things that aren't broken.
+- Match existing style, even if you'd do it differently.
+- If you notice unrelated dead code, **mention it — don't delete it.**
+
+When your changes create orphans:
+
+- Remove imports/variables/functions that **your** changes made unused.
+- Don't remove pre-existing dead code unless asked.
+
+The test: every changed line should trace directly to the request.
+
+> **One scoped exception:** a few briefs — T0 most of all — explicitly scope *deletions* of pre-existing dead code. There, deleting is the assignment and "mention, don't delete" doesn't apply. It's the enumerated list in the brief that authorises it; anything not on that list still falls under the rule above. Outside a brief that names them, never delete dead code on your own initiative.
+
+#### 4. Goal-driven execution
+
+**Define success criteria. Loop until verified.**
+
+Turn tasks into verifiable goals:
+
+- "Add validation" → "write tests for invalid inputs, then make them pass"
+- "Fix the bug" → "write a test that reproduces it, then make it pass"
+- "Refactor X" → "ensure tests pass before and after"
+
+For multi-step tasks, state a brief plan:
+
+```
+1. [Step] → verify: [check]
+2. [Step] → verify: [check]
+3. [Step] → verify: [check]
+```
+
+Strong success criteria let you loop independently. Weak criteria ("make it work") force constant clarification. This is the same instinct as §0.5 — and it's why each brief carries Acceptance criteria rather than a description of done.
+
+---
+
+## 1. Identity
 
 This repo has **three different names for itself**. Getting them straight prevents most confusion:
 
 | Name | What it refers to |
 |---|---|
 | **Mobadra** | The *folder* on disk (`~/PWS/ReactNative/Mobadra`). Appears nowhere in the code. |
-| **Binaa** (بناء) | The **app**. `app.json` displayName, `package.json` `"name": "binaa"`, Android `applicationId com.binaa`, iOS target/scheme `Binaa`, Gradle `rootProject.name = "Binaa"`. |
+| **Binaa** (بناء) | The **app**. `app.json`'s `expo.name`/`expo.slug`, `package.json` `"name": "binaa"`, `expo.ios.bundleIdentifier`/`expo.android.package` `com.binaa`. |
 | **Mubadarah** | The **backend**. `https://mubadarah.ce-svcs.cc` (prod) / `https://dev-mubadarah.ce-svcs.cc` (dev). |
 
 Git remote is `git@github.com:Tech-Support-Team/mobile-frontend.git`. Default branch `main`.
 
-**What the app does:** an Arabic-first structured-learning app. Students browse multi-level programs, subscribe, follow a daily lesson schedule, consume PDF and video lessons in-app, track completion offline, and chat per-lesson in realtime.
+**What the app does:** an Arabic-first structured-learning app. Students browse multi-level programs, subscribe, follow a daily lesson schedule, consume PDF and video lessons in-app, track completion offline, and chat per-lesson (currently polling, not realtime — see §3).
 
 ---
 
@@ -24,24 +158,26 @@ Git remote is `git@github.com:Tech-Support-Team/mobile-frontend.git`. Default br
 
 Package manager is **Yarn Classic (v1)**. There is only a `yarn.lock` — do not introduce `npm install` or a second lockfile.
 
+**This is now an Expo (CNG / bare-managed) project as of the 2026-08-17 T4 migration** (`docs/tasks/T4-expo-migration.md`). `android/` and `ios/` are **generated, gitignored, and not committed** — they don't exist in a fresh checkout.
+
 ```bash
 yarn install
-yarn pod-install          # npx pod-install, for iOS
+npx expo prebuild          # regenerates android/ and ios/ from app.json — run this first on a fresh checkout
+npx pod-install             # only needed if you hand-ran prebuild without -p and want iOS pods refreshed
 
-yarn start                # Metro
-yarn android              # react-native run-android
-yarn ios                  # react-native run-ios
+yarn start                 # expo start (Metro)
+yarn android                # expo run:android — prebuilds automatically if android/ is missing/stale
+yarn ios                    # expo run:ios     — same, for iOS
 
-yarn lint                 # runs all three below, in order
-yarn lint:rules           # eslint . --cache
-yarn lint:code-format     # prettier --check "{src,__mocks__}/**/*.{js,json,md,ts,tsx,yml,yaml}"
-yarn lint:type-check      # tsc
-yarn lint:fix             # autofix rules + format, then type-check
-
-yarn test                 # jest
+yarn lint                  # eslint .
+yarn test                  # jest
 ```
 
-Release (Fastlane lives in `Fastlane/` — **capital F**, which macOS's case-insensitive filesystem hides):
+There is no `lint:type-check`/`lint:fix`/`lint:code-format` script today (`package.json` only has `lint`, `start`, `android`, `ios`, `test`) — run `npx tsc --noEmit` and `npx prettier --check ...` directly if you need those.
+
+**Never hand-edit anything under `android/` or `ios/`.** `expo prebuild --clean` overwrites them from `app.json` + the plugins in `app.json`'s `plugins` array. If you find yourself patching a generated file, that's a missing config plugin — write one instead (see `docs/tasks/T4-expo-migration.md` acceptance criterion 10).
+
+Release (Fastlane lives in `Fastlane/` — **capital F**, which macOS's case-insensitive filesystem hides). Fastlane still expects `android/`/`ios/` to exist, so **run `expo prebuild` before any Fastlane lane**:
 
 ```bash
 bundle exec fastlane android build   # bundle release -> Play internal track (1% rollout) + Huawei AppGallery
@@ -50,16 +186,11 @@ bundle exec fastlane ios beta        # build -> TestFlight + Sentry dSYM upload
 
 Ruby deps are pinned in `Gemfile` (CocoaPods `>= 1.13`, with specific bad versions excluded). Node `>= 20` per `engines`.
 
-> **Current state** (measured 2026-08-17 against RN 0.86.2, `node_modules` installed):
+> **Current state** (measured 2026-08-17, post-migration, static checks only — no native build run):
 >
-> - **`tsc` reports 163 errors.** Largest groups: 62× `TS6133` (unused locals — `noUnusedLocals` is on), 22× `TS2339` (property doesn't exist), 15× `TS2307` (cannot find module, incl. an undeclared `react-native-fs` in `src/utils/pdfManager.ts`). Worst files: `atoms/FlashMessage` (23), `BottomTabNavigation` (9), `atoms/CircleStatus` (8).
-> - **`yarn test` fails: 4 suites, 0 tests run.** `babel.config.js` references `'transform-inline-environment-variables'`, which is not declared in `package.json`.
-> - `__tests__/App.test.tsx` imports `../App` — the leftover **root** template file — not `src/App.tsx`, so it asserts nothing real.
-> - `jest.config.js` has no `moduleNameMapper`, so `@/…` imports in tests won't resolve once the Babel issue is fixed.
->
-> ⚠️ **A stale `@react-native/typescript-config` will silently hide all of this.** If that package's installed version doesn't match `package.json`, `tsc` aborts on a config error (`TS5101`, `baseUrl` deprecation) *before type-checking any file* and appears to pass. If `tsc` reports almost nothing, verify the installed version matches before believing it.
->
-> Do not assume a green baseline. Establish one first.
+> - **`tsc` reports ~170 errors**, essentially the same shape/count as the pre-migration baseline (163) — the delta is pre-existing dead code (`src/theme/OldThem/**`, a few `noUnusedLocals` hits), not anything the migration introduced. Do not assume a green baseline.
+> - **`yarn test`: 3 suites fail, 1 passes** (`__tests__/App.test.tsx`, which — see §8 — asserts nothing real). This is unchanged from the post-P1 baseline; `jest.config.js` still has no `moduleNameMapper`/`transformIgnorePatterns`, so the harness gaps below are still open.
+> - The babel-plugin bug that used to make `yarn test` run 0 tests (`transform-inline-environment-variables` undeclared) is fixed — that plugin was only needed for Pusher's env vars, which are gone now that Pusher is (§3).
 
 ---
 
@@ -92,7 +223,7 @@ Project MCP config: `.mcp.json` — `maestro`, `metro`, `mobile`, `xcodebuild` (
 src/
 ├── assets/          fonts (Cairo), images, logo, svg, svg-app
 ├── components/      atoms / molecules / organisms / templates
-├── config/          index.ts (APP_LANGUTAGE), pusher.ts, telegram.ts
+├── config/          index.ts (APP_LANGUTAGE), telegram.ts
 ├── hooks/           useAccessibility, usePDFDocument, language/useI18n
 ├── navigation/      Application.tsx, BottomTabNavigation.tsx, paths.ts, types.ts
 ├── screens/         one folder per screen
@@ -126,7 +257,7 @@ A `Task` is a **day** (it has a `date`). A `Lesson` is a single item with a `url
 Server state belongs in react-query. Do not add new server-data slices to Redux.
 
 - **No local database.** WatermelonDB was removed on 2026-08-17 — it was fully unused (`src/db/` → `useProgress` → nothing; no `DatabaseProvider`, no `withObservables`). PDF read position lives in the Redux `documents` slice. If the Family feature needs offline progress, use MMKV or `op-sqlite` — do **not** reintroduce a reactive ORM for one flat table.
-- **Pusher** (`src/config/pusher.ts`) for realtime lesson chat.
+- **Pusher was removed on 2026-08-17** (same T4 Expo migration — `@pusher/pusher-websocket-react-native` has no Expo config plugin and was an unproven quantity under CNG; nobody had verified it autolinks). `src/config/pusher.ts` is gone. `LessonChat` (`src/components/molecules/LessonChat/`) now polls its react-query chat query every 5s (`refetchInterval`) instead of subscribing to a realtime channel — this is a stand-in, not a decision, flagged with `TODO(T4)` in that file. Before reintroducing realtime chat, pick one: a hand-written Expo config plugin for Pusher, a plain WebSocket client against Pusher's protocol, or a different realtime provider with Expo support.
 
 ### API layer
 
@@ -135,6 +266,16 @@ Server state belongs in react-query. Do not add new server-data slices to Redux.
 The legacy idiom is `REQUESTING(...)` taking a React `setState` and writing `{loading, error, results, pagination}` into component state. **Do not write new code against this pattern** — new data fetching uses react-query.
 
 `axios` and `ky` are both in `package.json` and both unused. apisauce is the real client.
+
+### Native config — `app.json`, not hand-edited native projects
+
+`app.json`'s `expo` key is the **source of truth** for everything the native projects need: bundle IDs, permissions, Cairo fonts (via the `expo-font` plugin), Sentry (via `@sentry/react-native/expo`, which fixed Android symbol upload as a side effect — it had never worked). `android/` and `ios/` are generated from it via `npx expo prebuild` and are gitignored — see §2.
+
+`metro.config.js` is built on `expo/metro-config`, not `@react-native/metro-config`. Two non-obvious things if you touch it:
+- Don't import `mergeConfig` from `metro-config` (the plain community package) or `@react-native/metro-config` — Expo's `getDefaultConfig()` output isn't safe to merge that way; it produces a config whose `Bundler` never gets a `_transformer` (fails silently — Metro's `Bundler.js` swallows the real error into a `console.error`, so what you actually see is a much-later, unrelated-looking `Cannot read properties of undefined (reading 'transformFile')` crash). Extend the object `getDefaultConfig()` returns in place instead (spread `defaultConfig.transformer`/`defaultConfig.resolver`).
+- `react-native-svg-transformer`'s `babelTransformerPath` must be the `/expo` entry point (`react-native-svg-transformer/expo`), not `/react-native`. The `/react-native` variant replaces Expo's own transformer wrapper outright instead of composing with it, which causes the same silent `_transformer` failure above.
+
+`babel.config.js` uses `babel-preset-expo` (not `@react-native/babel-preset` directly — `babel-preset-expo` wraps it). It auto-detects `react-native-worklets` and injects `react-native-worklets/plugin` itself; don't add that plugin explicitly.
 
 ---
 
@@ -269,7 +410,9 @@ The point of this feature is that a child never needs to open the YouTube app.
 
 Jest + `@testing-library/react-native`. Tests sit next to their subject as `*.test.tsx`.
 
-> **Current state:** `jest.config.js` is bare `{ preset: 'react-native' }` — no `moduleNameMapper` for `@/` or SVGs, no `transformIgnorePatterns`, no `setupFiles`. The mocks in `__mocks__/` are never loaded, and `__tests__/App.test.tsx` renders the leftover root `/App.tsx` template rather than `src/App.tsx`. Fix the harness before trusting a result.
+> **Current state:** `jest.config.js` is bare `{ preset: '@react-native/jest-preset' }` — no `moduleNameMapper` for `@/` or SVGs, no `transformIgnorePatterns` (ESM packages like `immer` crash the transform), no `setupFiles`. The mocks in `__mocks__/` are never loaded, and `__tests__/App.test.tsx` renders the leftover root `/App.tsx` template rather than `src/App.tsx`, so it "passes" without testing anything real. Fix the harness before trusting a result.
+>
+> The one thing that *is* fixed (2026-08-17): `babel.config.js` no longer references the undeclared `transform-inline-environment-variables` plugin, so tests actually run now instead of all 4 suites crashing at 0 tests. The gaps above are still open.
 
 Do not set coverage thresholds the suite cannot currently meet.
 
@@ -277,18 +420,22 @@ Do not set coverage thresholds the suite cannot currently meet.
 
 ## 9. Gotchas
 
-**Secrets — never commit them.** The repo currently violates this in five places (Telegram bot token in `src/config/telegram.ts`, keystore passwords in `android/gradle.properties`, Huawei client secret in `Fastlane/Fastfile`, Sentry DSN in `src/App.tsx`, `__DEV__` login credentials in `src/screens/auth/Login/index.tsx`). Do not add a sixth, and do not copy these patterns.
+**Secrets — never commit them.** The repo currently violates this in at least three places still (Telegram bot token in `src/config/telegram.ts`, Huawei client secret in `Fastlane/Fastfile`, Sentry DSN in `src/App.tsx`, `__DEV__` login credentials in `src/screens/auth/Login/index.tsx`). The keystore-passwords-in-`android/gradle.properties` violation is moot now that `android/` isn't committed (§2) — but when you regenerate release signing config (`MYAPP_UPLOAD_*`), use EAS credentials or a gitignored local override, **don't reintroduce plaintext passwords**. Do not add to the list above, and do not copy these patterns.
 
 **`isTest` in `src/services/API.ts` selects the API host** and is currently `true` — builds point at the dev backend. Check it before any release build.
 
-**New Architecture is ON** (`newArchEnabled=true`, `hermesEnabled=true`, Fabric pods in `Podfile.lock`). Any native module you add must support it.
+**New Architecture is ON** (`newArchEnabled: true` in `app.json`). Any native module you add must support it.
 
-**`react-native-beautiful-timeline` is pinned to an absolute path** on the original author's Mac (`file:/Users/mshokry/...`) and is imported nowhere. `yarn install` fails anywhere else.
+**`npx install-expo-modules@latest` does not yet know about SDK 57 / RN 0.86.2** (as of 2026-08-17) — its bundled version-compatibility table tops out at SDK 56, and it hard-errors (`Unsupported sdkVersion: 57`) rather than degrading gracefully. This blocked doing the "bare + expo modules, no prebuild yet" reversible check the way `docs/tasks/T4-expo-migration.md` Phase A originally described. If you need it, either wait for an upstream fix or add `expo`/`expo-modules-core`/`expo-font` etc. by hand at the versions `expo`'s own `package.json` pins (`npm view expo@<sdk-version> dependencies`) and rely on `expo prebuild` (which *is* SDK-57-aware) to do the real native wiring.
 
-**Abandoned dependencies** — `react-native-fast-image`, `react-native-actionsheet` and `react-native-render-html` were all last published in 2022 and have no New Arch commitment. Don't build new features on them.
+**Abandoned dependencies** — `react-native-fast-image`, `react-native-actionsheet` and `react-native-render-html` were all last published in 2022 and have no New Arch commitment. Don't build new features on them. (`expo-image` is now installable as a drop-in `fast-image` replacement — see T4 Phase F — but that swap hasn't been done yet.)
 
 **Navigation params are effectively untyped.** `src/navigation/types.ts` references `Lesson`/`Program`/`Subscription` without importing them, so they silently resolve to globals. Prefer passing IDs over whole domain objects.
 
-**`.history/` is committed** (editor history). Ignore it; don't add to it.
+**`.history/`** (editor history) is no longer tracked — it was untracked during the T4 cleanup. Don't reintroduce it.
 
 **`README.md` is wrong.** It documents a theme API (`colors.primary`, `spacing.md`, `react-native-config`) that has never existed in this codebase. Trust this file over that one.
+
+**Neither platform has ever had a real app icon.** Android shows the default React Native robot placeholder (`android/app/src/main/res/mipmap-*/ic_launcher.png` — well, it did, before that directory became generated; the source of truth is now `app.json`'s `icon` field, currently pointed at a generic placeholder). iOS's `AppIcon.appiconset` was completely empty. Pre-existing, unrelated to Expo. Needs a real 1024×1024 Binaa icon before shipping.
+
+**The native display name doesn't match the app's identity.** Before the T4 migration, both platforms' compiled resources showed **"مبادرة"** (Mubadarah — the *backend's* name, §1) as the home-screen label, not "بناء"/"Binaa". `app.json`'s `expo.name` is now `"Binaa"`, matching `package.json` and this doc's identity table — confirm that's actually what's wanted before shipping, since it changes what users see under the icon.

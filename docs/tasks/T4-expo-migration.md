@@ -1,8 +1,63 @@
 # T4 — Migrate to Expo (SDK 57 / CNG)
 
+> **Before you start:** read [`CLAUDE.md` §0](../../CLAUDE.md) — the working agreement. In short: **don't commit or push unless asked in this session**; never hand-edit `android/`/`ios/` (they're generated — `app.json` + config plugins instead); install with `npx expo install`, not `yarn add`; stay inside your `Owns` list and report anything outside it rather than fixing it; keep changes surgical (§0.8).
+>
+> **Keep the Status & checkpoints block below current as you work** — it lives in this file, not in a central tracker. Set the status when you start, tick each checkpoint only once you've *verified* it, and update it again when you stop. If you stop mid-brief, name the exact checkpoint you stopped at.
+
+---
+
+## Status & checkpoints
+
+| | |
+|---|---|
+| **Status** | 🔵 in progress — E, F, G left |
+| **Owner** | Mahmoud + Claude Code |
+| **Branch** | `feat/expo` — **uncommitted** |
+| **Last updated** | 2026-08-17 |
+
+**Pusher was removed, not migrated** — that's the biggest open item. See the Status section below for the full account.
+
+**Legend:** ⚪ not started · 🔵 in progress · ⏸️ blocked · ✅ done · 🟣 superseded
+
+Tick a box only when you have **verified** it, not when you've written the code. Add a checkpoint if this brief turns out to need one — don't silently widen the one you're on. This brief is `✅ done` only when every box is ticked **and** the Acceptance criteria below pass.
+
+- [x] P1 — babel plugin fix
+- [x] Phase A — reversible prep
+- [x] Phase B — `app.json` native config
+- [x] Phase C — metro config (plus 2 runtime crashes found and fixed afterwards)
+- [x] Phase D — prebuild + Android, **static parts only**
+- [ ] Phase D — live `expo run:android` build and launch *(owner)*
+- [ ] Phase E — iOS *(owner; needs Xcode + signing)*
+- [ ] Phase F — `expo-image` swap and the other wins
+- [ ] Phase G — EAS Build *(optional)*
+- [ ] Realtime replacement for `LessonChat` chosen
+- [ ] Migration committed *(owner is reviewing first — do not commit)*
+
+---
+
 **Verdict: yes, do it — but not with a fire-and-forget agent.** See "Why not just delegate this" below.
 
 **Depends on:** a green-ish baseline (see Prerequisites). **Conflicts with:** any brief owning `android/**`, `ios/**`, `metro.config.js`, or `package.json` — this cannot run in parallel with T1b or T1c.
+
+---
+
+## Status (2026-08-17)
+
+**P1, Phase A–C done. Phase D done except the actual `expo run:android` build/launch (left for the app owner to run — an agent isn't the right place to verify a live build). Phase E (iOS) explicitly not started.**
+
+What actually happened deviated from the plan in one big way: **`npx install-expo-modules@latest` doesn't support SDK 57 / RN 0.86.2 yet** (its version table tops out at SDK 56 and it hard-errors). Worked around it by hand-adding `expo`, `expo-modules-core`, `expo-font` at the versions `expo`'s own `package.json` pins, and — separately, mid-task — the app owner scaffolded a fresh `create-expo-app` project and moved the real `src/` into it, so the rest of the migration (package.json merge, `app.json`, `babel.config.js`, `metro.config.js`) happened against that base rather than incrementally on the original bare project. Net result is the same shape Phase B/C describe; see CLAUDE.md §2/§3 for the config that actually landed.
+
+**Pusher was removed, not migrated.** It's the "genuine unknown" this brief flagged (§ "Why not just delegate this", point 2) — rather than prove autolinking under CNG, it was pulled out entirely. `LessonChat` now polls (5s `refetchInterval`) instead of subscribing realtime. **This is the biggest open item**: pick a real replacement (config plugin, plain WebSocket client, different provider) before this can be called done. See CLAUDE.md §3.
+
+`android/` and `ios/` were deleted and gitignored (the brief's own Rollback section, item 3, suggested this *after* Phase D succeeded — it happened earlier than planned, at the app owner's direction). They regenerate via `npx expo prebuild`.
+
+Two real bugs were caught and fixed as a direct result of the `app.json` restructuring (flat `{name, displayName}` → `{expo: {name, ...}}`): `index.js`'s `AppRegistry.registerComponent(appName, ...)` was reading the old shape (would have registered `undefined` — not caught by `tsc` since it's a `.js` file) and `src/reactotron.config.ts` had the same issue. Also found: a tsconfig alias the template merge introduced (`"@/assets/*": ["./assets/*"]`) was shadowing the app's real, heavily-used `@/assets/...` imports — removed.
+
+Two Metro runtime crashes were hit and fixed after this doc's static work was "done" (see CLAUDE.md's "Native config" subsection under §3 for the technical detail): a `mergeConfig`-sourced-from-the-wrong-package bug, and `react-native-svg-transformer` needing its `/expo` entry point instead of `/react-native` under `expo/metro-config`. Both are exactly the class of "fails silently, surfaces as an unrelated-looking crash later" bug this brief's intro warns about.
+
+Also found and fixed in passing: `react-native-webview` was never actually a declared dependency despite `react-native-youtube-iframe` requiring it (pre-existing gap, unrelated to Expo — just hadn't been exercised by Metro before).
+
+Not done, not attempted: **the app icon** (neither platform has ever had a real one — pre-existing, unrelated to Expo, but `app.json` now needs a real 1024×1024 source) and **the native display name mismatch** (both platforms show "مبادرة" pre-migration; `app.json` now says "Binaa" — a real, user-visible change that needs a conscious yes/no, not a silent default). See CLAUDE.md §9.
 
 ---
 

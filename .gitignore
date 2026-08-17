@@ -37,7 +37,7 @@ local.properties
 .cxx/
 !debug.keystore
 .kotlin/
-
+.expo/
 # node.js
 #
 node_modules/

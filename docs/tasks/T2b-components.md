@@ -1,5 +1,34 @@
 # T2b — Normalize atoms and molecules
 
+> **Before you start:** read [`CLAUDE.md` §0](../../CLAUDE.md) — the working agreement. In short: **don't commit or push unless asked in this session**; never hand-edit `android/`/`ios/` (they're generated — `app.json` + config plugins instead); install with `npx expo install`, not `yarn add`; stay inside your `Owns` list and report anything outside it rather than fixing it; keep changes surgical (§0.8).
+>
+> **Keep the Status & checkpoints block below current as you work** — it lives in this file, not in a central tracker. Set the status when you start, tick each checkpoint only once you've *verified* it, and update it again when you stop. If you stop mid-brief, name the exact checkpoint you stopped at.
+
+---
+
+## Status & checkpoints
+
+| | |
+|---|---|
+| **Status** | ⚪ not started |
+| **Owner** | — |
+| **Branch** | — |
+| **Last updated** | 2026-08-17 |
+
+**Legend:** ⚪ not started · 🔵 in progress · ⏸️ blocked · ✅ done · 🟣 superseded
+
+Tick a box only when you have **verified** it, not when you've written the code. Add a checkpoint if this brief turns out to need one — don't silently widen the one you're on. This brief is `✅ done` only when every box is ticked **and** the Acceptance criteria below pass.
+
+- [ ] Flat atoms promoted to folders
+- [ ] Every `StyleSheet` split into a sibling `style.ts`
+- [ ] `forwardRef` + `memo` + `displayName` on every atom
+- [ ] Both barrels export every component **and** its prop types
+- [ ] `AssetByVariant` / `IconByVariant` — fixed or deleted, decision recorded here
+- [ ] `Text` / `Button` prop APIs unchanged
+- [ ] `LessonChat` given its `style.ts` split, `TODO(T4)` polling left intact
+
+---
+
 **Depends on:** T2a. **Parallel-safe with:** T2c, T2d.
 
 ## Goal
@@ -110,7 +139,11 @@ Same for molecules. Don't rewrite existing deep imports in screens — both path
 
 ### 7. `LessonChat` (451 LOC) — leave it mostly alone
 
-It's a molecule by folder, an organism by behaviour: it imports Pusher config, calls `/chat/{roomId}/join` and `/chat/{roomId}/send` directly, and holds react-query state.
+It's a molecule by folder, an organism by behaviour: it calls `/chat/{roomId}/join` and `/chat/{roomId}/send` directly and holds react-query state.
+
+> **Changed since this brief was written:** it no longer imports Pusher config. Pusher was **removed** in the T4 Expo migration, and this component now **polls** its react-query chat query every 5s (`refetchInterval`), marked `TODO(T4)` in the file. That is a stand-in, not a decision — picking a real realtime story is an [unowned open item](README.md#unowned-open-items).
+>
+> Don't try to solve that here, and **don't remove the `TODO(T4)`** — the polling is load-bearing until someone replaces it.
 
 **Don't refactor it here.** Give it the `style.ts` split and note in your report that it should move to `organisms/` and have its data access lifted into a hook. That's a follow-up, and it overlaps T2d's data-layer work.
 

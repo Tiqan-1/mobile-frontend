@@ -1,5 +1,35 @@
 # T3b — Family core: types, flag, PIN gate, mock API
 
+> **Before you start:** read [`CLAUDE.md` §0](../../CLAUDE.md) — the working agreement. In short: **don't commit or push unless asked in this session**; never hand-edit `android/`/`ios/` (they're generated — `app.json` + config plugins instead); install with `npx expo install`, not `yarn add`; stay inside your `Owns` list and report anything outside it rather than fixing it; keep changes surgical (§0.8).
+>
+> **Keep the Status & checkpoints block below current as you work** — it lives in this file, not in a central tracker. Set the status when you start, tick each checkpoint only once you've *verified* it, and update it again when you stop. If you stop mid-brief, name the exact checkpoint you stopped at.
+
+---
+
+## Status & checkpoints
+
+| | |
+|---|---|
+| **Status** | ⚪ not started |
+| **Owner** | — |
+| **Branch** | — |
+| **Last updated** | 2026-08-17 |
+
+There is no local database. Storage is MMKV.
+
+**Legend:** ⚪ not started · 🔵 in progress · ⏸️ blocked · ✅ done · 🟣 superseded
+
+Tick a box only when you have **verified** it, not when you've written the code. Add a checkpoint if this brief turns out to need one — don't silently widen the one you're on. This brief is `✅ done` only when every box is ticked **and** the Acceptance criteria below pass.
+
+- [ ] `LessonSource` discriminated union + family types
+- [ ] `FEATURE_FAMILY` flag
+- [ ] PIN gate; PIN in **encrypted** MMKV and never in Redux
+- [ ] Mock API covering every endpoint in [`family-contract.md`](../api/family-contract.md)
+- [ ] Exposed as react-query hooks, matching T2d's conventions
+- [ ] Swap to the real API is a single boundary
+
+---
+
 **Depends on:** T2d. **Parallel-safe with:** T3a.
 
 ## Goal

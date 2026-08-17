@@ -1,5 +1,34 @@
 # T1d — react-navigation v6 → v7
 
+> **Before you start:** read [`CLAUDE.md` §0](../../CLAUDE.md) — the working agreement. In short: **don't commit or push unless asked in this session**; never hand-edit `android/`/`ios/` (they're generated — `app.json` + config plugins instead); install with `npx expo install`, not `yarn add`; stay inside your `Owns` list and report anything outside it rather than fixing it; keep changes surgical (§0.8).
+>
+> **Keep the Status & checkpoints block below current as you work** — it lives in this file, not in a central tracker. Set the status when you start, tick each checkpoint only once you've *verified* it, and update it again when you stop. If you stop mid-brief, name the exact checkpoint you stopped at.
+
+---
+
+## Status & checkpoints
+
+| | |
+|---|---|
+| **Status** | ⚪ not started |
+| **Owner** | Mahmoud (most delegable of T1*) |
+| **Branch** | — |
+| **Last updated** | 2026-08-17 |
+
+Fully live — `@react-navigation/*` is still on `^6`.
+
+**Legend:** ⚪ not started · 🔵 in progress · ⏸️ blocked · ✅ done · 🟣 superseded
+
+Tick a box only when you have **verified** it, not when you've written the code. Add a checkpoint if this brief turns out to need one — don't silently widen the one you're on. This brief is `✅ done` only when every box is ticked **and** the Acceptance criteria below pass.
+
+- [ ] Installed via `npx expo install`, not `yarn add`
+- [ ] `createStackNavigator` → `native-stack`
+- [ ] `NavigationContainer` theme shape migrated
+- [ ] `src/navigation/types.ts` imports its domain types instead of resolving to globals
+- [ ] Full navigation smoke pass on a device
+
+---
+
 > **Mahmoud is doing the RN upgrade personally.** T1a–T1d are a runbook for him. This one is the most delegable of the four — it's pure JS and well-bounded — so it can be handed to an agent if you'd rather.
 
 **Depends on:** T1c. **Parallel-safe with:** T2a (different directories).

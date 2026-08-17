@@ -1,5 +1,35 @@
 # T2a — Token layer and a single theme system
 
+> **Before you start:** read [`CLAUDE.md` §0](../../CLAUDE.md) — the working agreement. In short: **don't commit or push unless asked in this session**; never hand-edit `android/`/`ios/` (they're generated — `app.json` + config plugins instead); install with `npx expo install`, not `yarn add`; stay inside your `Owns` list and report anything outside it rather than fixing it; keep changes surgical (§0.8).
+>
+> **Keep the Status & checkpoints block below current as you work** — it lives in this file, not in a central tracker. Set the status when you start, tick each checkpoint only once you've *verified* it, and update it again when you stop. If you stop mid-brief, name the exact checkpoint you stopped at.
+
+---
+
+## Status & checkpoints
+
+| | |
+|---|---|
+| **Status** | ⚪ not started |
+| **Owner** | — |
+| **Branch** | — |
+| **Last updated** | 2026-08-17 |
+
+Unaffected by the Expo migration. Good candidate for the opencode stream ([T5](T5-parallel-workflow.md) §5).
+
+**Legend:** ⚪ not started · 🔵 in progress · ⏸️ blocked · ✅ done · 🟣 superseded
+
+Tick a box only when you have **verified** it, not when you've written the code. Add a checkpoint if this brief turns out to need one — don't silently widen the one you're on. This brief is `✅ done` only when every box is ticked **and** the Acceptance criteria below pass.
+
+- [ ] `tokens/` authored: colors, spacing, radii, shadows, typography
+- [ ] `responsive.ts` with `sizeX` / `sizeY` / `sizeAdaptivity` / `isLight`
+- [ ] Mutable `var PALETTE` gone; `PALETTE` kept only as a `@deprecated` alias
+- [ ] `isRTL` exposed on the theme
+- [ ] `src/theme/OldThem/**` deleted
+- [ ] Runtime theme toggle re-renders every screen — **verified, not assumed**
+
+---
+
 **Depends on:** T1c. **Parallel-safe with:** T1d.
 
 ## Goal
