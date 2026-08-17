@@ -1,13 +1,14 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { IsIOS } from '@/utils/constants';
+import { IsIOS, isDevApi } from '@/utils/constants';
 import type { ApiResponse } from 'apisauce';
 import { create } from 'apisauce';
 import type { Dispatch, SetStateAction } from 'react';
 import { logger } from './logger';
-export const isTest = true;
+// Selects the dev backend based on build config (__DEV__), not a hardcoded
+// literal — set EXPO_PUBLIC_API_URL to override either default outright.
+export const isTest = isDevApi;
 export const baseURLProd1 = 'https://mubadarah.ce-svcs.cc';
 export const baseURLTest = 'https://dev-mubadarah.ce-svcs.cc';
-export const baseURLProd = isTest ? baseURLTest : baseURLProd1;
+export const baseURLProd = process.env.EXPO_PUBLIC_API_URL || (isTest ? baseURLTest : baseURLProd1);
 
 export type PARAMS = {
   Append?: boolean;
@@ -288,7 +289,7 @@ export const REQUESTING = async <T = unknown>(
         logger.error('API error:', error);
         setState?.((state: APISTATE<T>) => ({
           ...state,
-          error:  'Some Thing went Wrong',
+          error: 'Some Thing went Wrong',
           loading: false,
           isRequesting: false,
         }));

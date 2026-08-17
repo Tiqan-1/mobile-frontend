@@ -45,7 +45,8 @@
           "organization": "binaa",
           "project": "binaa"
         }
-      ]
+      ],
+      "expo-localization"
     ]
   }
 }

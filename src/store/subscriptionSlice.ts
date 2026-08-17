@@ -18,7 +18,7 @@ const subscriptionsSlice = createSlice({
   initialState,
   reducers: {
     setSubscriptions: (state, action: PayloadAction<Subscription[]>) => {
-      // state.items = action.payload;
+      state.items = action.payload;
       state.lastUpdated = Date.now();
     },
     resetSubscriptions: () => initialState,

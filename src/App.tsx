@@ -14,7 +14,7 @@ import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-cont
 
 function initSentry() {
   Sentry.init({
-    dsn: 'https://03c561f706f33bd93950556b709e7366@o4509213076160512.ingest.de.sentry.io/4509213096083536',
+    dsn: process.env.EXPO_PUBLIC_SENTRY_DSN,
 
     // Adds more context data to events (IP address, cookies, user, etc.)
     // For more information, visit: https://docs.sentry.io/platforms/react-native/data-management/data-collected/

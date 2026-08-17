@@ -10,9 +10,9 @@
 
 | | |
 |---|---|
-| **Status** | ⚪ not started — **next up, runs alone** |
-| **Owner** | — |
-| **Branch** | `feat/T0-hygiene` (planned) |
+| **Status** | 🔵 in progress |
+| **Owner** | Claude (agent session) |
+| **Branch** | `feat/expo` (working tree) — `feat/T0-hygiene` branching deferred to owner by explicit instruction; T4 work already committed at `62a8459`/`99b3689` |
 | **Last updated** | 2026-08-17 |
 
 Kickoff prompt is at the bottom of this file. Read the Post-T4 revision block first — it supersedes about a third of the brief.

@@ -2,6 +2,9 @@
 /android/
 /ios/
 
+# Secrets — never commit, use .env.example as the template
+.env
+
 # OSX
 #
 .DS_Store
@@ -68,6 +71,7 @@ yarn-error.log
 
 # testing
 /coverage
+junit.xml
 
 # Yarn
 .yarn/*
