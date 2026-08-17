@@ -47,7 +47,7 @@ Rules:
 - **`watchedSec` is monotonic.** Re-watching accumulates; scrubbing backwards doesn't decrement.
 - `completedPct` from `watchedSec / durationSec`. For a trimmed YouTube lesson, the denominator is `endSec - startSec`, **not** the full video — getting this wrong makes every trimmed lesson look incomplete.
 - `backgroundedCount` increments on `AppState` change to `background`/`inactive` *while a lesson is playing*. Ignore transitions outside playback.
-- Also capture PDF lessons — `PDFViewerScreen` already tracks pages via `useProgress`. Bridge it to the same shape rather than inventing a second progress model.
+- Also capture PDF lessons. `PDFViewerScreen` tracks read position by dispatching `setCurrentPage` to the Redux `documents` slice (**not** via any database — WatermelonDB was removed as dead code). Bridge that into the same progress shape rather than inventing a second model.
 
 Write locally first, always. The app must work fully offline.
 
@@ -55,7 +55,7 @@ Write locally first, always. The app must work fully offline.
 
 ## Part 3 — Sync worker
 
-`POST /api/progress/sync` with a batch of `LessonProgress`, using the `synced_at` column that has existed in the schema since day one and never been used.
+`POST /api/progress/sync` with a batch of `LessonProgress`, tracking a `syncedAt` marker per entry in whatever local storage T3b chose.
 
 - **Batch, don't chatter.** Flush on app background, on lesson completion, and periodically — not on every progress tick.
 - **Idempotent.** The contract specifies last-write-wins per `lessonId` with `watchedSec` taking the max. Resends must be safe.

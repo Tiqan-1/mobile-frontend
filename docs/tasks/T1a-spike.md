@@ -18,19 +18,17 @@ A scratch RN 0.87 app outside this repo, plus one output file: `docs/tasks/T1a-f
 
 ---
 
-## The two risks
+## The risk
 
-### 1. `@nozbe/watermelondb@0.28.0` — highest risk
+> ### ✅ WatermelonDB — resolved, no longer a risk
+>
+> `@nozbe/watermelondb` was originally the headline risk here: JSI-level, a `simdjson` pod, unmoved since 0.28.0.
+>
+> **On 2026-08-17 it was found to be entirely unused and removed.** The dependency chain was `src/db/* → src/hooks/useProgress.ts → nothing` — `useProgress` was never imported, there was no `DatabaseProvider` in `App.tsx`, and no `withObservables` anywhere. `@nozbe/watermelondb`, `@nozbe/with-observables`, `@babel/plugin-proposal-decorators`, `src/db/` and `useProgress.ts` are all gone.
+>
+> **Do not spike it.** If the Family feature needs offline progress later, use MMKV (already present) or `@op-engineering/op-sqlite` — one flat table doesn't warrant a reactive ORM.
 
-Last published version is 0.28.0 and it hasn't moved. It uses **JSI directly** and requires a `simdjson` pod (see `ios/Podfile`: `pod 'simdjson', path: '../node_modules/@nozbe/simdjson', modular_headers: true`). JSI-level integrations are exactly what breaks across RN majors.
-
-It backs offline lesson progress — `src/db/`, one table (`progress`), consumed via `src/hooks/useProgress.ts`. Small surface, which is good news if it has to be replaced.
-
-**Test:** fresh RN 0.87 app, New Arch on, install WatermelonDB, replicate `src/db/schema.ts` and `src/db/models/Progress.ts` (note it uses **legacy decorators** — check `babel.config.js` still supports them on 0.87's Babel preset). Write a record, read it back, kill and relaunch the app, confirm it persisted. **Both platforms** — the adapter uses `jsi: IsIOS`, so iOS and Android take different code paths.
-
-**If it fails:** evaluate `@op-engineering/op-sqlite`, or drop to MMKV. One table with six columns and no relations doesn't need a reactive ORM. Estimate the migration in your findings.
-
-### 2. `react-native-render-html@6.3.4` — high risk
+### `react-native-render-html@6.3.4` — the remaining high risk
 
 Last published **2022**. No New Arch commitment. Renders lesson body HTML, and `src/theme/typography.ts` carries three tagsStyles maps for it (`tagsStylesHTML`, `tagsStylesHTMLWhite`, `tagsStylesHTMLBrand`), so it's load-bearing for content display.
 
@@ -52,7 +50,7 @@ Cheap to check while the spike app exists:
 
 ## Acceptance criteria
 
-`docs/tasks/T1a-findings.md` exists and states, for each of the five packages:
+`docs/tasks/T1a-findings.md` exists and states, for each of the four packages:
 
 - **Verdict:** works / works with changes / broken
 - Exact versions tested, and on which platforms

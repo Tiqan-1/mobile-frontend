@@ -191,4 +191,4 @@ Called by the **guardian**. 403 unless an active link exists.
 
 ## 5. App-side status
 
-The mobile app implements this contract against a local mock backed by WatermelonDB, behind a `FEATURE_FAMILY` flag. When these endpoints land, one module swaps and the flag flips. **No app changes are needed to accommodate reasonable naming adjustments** — tell us what you'd prefer and we'll adapt on our side.
+The mobile app implements this contract against a local mock (MMKV-backed), behind a `FEATURE_FAMILY` flag. When these endpoints land, one module swaps and the flag flips. **No app changes are needed to accommodate reasonable naming adjustments** — tell us what you'd prefer and we'll adapt on our side.

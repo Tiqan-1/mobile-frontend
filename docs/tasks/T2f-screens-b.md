@@ -34,7 +34,7 @@ Coordinate with T2e on shared extractions — don't both create the same card co
 | `Menu/index.tsx` | 156 | account deletion, logout, the admin easter egg (T0 fixed its render-phase `setState`) |
 | `auth/signup` · `Login` · `ForgotPassword` | 218 · 209 · 119 | Formik + yup |
 | `AccessibilitySettings` | 142 | |
-| `PDFViewerScreen/PDFViewer.tsx` | 102 | WatermelonDB progress |
+| `PDFViewerScreen/PDFViewer.tsx` | 102 | read position → Redux `documents` slice |
 
 ---
 
@@ -46,7 +46,7 @@ react-query instead of `REQUESTING`; `useTheme()` instead of `PALETTE`; `style.t
 
 For `Subscription`, `Program` and `PDFViewer`, params were whole `Program`/`Subscription`/`Lesson` objects — now IDs, read from the query cache.
 
-`PDFViewer` also reads/writes WatermelonDB progress via `useProgress`. **Leave the DB access as-is** — T3b owns that layer.
+`PDFViewer` stores read position by dispatching `setCurrentPage` to the Redux `documents` slice. There is no database involved — an earlier draft of this brief claimed WatermelonDB, which was wrong; it was dead code and has been removed.
 
 ### 5. Auth screens
 

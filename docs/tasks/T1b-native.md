@@ -44,7 +44,9 @@ Not `package.json` — that's T1c. You may need to bump JS deps locally to test;
 
 1. **AGP is the headline.** 8.1.2 against Gradle 8.14.3 and compileSdk 36 is an unsupported combination — it was already wrong for 0.81. Move it to whatever RN 0.87's template ships, and align Kotlin, NDK and buildTools to that template rather than picking versions independently.
 
-2. **Take the template diff as the reference.** Generate a clean `npx @react-native-community/cli init` at 0.87.0 and diff its `android/` against ours. Apply deliberately — this project has diverged, so a blind copy will clobber real config (Sentry gradle plugin, the JSC flavor fallback, signing config).
+2. **Take the template diff as the reference.** Generate a clean `npx @react-native-community/cli init` at the target version and diff its `android/` against ours. Apply deliberately — this project has diverged, so a blind copy will clobber real config (the JSC flavor fallback, the `MYAPP_UPLOAD_*` signing config).
+
+   > **Correction:** an earlier draft of this brief listed "Sentry gradle plugin" among the config to preserve. That was wrong — `android/app/build.gradle` has **never** contained a Sentry plugin in any commit, though `android/sentry.properties` exists. **Android symbol upload has therefore never been wired.** Treat that as a separate bug to fix, not as config to protect.
 
 3. **Remove accumulated cruft:**
    - `android.enableJetifier=true` in `gradle.properties` — obsolete, slows every build
@@ -64,7 +66,6 @@ Not `package.json` — that's T1c. You may need to bump JS deps locally to test;
 
 - `platform :ios, '15.1'`, with `post_install` force-setting `IPHONEOS_DEPLOYMENT_TARGET = '15.1'` on **every** pod target
 - The `min_ios_version_supported` line is commented out
-- `pod 'simdjson'` for WatermelonDB
 - `hermes_enabled` / `new_arch_enabled` args commented out (inherited from env)
 - CocoaPods 1.16.2, Podfile.lock present, Fabric pods confirmed
 
@@ -72,7 +73,7 @@ Not `package.json` — that's T1c. You may need to bump JS deps locally to test;
 
 1. **Raise the deployment target** to 0.87's floor, in both places (`platform :ios` and the `post_install` loop). Better: **uncomment `min_ios_version_supported`** and delete the hardcoded `15.1` from `platform`, so it tracks RN automatically. The `post_install` override should use the same value rather than a literal — that loop is what silently pins pods to an old target.
 
-2. **`simdjson` pod** — keep it if T1a says WatermelonDB survives. If T1a says it doesn't, leave the pod alone and let T1c handle the swap; don't remove it unilaterally.
+2. **No `simdjson` pod needed.** It existed only for WatermelonDB, which has been removed. If you find that line in an older Podfile, drop it.
 
 3. Diff against the 0.87 template's `ios/` the same way as Android. Watch for changes to `AppDelegate` (the Swift/ObjC++ migration path has moved across recent versions) and to the `.xcode.env` handling.
 

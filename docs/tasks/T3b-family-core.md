@@ -10,7 +10,7 @@ Build the foundation the Family feature sits on — and a **mock backend** so T3
 
 ```
 src/features/family/types/**    src/features/family/api/**
-src/features/family/gate/**     src/db/**
+src/features/family/gate/**     src/features/family/storage/**
 src/config/index.ts             (FEATURE_FAMILY flag)
 ```
 
@@ -24,7 +24,7 @@ Not screens (T3c), not sync (T3d), not the player (T3a).
 
 ## Context
 
-The backend team hasn't built this yet. Everything here runs against a local mock backed by WatermelonDB, behind `FEATURE_FAMILY`.
+The backend team hasn't built this yet. Everything here runs against a local mock behind `FEATURE_FAMILY`, backed by whichever local storage you pick in step 3.
 
 **The insight that keeps this small:** the existing domain model already *is* a curriculum. `Program → Level → Task → Lesson` maps onto *curriculum → unit → day → item*. A parent-authored curriculum is a `Program` with `ownerType: 'guardian'` and `visibility: 'private'`. **No new content entities.**
 
@@ -69,21 +69,25 @@ Write a `toLessonSource(lesson: Lesson): LessonSource` adapter that derives a `s
 
 `FEATURE_FAMILY` in `src/config/index.ts`, driven from `.env`. **Default off.** Every Family entry point checks it. With it off, the app must behave exactly as it does today — verify that, don't assume it.
 
-### 3. WatermelonDB schema
+### 3. Local storage — you choose it
 
-Current: schema v1, one table `progress` (`subscription_id`, `level_id`, `task_id`, `completed`, `completed_at`, `synced_at`). Model at `src/db/models/Progress.ts`, empty `migrations.ts`.
+> **There is no local database any more.** An earlier draft of this brief assumed WatermelonDB. On 2026-08-17 it was found to be **entirely unused** (`src/db/* → useProgress → nothing`) and removed along with `src/db/`, `useProgress.ts`, `@nozbe/*` and the legacy-decorators Babel plugin. There is no `progress` table and no existing data to migrate — this is a clean slate.
 
-Add tables for `guardian_links`, `family_programs` (+ levels/tasks/lessons), and `lesson_progress`, and **extend `progress` to lesson granularity** — it's currently task-level, but progress is reported per lesson.
+**Recommendation: MMKV.** It's already a dependency, already carries an `encryptionKey` from T0, and already backs redux-persist. What you're storing is a handful of flat, key-addressable collections:
 
-**Write real migrations.** `migrations.ts` is empty because the schema has never changed; this is the first change, and getting the pattern right now matters. Existing users have `progress` rows — don't drop them.
+- `guardian_links` — a short list
+- `family_programs` — parent-authored `Program` trees, serialized whole
+- `lesson_progress` — a flat map keyed by `lessonId`, which is exactly the shape the sync contract's last-write-wins semantics want
 
-Models use **legacy decorators** (`@babel/plugin-proposal-decorators`). Follow the existing `Progress.ts` style, but type the fields properly — the current model is untyped.
+None of that needs relational queries, reactive observers, or migrations. Build a small typed repository module over MMKV and keep the storage detail behind the `FamilyApi` interface, so swapping later costs one file.
 
-> If T1a's spike replaced WatermelonDB, apply all of this to the replacement instead. The shape holds either way.
+**Only reach for `@op-engineering/op-sqlite` if** you find you genuinely need relational queries or expect thousands of progress rows per learner. Justify it in your report if you do — and do **not** reintroduce a reactive ORM for this.
+
+Whatever you pick, **version your persisted shape from day one** (a `schemaVersion` key plus a migrate-on-read function). The old setup had an empty `migrations.ts` because nobody planned for change; don't repeat that.
 
 ### 4. Mock API — `src/features/family/api/`
 
-Implement every endpoint in the contract, against WatermelonDB, behind **one interface**:
+Implement every endpoint in the contract, against your local storage layer, behind **one interface**:
 
 ```ts
 export interface FamilyApi { /* one method per contract endpoint */ }
@@ -118,7 +122,7 @@ A PIN is a speed bump against a curious child, not a security boundary. Don't ga
 
 1. With `FEATURE_FAMILY=false`, the app is byte-for-byte behaviourally identical to today.
 2. Every contract endpoint has a mock implementation and a react-query hook.
-3. WatermelonDB migrations run cleanly against a **pre-existing** database with `progress` rows — test the upgrade path, not just a fresh install.
+3. The persisted shape is versioned, and a migrate-on-read path exists and is tested (even though there is no legacy data today).
 4. PIN is stored encrypted; verified; resettable.
 5. `toLessonSource()` correctly maps all three legacy `type` values, with tests.
 6. Swapping `USE_MOCK` compiles (even though HTTP calls throw).
@@ -127,5 +131,5 @@ A PIN is a speed bump against a curious child, not a security boundary. Don't ga
 ## Report back
 
 - Any place the contract was ambiguous — that's feedback for the backend team **before** they build.
-- The migration strategy for existing `progress` rows.
+- Which storage you chose and why (MMKV unless you can justify otherwise).
 - The `Menu`/`isSU` overlap, for T2f.

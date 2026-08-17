@@ -1,6 +1,6 @@
 # Task briefs — Binaa upgrade, refactor, and Family feature
 
-Fourteen self-contained briefs. Each one names the files it owns, what it depends on, the work, and how it's judged done. They're written to be handed to an agent or a developer cold — no other context required beyond `CLAUDE.md`.
+Fifteen self-contained briefs. Each one names the files it owns, what it depends on, the work, and how it's judged done. They're written to be handed to an agent or a developer cold — no other context required beyond `CLAUDE.md`.
 
 Full reasoning behind the sequencing lives in the plan this was generated from; you shouldn't need it to execute a brief.
 
@@ -11,15 +11,17 @@ Full reasoning behind the sequencing lives in the plan this was generated from; 
 | **T1a–T1d** (the RN upgrade) | **Mahmoud, personally.** Written as a runbook, not agent tasks. T1d (react-navigation) is the most delegable of the four if you want to hand one off. |
 | T0, T2*, T3* | Agents or devs. Use the `binaa-mobile` agent — it loads `CLAUDE.md` and the brief conventions automatically. |
 
-## Target RN version — read before starting T1
+## RN version — status as of 2026-08-17
 
-**Attempt 0.87.0; fall back to 0.83.10 without hesitation.**
+**Settled at 0.86.2.** 0.87.0 was attempted and abandoned; the tree now runs 0.86.2, which is also exactly what Expo SDK 57 pins (relevant to T4).
 
-npm's `dist-tags` show which lines are actually maintained: `0.81-stable → 0.81.6` (current line), `0.83-stable → 0.83.10` (nearest maintained line above), `latest → 0.87.0`. There is no `0.82`/`0.84`/`0.85`/`0.86` stable tag — **0.83.10 is the real fallback**, not an arbitrary midpoint.
+Much of T1a/T1c's original risk analysis is now spent:
 
-This app carries three abandoned dependencies (`react-native-fast-image`, `react-native-render-html`, `react-native-actionsheet` — all last published 2022) plus a JSI-level database on a version that hasn't moved. That's exactly the profile that makes a six-minor jump expensive. The decision rule is in [T1c](T1c-js-deps.md#which-version-to-target); T1a's spike is what supplies the evidence.
+- **WatermelonDB** — was the headline risk (JSI, `simdjson` pod, unmoved since 0.28.0). Found to be **entirely unused** and removed. No longer a factor.
+- **`react-native-render-html`** — still the open risk. Last published 2022, no New Arch commitment, load-bearing for lesson content.
+- `react-native-fast-image` and `react-native-actionsheet` — also abandoned 2022, also still present.
 
-**Free win first:** 0.81.4 → **0.81.6** is a patch bump inside your current line. Near-zero risk, and it gives you a clean commit to bisect against.
+The version-choice guidance in [T1c](T1c-js-deps.md#which-version-to-target) is kept for reference (and would apply again on any future jump), but it describes a decision already made.
 
 ---
 
@@ -94,11 +96,14 @@ This app carries three abandoned dependencies (`react-native-fast-image`, `react
 | T2e | [Screen refactor — Programs, MainScreen](T2e-screens-a.md) | those two dirs | T2b, T2d | T2f |
 | T2f | [Screen refactor — Program, Library, Today, Subscription](T2f-screens-b.md) | those dirs | T2b, T2d | T2e |
 | T3a | [FocusPlayer](T3a-focus-player.md) | `organisms/FocusPlayer/**` | T2b | T3b |
-| T3b | [Family types + mock API](T3b-family-core.md) | `src/features/family/**`, `src/db/**` | T2d | T3a |
+| T3b | [Family types + mock API](T3b-family-core.md) | `src/features/family/**` (incl. `storage/`) | T2d | T3a |
 | T3c | [Parent screens](T3c-parent-screens.md) | `src/features/family/screens/**` | T3b | T3d |
 | T3d | [Learner side + progress sync](T3d-learner-sync.md) | `src/features/family/sync/**`, `screens/TodayLessons/**` | T3b, T3a | T3c |
+| T4 | [Migrate to Expo (SDK 57 / CNG)](T4-expo-migration.md) 👤 | `app.json`, `metro.config.js`, `android/**`, `ios/**`, `package.json` | a verifiable baseline | **nothing** — conflicts with T1b/T1c |
 
 👤 = Mahmoud is running these personally.
+
+**T4 (Expo) is now recommended** — the WatermelonDB blocker turned out to be dead code and was removed, and RN 0.86.2 matches Expo SDK 57 exactly, so no version movement is required. If you adopt it, T4 **replaces** most of T1b: `android/` and `ios/` become generated and the AGP/Gradle/Kotlin work stops being your problem. Decide between them before starting either.
 
 **T1b is worth doing even if the RN upgrade is postponed** — the AGP 8.1.2 fix in it is already overdue for the RN version currently installed.
 

@@ -14,7 +14,7 @@ Move `react-native` off 0.81.4 and bring every dependency to a version that work
 
 **Attempt 0.87.0. Fall back to 0.83.10 without hesitation if it fights back.**
 
-There is no prize for landing on the newest release, and this app carries three abandoned dependencies plus a JSI-level database — the exact profile that makes a six-minor jump expensive.
+There is no prize for landing on the newest release, and this app still carries three abandoned dependencies — the profile that makes a six-minor jump expensive. (The JSI-level database that used to compound this has been removed.)
 
 ### The npm picture
 
@@ -32,9 +32,8 @@ There is no `0.82-stable`, `0.84/85/86-stable`. **0.83 is the fallback**, not an
 
 Abandon 0.87 and go to **0.83.10** if any of these is true:
 
-- WatermelonDB cannot be made to work on 0.87, **and** replacing it now isn't acceptable
 - `react-native-render-html` has no viable path, **and** the backend can't switch to Markdown
-- Three or more of the five spiked packages fail
+- Three or more of the four spiked packages fail
 - You've spent more than two days fighting native build errors with no clear end
 
 Going to 0.83.10 costs you a second upgrade later. Getting stuck halfway through a 0.87 migration costs more, and blocks Phase 2 and 3 behind it.
@@ -59,7 +58,9 @@ You may need small source edits for renamed APIs. Keep them **mechanical and min
 
 ## Read first
 
-`docs/tasks/T1a-findings.md`. If T1a says WatermelonDB or render-html is broken, the replacement work happens **here**, and it changes the size of this task considerably. Don't start until you've read the verdicts.
+`docs/tasks/T1a-findings.md`. If T1a says `react-native-render-html` is broken, the replacement work happens **here**, and it changes the size of this task considerably. Don't start until you've read the verdict.
+
+*(WatermelonDB was the other headline risk. It has been removed as dead code, so it is no longer a factor.)*
 
 ---
 
@@ -109,7 +110,7 @@ Use the [Upgrade Helper diff](https://react-native-community.github.io/upgrade-h
 
 The `module-resolver` plugin's `extensions` array lists only `.js` and `.json` — **no `.ts`/`.tsx`**. Alias resolution for TypeScript files is currently working by accident (Metro's own resolution covers it). Add them.
 
-Confirm `@babel/plugin-proposal-decorators` (legacy mode, for WatermelonDB models) still works on 0.87's Babel preset — T1a should have answered this.
+`@babel/plugin-proposal-decorators` has been removed — it existed only for WatermelonDB models. Confirm nothing else in the tree relies on legacy decorators.
 
 ### `tsconfig.json`
 
@@ -146,7 +147,6 @@ Preserve the existing wrappers — `wrapWithReanimatedMetroConfig`, `withSentryC
 3. `yarn test` green.
 4. Both platforms build **debug and release**.
 5. Manual smoke on a real device, both platforms: login → programs list → subscribe → today's lessons → open a PDF → open a video → lesson chat connects → menu → logout.
-6. Offline progress still persists across an app restart (or the T1a-recommended replacement does).
 7. Each major landed as its own commit, so `git bisect` is meaningful.
 
 ## Report back

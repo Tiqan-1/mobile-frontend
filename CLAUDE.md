@@ -50,13 +50,41 @@ bundle exec fastlane ios beta        # build -> TestFlight + Sentry dSYM upload
 
 Ruby deps are pinned in `Gemfile` (CocoaPods `>= 1.13`, with specific bad versions excluded). Node `>= 20` per `engines`.
 
-> **Current state:** `yarn lint` and `yarn test` are not expected to pass on a clean checkout, and the repo does not install on a machine other than the original author's. See §9.
+> **Current state** (measured 2026-08-17 against RN 0.86.2, `node_modules` installed):
 >
-> *(Determined by inspecting config, not by executing — `node_modules` was not installed at the time of writing. The specifics: ESLint 8 is declared against a flat config whose plugins require ESLint 9; `jest.config.js` has no `moduleNameMapper`, so `Skeleton.test.tsx`'s `@/…` import cannot resolve; and `__tests__/App.test.tsx` imports `../App` — the leftover root template file — rather than `src/App.tsx`.)*
+> - **`tsc` reports 163 errors.** Largest groups: 62× `TS6133` (unused locals — `noUnusedLocals` is on), 22× `TS2339` (property doesn't exist), 15× `TS2307` (cannot find module, incl. an undeclared `react-native-fs` in `src/utils/pdfManager.ts`). Worst files: `atoms/FlashMessage` (23), `BottomTabNavigation` (9), `atoms/CircleStatus` (8).
+> - **`yarn test` fails: 4 suites, 0 tests run.** `babel.config.js` references `'transform-inline-environment-variables'`, which is not declared in `package.json`.
+> - `__tests__/App.test.tsx` imports `../App` — the leftover **root** template file — not `src/App.tsx`, so it asserts nothing real.
+> - `jest.config.js` has no `moduleNameMapper`, so `@/…` imports in tests won't resolve once the Babel issue is fixed.
+>
+> ⚠️ **A stale `@react-native/typescript-config` will silently hide all of this.** If that package's installed version doesn't match `package.json`, `tsc` aborts on a config error (`TS5101`, `baseUrl` deprecation) *before type-checking any file* and appears to pass. If `tsc` reports almost nothing, verify the installed version matches before believing it.
 >
 > Do not assume a green baseline. Establish one first.
 
 ---
+
+
+## MCP Servers (Debugging Tools)
+
+Project MCP config: `.mcp.json` — `maestro`, `metro`, `mobile`, `xcodebuild` (plus Figma/Notion/Drive, unrelated to app debugging). **Don't probe all of them by default.** Pick one server per task and call only the tools you need — never call `ToolSearch` with a broad/empty query expecting the full catalog; search for the specific capability instead (e.g. `ToolSearch("+metro console logs")`).
+
+**A server only shows up in `ToolSearch` if this session loaded it at startup.** If `.mcp.json` was edited after the session began, `/mcp` reconnecting may not surface its tools here — verify with a targeted `ToolSearch` call before assuming a tool exists; if it's missing, tell the user a fresh session is needed rather than guessing at tool names.
+
+| Task | Use | Not |
+|---|---|---|
+| Inspect Redux/console/network/component tree/nav state while app is running | **metro** | mobile, maestro |
+| Runtime JS errors, evaluate expressions in the running app | **metro** | xcodebuild |
+| Write/run Maestro YAML E2E flows, view hierarchy for tests | **maestro** | mobile |
+| One-off tap/swipe/screenshot, no Metro connection | **mobile** or **maestro** | metro |
+| iOS build/scheme/simulator boot, native build failures, lldb | **xcodebuild** | metro, mobile |
+| Android build/run | Bash (`yarn android`) | xcodebuild |
+| Design-system/code edits, refactors | No MCP — Read/Grep/Edit | any MCP |
+
+- **metro** (`npx metro-mcp`) — connects to a *running* Metro (`yarn start` + app open) via CDP: console logs, network, React tree, Redux state/dispatch, navigation state, JS eval. Prefer this over ad-hoc `console.log` + on-screen debug overlays for reading native/runtime state.
+- **maestro** (`maestro mcp`) — deterministic E2E flows (YAML), device control, view-hierarchy inspection. Requires Maestro CLI + booted simulator.
+- **mobile** (`npx @mobilenext/mobile-mcp`) — ad-hoc device control without Metro (tap/swipe/screenshot/launch). Overlaps with maestro; prefer maestro when the interaction should become a repeatable test.
+- **xcodebuild** (`npx xcodebuildmcp`) — native iOS build/test/simulator/debug tooling (schemes, `build-and-run`, log capture, lldb). Not for Android or pure-JS issues.
+
 
 ## 3. Architecture
 
@@ -65,8 +93,7 @@ src/
 ├── assets/          fonts (Cairo), images, logo, svg, svg-app
 ├── components/      atoms / molecules / organisms / templates
 ├── config/          index.ts (APP_LANGUTAGE), pusher.ts, telegram.ts
-├── db/              WatermelonDB — schema, models/Progress.ts
-├── hooks/           useAccessibility, useProgress, usePDFDocument, language/useI18n
+├── hooks/           useAccessibility, usePDFDocument, language/useI18n
 ├── navigation/      Application.tsx, BottomTabNavigation.tsx, paths.ts, types.ts
 ├── screens/         one folder per screen
 ├── services/        API.ts (apisauce) + documentService, telegramAPI, logger, …
@@ -98,7 +125,7 @@ A `Task` is a **day** (it has a `date`). A `Lesson` is a single item with a `url
 
 Server state belongs in react-query. Do not add new server-data slices to Redux.
 
-- **WatermelonDB** (`src/db/`) for offline lesson progress — one table, `progress`, with an as-yet-unused `synced_at` column.
+- **No local database.** WatermelonDB was removed on 2026-08-17 — it was fully unused (`src/db/` → `useProgress` → nothing; no `DatabaseProvider`, no `withObservables`). PDF read position lives in the Redux `documents` slice. If the Family feature needs offline progress, use MMKV or `op-sqlite` — do **not** reintroduce a reactive ORM for one flat table.
 - **Pusher** (`src/config/pusher.ts`) for realtime lesson chat.
 
 ### API layer
