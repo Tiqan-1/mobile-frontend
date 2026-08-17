@@ -7,36 +7,35 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		0409EB472FEC47F890AFF11C /* Cairo-Black.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 0DDAC704DF9143C6879CBADC /* Cairo-Black.ttf */; };
 		0C80B921A6F3F58F76C31292 /* libPods-Binaa.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5DCACB8F33CDC322A6C60F78 /* libPods-Binaa.a */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
-		2CFF29792CFC42B487723D86 /* Cairo-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 7C0232B7C20E4530988E2A85 /* Cairo-Light.ttf */; };
-		6B95815839F94B37891389EC /* Cairo-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 1C8AA501B3EF4008A0EB1E05 /* Cairo-SemiBold.ttf */; };
 		761780ED2CA45674006654EE /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 761780EC2CA45674006654EE /* AppDelegate.swift */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
-		86BCF114BA2C404192AA7374 /* Cairo-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = BF6CF2F4E65642798AA81719 /* Cairo-Regular.ttf */; };
-		ADF7F3F1932F4CCA9CA17D7B /* Cairo-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = FCFB3E825D9C48699F2909B7 /* Cairo-Bold.ttf */; };
-		B313BC227D0F48D987338055 /* Cairo-ExtraLight.ttf in Resources */ = {isa = PBXBuildFile; fileRef = C7956E62840C48AFB9B646A8 /* Cairo-ExtraLight.ttf */; };
-		BF9EC50C25F52174D90FACD8 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */; };
+		77B37885F5FB4599A9CD8A30 /* Cairo-ExtraLight.ttf in Resources */ = {isa = PBXBuildFile; fileRef = ADA256B90BFE42F4AF627731 /* Cairo-ExtraLight.ttf */; };
+		D34F8F815832474795F7247F /* Cairo-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 1F8900D0387E489098C1D102 /* Cairo-SemiBold.ttf */; };
+		141B8C6CED6C45F8A6180AE2 /* Cairo-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = E06C87B12A044B0198D5FB7F /* Cairo-Regular.ttf */; };
+		FD746018852F4D79ABAE1FBF /* Cairo-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 5C98D575A04C44CA8C9E75C2 /* Cairo-Light.ttf */; };
+		D9B7A77152F44A758661716B /* Cairo-Black.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 237DD3EA400944B0B8273607 /* Cairo-Black.ttf */; };
+		32B94C24C052490FBF7E5939 /* Cairo-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 759474586D7A4CE2858411FF /* Cairo-Bold.ttf */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		0DDAC704DF9143C6879CBADC /* Cairo-Black.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Cairo-Black.ttf"; path = "../src/assets/fonts/cairo/Cairo-Black.ttf"; sourceTree = "<group>"; };
-		13B07F961A680F5B00A75B9A /* Binaa.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Binaa.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = Binaa/Images.xcassets; sourceTree = "<group>"; };
-		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = Binaa/Info.plist; sourceTree = "<group>"; };
+		13B07F961A680F5B00A75B9A /* Binaa.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Binaa.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = "Binaa/Images.xcassets"; sourceTree = "<group>"; };
+		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = "Binaa/Info.plist"; sourceTree = "<group>"; };
 		13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = PrivacyInfo.xcprivacy; path = Binaa/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
-		1C8AA501B3EF4008A0EB1E05 /* Cairo-SemiBold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Cairo-SemiBold.ttf"; path = "../src/assets/fonts/cairo/Cairo-SemiBold.ttf"; sourceTree = "<group>"; };
 		3B4392A12AC88292D35C810B /* Pods-Binaa.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Binaa.debug.xcconfig"; path = "Target Support Files/Pods-Binaa/Pods-Binaa.debug.xcconfig"; sourceTree = "<group>"; };
 		5709B34CF0A7D63546082F79 /* Pods-Binaa.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Binaa.release.xcconfig"; path = "Target Support Files/Pods-Binaa/Pods-Binaa.release.xcconfig"; sourceTree = "<group>"; };
 		5DCACB8F33CDC322A6C60F78 /* libPods-Binaa.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Binaa.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		761780EC2CA45674006654EE /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = Binaa/AppDelegate.swift; sourceTree = "<group>"; };
-		7C0232B7C20E4530988E2A85 /* Cairo-Light.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Cairo-Light.ttf"; path = "../src/assets/fonts/cairo/Cairo-Light.ttf"; sourceTree = "<group>"; };
-		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = Binaa/LaunchScreen.storyboard; sourceTree = "<group>"; };
-		BF6CF2F4E65642798AA81719 /* Cairo-Regular.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Cairo-Regular.ttf"; path = "../src/assets/fonts/cairo/Cairo-Regular.ttf"; sourceTree = "<group>"; };
-		C7956E62840C48AFB9B646A8 /* Cairo-ExtraLight.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Cairo-ExtraLight.ttf"; path = "../src/assets/fonts/cairo/Cairo-ExtraLight.ttf"; sourceTree = "<group>"; };
+		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = "Binaa/LaunchScreen.storyboard"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
-		FCFB3E825D9C48699F2909B7 /* Cairo-Bold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Cairo-Bold.ttf"; path = "../src/assets/fonts/cairo/Cairo-Bold.ttf"; sourceTree = "<group>"; };
+		ADA256B90BFE42F4AF627731 /* Cairo-ExtraLight.ttf */ = {isa = PBXFileReference; name = "Cairo-ExtraLight.ttf"; path = "../src/assets/fonts/cairo/Cairo-ExtraLight.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		1F8900D0387E489098C1D102 /* Cairo-SemiBold.ttf */ = {isa = PBXFileReference; name = "Cairo-SemiBold.ttf"; path = "../src/assets/fonts/cairo/Cairo-SemiBold.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		E06C87B12A044B0198D5FB7F /* Cairo-Regular.ttf */ = {isa = PBXFileReference; name = "Cairo-Regular.ttf"; path = "../src/assets/fonts/cairo/Cairo-Regular.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		5C98D575A04C44CA8C9E75C2 /* Cairo-Light.ttf */ = {isa = PBXFileReference; name = "Cairo-Light.ttf"; path = "../src/assets/fonts/cairo/Cairo-Light.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		237DD3EA400944B0B8273607 /* Cairo-Black.ttf */ = {isa = PBXFileReference; name = "Cairo-Black.ttf"; path = "../src/assets/fonts/cairo/Cairo-Black.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		759474586D7A4CE2858411FF /* Cairo-Bold.ttf */ = {isa = PBXFileReference; name = "Cairo-Bold.ttf"; path = "../src/assets/fonts/cairo/Cairo-Bold.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -60,7 +59,7 @@
 				81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */,
 				13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */,
 			);
-			name = Binaa;
+			name = "Binaa";
 			sourceTree = "<group>";
 		};
 		2D16E6871FA4F8E400B85C8A /* Frameworks */ = {
@@ -87,7 +86,7 @@
 				83CBBA001A601CBA00E9B192 /* Products */,
 				2D16E6871FA4F8E400B85C8A /* Frameworks */,
 				BBD78D7AC51CEA395F1C20DB /* Pods */,
-				ACC28FF3AEBC4EF3A508BC77 /* Resources */,
+				764ED859001442358ED9A2A2 /* Resources */,
 			);
 			indentWidth = 2;
 			sourceTree = "<group>";
@@ -102,19 +101,6 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		ACC28FF3AEBC4EF3A508BC77 /* Resources */ = {
-			isa = PBXGroup;
-			children = (
-				0DDAC704DF9143C6879CBADC /* Cairo-Black.ttf */,
-				FCFB3E825D9C48699F2909B7 /* Cairo-Bold.ttf */,
-				C7956E62840C48AFB9B646A8 /* Cairo-ExtraLight.ttf */,
-				7C0232B7C20E4530988E2A85 /* Cairo-Light.ttf */,
-				BF6CF2F4E65642798AA81719 /* Cairo-Regular.ttf */,
-				1C8AA501B3EF4008A0EB1E05 /* Cairo-SemiBold.ttf */,
-			);
-			name = Resources;
-			sourceTree = "<group>";
-		};
 		BBD78D7AC51CEA395F1C20DB /* Pods */ = {
 			isa = PBXGroup;
 			children = (
@@ -123,6 +109,20 @@
 			);
 			path = Pods;
 			sourceTree = "<group>";
+		};
+		764ED859001442358ED9A2A2 /* Resources */ = {
+			isa = "PBXGroup";
+			children = (
+				ADA256B90BFE42F4AF627731 /* Cairo-ExtraLight.ttf */,
+				1F8900D0387E489098C1D102 /* Cairo-SemiBold.ttf */,
+				E06C87B12A044B0198D5FB7F /* Cairo-Regular.ttf */,
+				5C98D575A04C44CA8C9E75C2 /* Cairo-Light.ttf */,
+				237DD3EA400944B0B8273607 /* Cairo-Black.ttf */,
+				759474586D7A4CE2858411FF /* Cairo-Bold.ttf */,
+			);
+			name = Resources;
+			sourceTree = "<group>";
+			path = "";
 		};
 /* End PBXGroup section */
 
@@ -138,14 +138,13 @@
 				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
 				00EEFC60759A1932668264C0 /* [CP] Embed Pods Frameworks */,
 				E235C05ADACE081382539298 /* [CP] Copy Pods Resources */,
-				74C5A352374E4DD688349B7B /* Upload Debug Symbols to Sentry */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 			);
-			name = Binaa;
-			productName = Binaa;
+			name = "Binaa";
+			productName = "Binaa";
 			productReference = 13B07F961A680F5B00A75B9A /* Binaa.app */;
 			productType = "com.apple.product-type.application";
 		};
@@ -187,13 +186,12 @@
 			files = (
 				81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
-				0409EB472FEC47F890AFF11C /* Cairo-Black.ttf in Resources */,
-				ADF7F3F1932F4CCA9CA17D7B /* Cairo-Bold.ttf in Resources */,
-				B313BC227D0F48D987338055 /* Cairo-ExtraLight.ttf in Resources */,
-				2CFF29792CFC42B487723D86 /* Cairo-Light.ttf in Resources */,
-				86BCF114BA2C404192AA7374 /* Cairo-Regular.ttf in Resources */,
-				6B95815839F94B37891389EC /* Cairo-SemiBold.ttf in Resources */,
-				BF9EC50C25F52174D90FACD8 /* PrivacyInfo.xcprivacy in Resources */,
+				77B37885F5FB4599A9CD8A30 /* Cairo-ExtraLight.ttf in Resources */,
+				D34F8F815832474795F7247F /* Cairo-SemiBold.ttf in Resources */,
+				141B8C6CED6C45F8A6180AE2 /* Cairo-Regular.ttf in Resources */,
+				FD746018852F4D79ABAE1FBF /* Cairo-Light.ttf in Resources */,
+				D9B7A77152F44A758661716B /* Cairo-Black.ttf in Resources */,
+				32B94C24C052490FBF7E5939 /* Cairo-Bold.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -214,7 +212,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "set -e\n\nWITH_ENVIRONMENT=\"$REACT_NATIVE_PATH/scripts/xcode/with-environment.sh\"\nREACT_NATIVE_XCODE=\"$REACT_NATIVE_PATH/scripts/react-native-xcode.sh\"\n\n/bin/sh -c \"$WITH_ENVIRONMENT /bin/sh ../node_modules/@sentry/react-native/scripts/sentry-xcode.sh $REACT_NATIVE_XCODE\"\n";
+			shellScript = "set -e\n\nWITH_ENVIRONMENT=\"$REACT_NATIVE_PATH/scripts/xcode/with-environment.sh\"\nREACT_NATIVE_XCODE=\"$REACT_NATIVE_PATH/scripts/react-native-xcode.sh\"\n\n/bin/sh -c \"\\\"$WITH_ENVIRONMENT\\\" \\\"$REACT_NATIVE_XCODE\\\"\"\n";
 		};
 		00EEFC60759A1932668264C0 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -232,20 +230,6 @@
 			shellPath = /bin/sh;
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Binaa/Pods-Binaa-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
-		};
-		74C5A352374E4DD688349B7B /* Upload Debug Symbols to Sentry */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "Upload Debug Symbols to Sentry";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "/bin/sh ../node_modules/@sentry/react-native/scripts/sentry-xcode-debug-files.sh";
 		};
 		C38B50BA6285516D6DCD4F65 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -306,11 +290,10 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
-				CURRENT_PROJECT_VERSION = 6;
-				DEVELOPMENT_TEAM = FS23EFUE9H;
+				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_BITCODE = NO;
-				INFOPLIST_FILE = Binaa/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = Binaa;
+				INFOPLIST_FILE = "Binaa/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Binaa";
 				IPHONEOS_DEPLOYMENT_TARGET = 15.1;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -322,10 +305,12 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.binaa;
-				PRODUCT_NAME = Binaa;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.binaa";
+				PRODUCT_NAME = "Binaa";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
 				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = Debug;
@@ -336,10 +321,9 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
-				CURRENT_PROJECT_VERSION = 6;
-				DEVELOPMENT_TEAM = FS23EFUE9H;
-				INFOPLIST_FILE = Binaa/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = Binaa;
+				CURRENT_PROJECT_VERSION = 1;
+				INFOPLIST_FILE = "Binaa/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Binaa";
 				IPHONEOS_DEPLOYMENT_TARGET = 15.1;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -351,9 +335,11 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.binaa;
-				PRODUCT_NAME = Binaa;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.binaa";
+				PRODUCT_NAME = "Binaa";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
 				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = Release;
@@ -427,10 +413,7 @@
 					"-DFOLLY_CFG_NO_COROUTINES=1",
 					"-DFOLLY_HAVE_CLOCK_GETTIME=1",
 				);
-				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native";
 				SDKROOT = iphoneos;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) DEBUG";
-				USE_HERMES = true;
 			};
 			name = Debug;
 		};
@@ -495,9 +478,7 @@
 					"-DFOLLY_CFG_NO_COROUTINES=1",
 					"-DFOLLY_HAVE_CLOCK_GETTIME=1",
 				);
-				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native";
 				SDKROOT = iphoneos;
-				USE_HERMES = true;
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
