@@ -105,9 +105,6 @@ platform :ios do
 			use_bundle_exec: false,
 			repo_update: true,
 		)
-		
-
-  	yarn(command: "patch-package")
 
 
 		api_key = app_store_connect_api_key(
