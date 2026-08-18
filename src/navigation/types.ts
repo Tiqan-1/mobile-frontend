@@ -1,7 +1,6 @@
 import type { StackScreenProps } from '@react-navigation/stack';
 import type { Paths } from '@/navigation/paths';
-import { Lesson, Program } from '@/types/program';
-import { Subscription } from 'react-redux';
+import { Lesson, Program, Subscription } from '@/types/program';
 
 export type RootStackParamList = {
   [Paths.AccessibilitySettings]: undefined;

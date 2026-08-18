@@ -165,7 +165,7 @@ function Login({ navigation, route }: RootScreenProps<Paths.Login>) {
           type="underline"
           title="Fast Login Dev"
           onPress={() => {
-            handleSubmit(initialValues);
+            handleSubmit({ email: 'm@m.com', password: 'Aa@123123' });
           }}
         />
       )}
