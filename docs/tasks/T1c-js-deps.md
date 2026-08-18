@@ -149,6 +149,7 @@ Use the [Upgrade Helper diff](https://react-native-community.github.io/upgrade-h
 
 - **`react-native-fast-image`** (last published 2022, no New Arch support). Three call sites: `VideoModal`, `MainScreen`, `Programs`. RN's built-in `Image` now does caching; `expo-image` is the richer option. **Note:** `VideoModal` is deleted by T3a and the other two are refactored by T2e — coordinate, or do the minimum to make them compile and let those briefs finish the job.
 - **`react-native-render-html`** — per T1a's verdict.
+- **`react-native-restart`** — expo-updates.
 
 ### Not upgraded
 
