@@ -10,12 +10,12 @@
 
 | | |
 |---|---|
-| **Status** | 🔵 in progress — all checkpoints done or explicitly accounted for except C3 (blocked, see below) and human device verification (cannot be done by this agent) |
+| **Status** | ✅ done — landed and committed. **Three caveats, all recorded below:** C3 blocked (T2d's file), three credential rotations outstanding, and `.env` is still tracked with a real token. |
 | **Owner** | Claude (agent session) |
 | **Branch** | Started on `feat/expo` per instruction. Mid-session the owner branched `feat/T0-hygiene` from it and committed the in-progress work himself as `5bdf216` (his own action, not this agent's — `git commit`/`checkout` were never run by this agent). All work since is uncommitted on top of `5bdf216`. **Flagged in the report: that commit captured `.env` with real secret values — see C2.** |
-| **Last updated** | 2026-08-17 |
+| **Last updated** | 2026-08-18 |
 
-Kickoff prompt is at the bottom of this file. Read the Post-T4 revision block first — it supersedes about a third of the brief.
+**This brief is finished** — kept as the record of what landed, not as work to pick up. Committed as `5bdf216` and `2c03f8e` on `feat/T0-hygiene`. Measured after: `lint:rules` exits 0 (was a hard crash), `tsc` 158 (was 170), `yarn test` 1 of 2 suites passing. Everything it found but couldn't fix is in [README's unowned open items](README.md#unowned-open-items).
 
 **Legend:** ⚪ not started · 🔵 in progress · ⏸️ blocked · ✅ done · 🟣 superseded
 
@@ -30,7 +30,7 @@ Tick a box only when you have **verified** it, not when you've written the code.
 - [~] **B3** — jest `moduleNameMapper` / `transformIgnorePatterns` / `setupFiles` / `setupFilesAfterEnv` wired; `resolver` added (needed to unblock reanimated 4 + worklets under Jest); test retargeted at `src/App.tsx` and **passes** (full real app render — Redux, PersistGate, ThemeProvider, ApplicationNavigator, FlashMessage, Sentry.wrap). `yarn test` is **not fully green**: 1 of 2 suites passes (mine); `src/components/atoms/Skeleton/Skeleton.test.tsx` (T2b's, not owned) still fails on a pre-existing `TestAppWrapper.tsx` bug — see docs/tasks/README.md unowned items
 - [x] **Part B** — `lint:rules` / `lint:type-check` / `lint:format` scripts added, plus combined `lint`
 - [x] **C1** — `setSubscriptions` assigns `state.items`; the 4 consumer screens (`MainScreen:135`, `TodayLessons:40`, `Programs:23`, `Program:26,45`) confirmed as real consumers, not touched (outside `Owns`)
-- [x] **C2 (code fix)** — secrets moved to `EXPO_PUBLIC_*` (`telegram.ts`, `App.tsx` Sentry DSN, Fastlane Huawei secret → `Fastlane/.env`); `.env` untracked (re-verified after it was unexpectedly re-tracked mid-session — see report); `.env.example` / `Fastlane/.env.example` complete. **Rotations still outstanding — see below, this is not "resolved."**
+- [~] **C2 — partly done, and partly reversed by the owner.** Secrets moved to `EXPO_PUBLIC_*` (`telegram.ts`, `App.tsx` Sentry DSN, Fastlane Huawei secret → `Fastlane/.env`); `.env.example` / `Fastlane/.env.example` complete. **The `.env`-untracking half did not stick:** the tick claimed `.env` was untracked, but it never was — `.gitignore` does nothing to an already-tracked file — and on 2026-08-18 the owner removed the `.env` entry from `.gitignore` outright (`06fa36e`), making it tracked on purpose. So the live Telegram token sits in the repo by decision. **The three rotations remain the actual fix** and are still outstanding — see [README's unowned items](README.md#unowned-open-items).
 - [ ] **C3 — BLOCKED, not done.** Requires editing `src/store/index.ts` (`new MMKV()`), which is T2d's file per this repo's ownership table (`Owns: src/services/**, src/store/**, src/App.tsx`) — T0's `Owns` only carves out `subscriptionSlice.ts`. Flagged in docs/tasks/README.md for T2d or an explicit scope widening.
 - [x] **C4** — API base URL out of source; `isTest` reconciled with `isDevApi`; `EXPO_PUBLIC_API_URL` overrides when set
 - [x] **C6** — `Menu`'s admin-unlock dispatch moved from render body into a `useEffect`
@@ -131,7 +131,7 @@ src/App.tsx                        (Sentry DSN only — do not restructure)
 deletions listed below
 ```
 
-Do not touch anything else. In particular, leave `android/` and `ios/` to T1b — except `android/gradle.properties`, which is yours for the keystore-secrets fix only.
+Do not touch anything else. `android/` and `ios/` are generated output and are not in anyone's `Owns` list — native config belongs in `app.json` (`CLAUDE.md` §0.3).
 
 ---
 
@@ -215,7 +215,7 @@ Then check the call sites: anything reading subscriptions from Redux has been re
 | Keystore alias + passwords | `android/gradle.properties` | `~/.gradle/gradle.properties` |
 | Huawei `client_secret` | `Fastlane/Fastfile` | Fastlane env var |
 
-The project already uses `babel-plugin-inline-dotenv`, so `.env` values are available at build time — follow the existing pattern in `src/config/pusher.ts`.
+~~The project already uses `babel-plugin-inline-dotenv`… follow the pattern in `src/config/pusher.ts`.~~ **Both are gone** — see revision item 2 above. Values reach the bundle as `EXPO_PUBLIC_*`, inlined by `babel-preset-expo`.
 
 Then untrack `.env` (`git rm --cached .env`), add it to `.gitignore`, and make sure `.env.example` lists every key with empty values. `.env.example` is currently missing `RCT_NEW_ARCH_ENABLED`.
 
@@ -290,7 +290,7 @@ Dead code, verified by grep:
 
 Also in `react-native.config.js`: remove the `react-native-vector-icons` platform override — that package isn't a dependency.
 
-Finally, `README.md` documents a theme API (`colors.primary`, `spacing.md`, `react-native-config`) that has **never existed** in this codebase. Replace that section with a pointer to `CLAUDE.md` rather than leaving active misinformation.
+~~Finally, `README.md` documents a theme API that has never existed…~~ **Done on 2026-08-18**, outside this brief — `README.md` was rewritten as an Expo-era orientation doc pointing at `CLAUDE.md`.
 
 ---
 

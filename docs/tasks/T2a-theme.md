@@ -30,7 +30,9 @@ Tick a box only when you have **verified** it, not when you've written the code.
 
 ---
 
-**Depends on:** T1c. **Parallel-safe with:** T1d.
+**Depends on:** [T0](T0-hygiene.md). **Parallel-safe with:** [T1d](T1d-navigation.md), [T6](T6-expo-hardening.md).
+
+> **One coupling with [T6](T6-expo-hardening.md):** `src/theme/typography.ts` imports `defaultSystemFonts` from `react-native-render-html` to build a `systemFonts` export that **nothing consumes**. T6 removes the dependency; **you remove the import and the orphaned export.** Whoever goes second will otherwise break the other's build — agree the order before starting.
 
 ## Goal
 
