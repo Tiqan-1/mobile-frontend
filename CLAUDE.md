@@ -41,6 +41,7 @@ This applies to ad-hoc work too: if you change something a brief owns, note it i
 - **`app.json`'s `expo` key is the source of truth** for bundle IDs, permissions, fonts, Info.plist keys, Sentry, icons, `newArchEnabled`, `edgeToEdgeEnabled`. Native config changes go there.
 - Native *build* settings that `app.json` doesn't expose (deployment target, NDK, Proguard, compileSdk) go through **`expo-build-properties`**, not a gradle or Podfile edit.
 - **Install dependencies with `npx expo install <pkg>`, not `yarn add`.** Expo pins versions per SDK; `yarn add` grabs `latest` and will silently give you something SDK 57 doesn't support. `npx expo install --check` audits what's already there.
+- **Expo SDK pins the React Native version.** SDK 57 pins RN **0.86.2** — which is what the repo is on, so the migration cost nothing. Going forward that pin is a **ceiling, not a floor**: you cannot jump to an RN release before an SDK ships it. (0.87.0 was tried and abandoned before the migration; under Expo it wouldn't have been an option at all.) Plan upgrades around SDK releases, not RN releases.
 - Any new native module must **support the New Architecture** (`newArchEnabled: true`) and should have an Expo config plugin or be autolink-clean under CNG. If it has neither, say so before adding it.
 - To verify native work: `npx expo prebuild -p android --no-install` (or `--clean` to regenerate from scratch), then build. Don't assume prebuild output is current — it usually isn't.
 - Env vars reach the bundle via **`EXPO_PUBLIC_*`**, which `babel-preset-expo` inlines at build time. There is no `react-native-config` and no `babel-plugin-inline-dotenv` any more. Remember that `EXPO_PUBLIC_*` values **ship inside the app** — they are not secrets.
@@ -163,17 +164,23 @@ Package manager is **Yarn Classic (v1)**. There is only a `yarn.lock` — do not
 ```bash
 yarn install
 npx expo prebuild          # regenerates android/ and ios/ from app.json — run this first on a fresh checkout
-npx pod-install             # only needed if you hand-ran prebuild without -p and want iOS pods refreshed
+                           # it runs pod install itself; `npx pod-install` is only a fallback
 
 yarn start                 # expo start (Metro)
 yarn android                # expo run:android — prebuilds automatically if android/ is missing/stale
 yarn ios                    # expo run:ios     — same, for iOS
 
-yarn lint                  # eslint .
+yarn lint                  # lint:rules && lint:type-check && lint:format
+yarn lint:rules            # eslint .
+yarn lint:type-check       # tsc --noEmit
+yarn lint:format           # prettier --check .
 yarn test                  # jest
+
+npx expo-doctor            # the Expo health check — run before calling any native work done
+npx expo install --check   # audits installed deps against the SDK 57 pin
 ```
 
-There is no `lint:type-check`/`lint:fix`/`lint:code-format` script today (`package.json` only has `lint`, `start`, `android`, `ios`, `test`) — run `npx tsc --noEmit` and `npx prettier --check ...` directly if you need those.
+The four `lint*` scripts landed in T0. Note that `yarn lint` is now a **gate on all three**, while CI runs `lint:type-check` and `lint:format` as non-blocking ratchets — the residual errors belong to briefs that haven't run yet, not to new code.
 
 **Never hand-edit anything under `android/` or `ios/`.** `expo prebuild --clean` overwrites them from `app.json` + the plugins in `app.json`'s `plugins` array. If you find yourself patching a generated file, that's a missing config plugin — write one instead (see `docs/tasks/T4-expo-migration.md` acceptance criterion 10).
 
@@ -186,11 +193,12 @@ bundle exec fastlane ios beta        # build -> TestFlight + Sentry dSYM upload
 
 Ruby deps are pinned in `Gemfile` (CocoaPods `>= 1.13`, with specific bad versions excluded). Node `>= 20` per `engines`.
 
-> **Current state** (measured 2026-08-17, post-migration, static checks only — no native build run):
+> **Current state** (measured 2026-08-18, after T0 landed. **Confirm these, don't trust them** — §0.5):
 >
-> - **`tsc` reports ~170 errors**, essentially the same shape/count as the pre-migration baseline (163) — the delta is pre-existing dead code (`src/theme/OldThem/**`, a few `noUnusedLocals` hits), not anything the migration introduced. Do not assume a green baseline.
-> - **`yarn test`: 3 suites fail, 1 passes** (`__tests__/App.test.tsx`, which — see §8 — asserts nothing real). This is unchanged from the post-P1 baseline; `jest.config.js` still has no `moduleNameMapper`/`transformIgnorePatterns`, so the harness gaps below are still open.
-> - The babel-plugin bug that used to make `yarn test` run 0 tests (`transform-inline-environment-variables` undeclared) is fixed — that plugin was only needed for Pusher's env vars, which are gone now that Pusher is (§3).
+> - **`yarn lint:rules` runs and exits 0** (0 errors, 15 warnings). Before T0 it hard-crashed with `sourceCode.getRange is not a function` — ESLint 8 against a config needing ESLint 9. Lint *existing at all* is new.
+> - **`tsc` reports 147 errors** (was 170 before T0). Do not assume a green baseline and **do not chase zero**: the bulk belong to T2b/T2d/T2e/T2f and get fixed when those briefs run. The single worst file is `src/components/atoms/FlashMessage/index.tsx` at 23. The number is a ratchet, not a gate.
+> - **`yarn test`: 1 of 2 suites passes** (1 of 4 tests). `__tests__/App.test.tsx` renders the real `src/App.tsx` (Redux, PersistGate, ThemeProvider, navigator, Sentry) instead of the deleted root template. The failure is `src/components/atoms/Skeleton/Skeleton.test.tsx`, blocked on a pre-existing `__mocks__/TestAppWrapper.tsx` bug — see §8.
+> - **CI exists** (`.github/workflows/ci.yml`): install → lint → type-check + format (non-blocking) → test → `expo prebuild -p android` → `assembleDebug`. iOS is deliberately not in CI yet ([T6](docs/tasks/T6-expo-hardening.md)).
 
 ---
 
@@ -410,9 +418,9 @@ The point of this feature is that a child never needs to open the YouTube app.
 
 Jest + `@testing-library/react-native`. Tests sit next to their subject as `*.test.tsx`.
 
-> **Current state:** `jest.config.js` is bare `{ preset: '@react-native/jest-preset' }` — no `moduleNameMapper` for `@/` or SVGs, no `transformIgnorePatterns` (ESM packages like `immer` crash the transform), no `setupFiles`. The mocks in `__mocks__/` are never loaded, and `__tests__/App.test.tsx` renders the leftover root `/App.tsx` template rather than `src/App.tsx`, so it "passes" without testing anything real. Fix the harness before trusting a result.
->
-> The one thing that *is* fixed (2026-08-17): `babel.config.js` no longer references the undeclared `transform-inline-environment-variables` plugin, so tests actually run now instead of all 4 suites crashing at 0 tests. The gaps above are still open.
+**The harness works now.** T0 wired it: `jest.config.js` has `moduleNameMapper` for `@/` and SVGs, `transformIgnorePatterns` (ESM packages like `immer` crashed the transform without it), `setupFiles`/`setupFilesAfterEach` pointing at `__mocks__/libs/*`, and a custom `jest/resolver.js` — which is what unblocks Reanimated 4 + `react-native-worklets` under Jest. `__tests__/App.test.tsx` renders the real `src/App.tsx`; the root template it used to render is deleted.
+
+> **One known failure:** `src/components/atoms/Skeleton/Skeleton.test.tsx` crashes because `__mocks__/TestAppWrapper.tsx` imports `queryClient` and `storage` from `@/App`, and `src/App.tsx` exports neither (there's no `QueryClientProvider` yet — §3). Pre-existing, not a harness gap. It's an [unowned open item](docs/tasks/README.md#unowned-open-items) and a natural fit for T2d.
 
 Do not set coverage thresholds the suite cannot currently meet.
 
@@ -420,21 +428,25 @@ Do not set coverage thresholds the suite cannot currently meet.
 
 ## 9. Gotchas
 
-**Secrets — never commit them.** The repo currently violates this in at least three places still (Telegram bot token in `src/config/telegram.ts`, Huawei client secret in `Fastlane/Fastfile`, Sentry DSN in `src/App.tsx`, `__DEV__` login credentials in `src/screens/auth/Login/index.tsx`). The keystore-passwords-in-`android/gradle.properties` violation is moot now that `android/` isn't committed (§2) — but when you regenerate release signing config (`MYAPP_UPLOAD_*`), use EAS credentials or a gitignored local override, **don't reintroduce plaintext passwords**. Do not add to the list above, and do not copy these patterns.
+**Secrets — never commit them.** T0 moved the hardcoded values out of source into `EXPO_PUBLIC_*` (Telegram token, Sentry DSN, the Huawei secret into `Fastlane/.env`) and removed the `__DEV__` login credentials from `Login`.
+
+**`.env` is tracked, deliberately** — the owner removed it from `.gitignore` in `06fa36e`. Two consequences to keep in mind rather than re-litigate: the Telegram bot token in it is live and readable by anyone with repo access, and it is in git history regardless of what happens to the file now. **Rotation is the only real fix** — see the [unowned open items](docs/tasks/README.md#unowned-open-items). Anything that genuinely must not ship should not be an `EXPO_PUBLIC_*` value at all; it belongs on the backend. When you regenerate release signing config (`MYAPP_UPLOAD_*`), use EAS credentials or a gitignored local override — **don't reintroduce plaintext passwords**. Do not add to this list, and do not copy these patterns.
 
 **`isTest` in `src/services/API.ts` selects the API host** and is currently `true` — builds point at the dev backend. Check it before any release build.
 
 **New Architecture is ON** (`newArchEnabled: true` in `app.json`). Any native module you add must support it.
 
-**`npx install-expo-modules@latest` does not yet know about SDK 57 / RN 0.86.2** (as of 2026-08-17) — its bundled version-compatibility table tops out at SDK 56, and it hard-errors (`Unsupported sdkVersion: 57`) rather than degrading gracefully. This blocked doing the "bare + expo modules, no prebuild yet" reversible check the way `docs/tasks/T4-expo-migration.md` Phase A originally described. If you need it, either wait for an upstream fix or add `expo`/`expo-modules-core`/`expo-font` etc. by hand at the versions `expo`'s own `package.json` pins (`npm view expo@<sdk-version> dependencies`) and rely on `expo prebuild` (which *is* SDK-57-aware) to do the real native wiring.
+**Abandoned dependencies** — `react-native-fast-image`, `react-native-actionsheet` and `react-native-render-html` were all last published in 2022 and have no New Arch commitment. Don't build new features on them. Their status differs:
 
-**Abandoned dependencies** — `react-native-fast-image`, `react-native-actionsheet` and `react-native-render-html` were all last published in 2022 and have no New Arch commitment. Don't build new features on them. (`expo-image` is now installable as a drop-in `fast-image` replacement — see T4 Phase F — but that swap hasn't been done yet.)
+- **`react-native-render-html` is dead weight, not a risk to manage.** It is imported once, in `src/theme/typography.ts`, for `defaultSystemFonts` — which feeds a `systemFonts` export nothing consumes. Nothing in `src/` renders HTML. [T6](docs/tasks/T6-expo-hardening.md) deletes the dependency; T2a deletes the import.
+- **`react-native-fast-image` → `expo-image`** is a near drop-in (`resizeMode` becomes `contentFit`). Three call sites. Also [T6](docs/tasks/T6-expo-hardening.md).
+- **`react-native-actionsheet` is live** in `Login` and **no brief owns replacing it** — it's an [unowned open item](docs/tasks/README.md#unowned-open-items).
 
 **Navigation params are effectively untyped.** `src/navigation/types.ts` references `Lesson`/`Program`/`Subscription` without importing them, so they silently resolve to globals. Prefer passing IDs over whole domain objects.
 
 **`.history/`** (editor history) is no longer tracked — it was untracked during the T4 cleanup. Don't reintroduce it.
 
-**`README.md` is wrong.** It documents a theme API (`colors.primary`, `spacing.md`, `react-native-config`) that has never existed in this codebase. Trust this file over that one.
+**`README.md` was rewritten on 2026-08-18** and is now accurate — it had been the untouched bare-RN template, documenting a theme API (`colors.primary`, `spacing.md`, `react-native-config`) that never existed here. It is now a short orientation doc that points back to this file. This file is still the deeper source of truth; the two should agree.
 
 **Neither platform has ever had a real app icon.** Android shows the default React Native robot placeholder (`android/app/src/main/res/mipmap-*/ic_launcher.png` — well, it did, before that directory became generated; the source of truth is now `app.json`'s `icon` field, currently pointed at a generic placeholder). iOS's `AppIcon.appiconset` was completely empty. Pre-existing, unrelated to Expo. Needs a real 1024×1024 Binaa icon before shipping.
 

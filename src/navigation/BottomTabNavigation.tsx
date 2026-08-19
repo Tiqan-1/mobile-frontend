@@ -116,7 +116,7 @@ const BottomTabNavigation = () => {
         component={Menu}
         name={Paths.Menu}
         options={{
-          tabBarLabel: t('القائمة'),
+          tabBarLabel: t('navigation.Menu'),
           tabBarIcon: ({ color, size }) => <Student style={{ color: color }} fill={color} height={size} width={size} />,
           tabBarAccessibilityLabel: 'Menu tab',
         }}

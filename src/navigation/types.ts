@@ -1,10 +1,10 @@
 import type { StackScreenProps } from '@react-navigation/stack';
 import type { Paths } from '@/navigation/paths';
+import { Lesson, Program, Subscription } from '@/types/program';
 
 export type RootStackParamList = {
   [Paths.AccessibilitySettings]: undefined;
   [Paths.Auth]: undefined;
-  [Paths.Example]: undefined;
   [Paths.ForgotPassword]: undefined;
   [Paths.Login]: { email?: string } | undefined;
   [Paths.Main]: undefined;

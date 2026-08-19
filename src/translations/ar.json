@@ -46,7 +46,8 @@
     "navigation": {
       "Programs": "البرامج",
       "Main": "اشتركاتي",
-      "TodayLessons": "الدروس المنتظرة"
+      "TodayLessons": "الدروس المنتظرة",
+      "Menu": "القائمة"
     },
     "Programs": {
       "remainig": "متبقي",

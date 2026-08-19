@@ -97,7 +97,7 @@ Write a `toLessonSource(lesson: Lesson): LessonSource` adapter that derives a `s
 
 ### 2. Feature flag
 
-`FEATURE_FAMILY` in `src/config/index.ts`, driven from `.env`. **Default off.** Every Family entry point checks it. With it off, the app must behave exactly as it does today — verify that, don't assume it.
+`FEATURE_FAMILY` in `src/config/index.ts`, read from `process.env.EXPO_PUBLIC_FEATURE_FAMILY` — `babel-preset-expo` inlines `EXPO_PUBLIC_*` at build time (`CLAUDE.md` §0.3). **Default off.** Every Family entry point checks it. With it off, the app must behave exactly as it does today — verify that, don't assume it.
 
 ### 3. Local storage — you choose it
 

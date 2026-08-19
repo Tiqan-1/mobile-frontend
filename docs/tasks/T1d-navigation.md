@@ -29,15 +29,15 @@ Tick a box only when you have **verified** it, not when you've written the code.
 
 ---
 
-> **Mahmoud is doing the RN upgrade personally.** T1a–T1d are a runbook for him. This one is the most delegable of the four — it's pure JS and well-bounded — so it can be handed to an agent if you'd rather.
+> **Mahmoud runs this one personally**, but it's the most delegable of his — pure JS, well-bounded, no device or console access needed — so it can be handed to an agent if you'd rather. The RN upgrade it used to be part of is done; this is all that's left of it.
 
-**Depends on:** T1c. **Parallel-safe with:** T2a (different directories).
+**Depends on:** [T0](T0-hygiene.md). **Parallel-safe with:** [T2a](T2a-theme.md) and [T6](T6-expo-hardening.md) (different directories).
 
 ## Goal
 
 Move react-navigation 6 → 7 and switch the root stack from the JS `createStackNavigator` to `native-stack`.
 
-Kept out of T1c deliberately: this is a behavioural change, not a version bump, and it deserves its own reviewable commit.
+Kept out of the RN dependency upgrade deliberately: this is a behavioural change, not a version bump, and it deserves its own reviewable commit.
 
 ## Owns
 

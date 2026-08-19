@@ -97,19 +97,17 @@ git worktree prune
 
 ## 5. Who does what
 
-### Right now (you're on `feat/expo` @ `fe4efa9`)
+### Right now (T0 and T4 have both landed on `feat/T0-hygiene`)
 
-**Step 1 — one tool, alone:** T0.
-
-**Step 2 — three streams, zero file overlap:**
+**Three streams, zero file overlap:**
 
 | Stream | Brief | Owns | Why this tool |
 |---|---|---|---|
-| Claude Code + you | [T4](T4-expo-migration.md) Expo A–D | `app.json`, `metro.config.js`, `android/`, `ios/`, `package.json` | Highest risk, needs your Xcode/credentials |
+| Claude Code + you | [T6](T6-expo-hardening.md) Expo hardening | `app.json`, `package.json`, `eas.json`, `.github/workflows/ci.yml` | Highest risk; needs your Xcode, device and console logins |
 | opencode | [T2a](T2a-theme.md) theme tokens | `src/theme/**` | Self-contained, crisp acceptance criteria |
 | Trae (you driving) | [T2d](T2d-data-layer.md) data layer | `src/services/`, `src/store/`, `src/App.tsx` | Design judgement; worth a human in the loop |
 
-Verified disjoint — no path appears in two rows.
+Verified disjoint — no path appears in two rows. **One ordering caution:** T6 removes `react-native-render-html` from `package.json`, and its last import lives in T2a's `src/theme/typography.ts`. Disjoint by path, coupled by build — let T6 land first, or agree who deletes what.
 
 ### Deriving future splits
 

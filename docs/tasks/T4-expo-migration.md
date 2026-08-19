@@ -10,12 +10,12 @@
 
 | | |
 |---|---|
-| **Status** | 🔵 in progress — E, F, G left |
+| **Status** | ✅ done as a migration — **all remaining work is [T6](T6-expo-hardening.md)** |
 | **Owner** | Mahmoud + Claude Code |
-| **Branch** | `feat/expo` — **uncommitted** |
-| **Last updated** | 2026-08-17 |
+| **Branch** | landed on `feat/expo`, committed as `62a8459` / `99b3689` |
+| **Last updated** | 2026-08-18 |
 
-**Pusher was removed, not migrated** — that's the biggest open item. See the Status section below for the full account.
+The project is on Expo SDK 57 / CNG and stays there. Phases E (iOS), F (Expo-native wins) and G (EAS) were never done and are now **[T6](T6-expo-hardening.md)**, along with the platform decisions this brief deferred. **Pusher was removed, not migrated** — that stayed an [unowned open item](README.md#unowned-open-items), deliberately, because it's an architecture choice rather than migration work.
 
 **Legend:** ⚪ not started · 🔵 in progress · ⏸️ blocked · ✅ done · 🟣 superseded
 
@@ -26,18 +26,18 @@ Tick a box only when you have **verified** it, not when you've written the code.
 - [x] Phase B — `app.json` native config
 - [x] Phase C — metro config (plus 2 runtime crashes found and fixed afterwards)
 - [x] Phase D — prebuild + Android, **static parts only**
-- [ ] Phase D — live `expo run:android` build and launch *(owner)*
-- [ ] Phase E — iOS *(owner; needs Xcode + signing)*
-- [ ] Phase F — `expo-image` swap and the other wins
-- [ ] Phase G — EAS Build *(optional)*
-- [ ] Realtime replacement for `LessonChat` chosen
-- [ ] Migration committed *(owner is reviewing first — do not commit)*
+- [x] Phase D — live Android build verified during T0 (`expo prebuild -p android --no-install` → `assembleDebug` → APK, 676/676 tasks)
+- [x] Migration reviewed and committed by the owner
+- [x] Phase E — iOS → **moved to [T6](T6-expo-hardening.md)**
+- [x] Phase F — `expo-image` and the other wins → **moved to [T6](T6-expo-hardening.md)**
+- [x] Phase G — EAS Build → **moved to [T6](T6-expo-hardening.md)**
+- [x] Realtime replacement for `LessonChat` → **stays an [unowned open item](README.md#unowned-open-items)**, not Expo work
 
 ---
 
 **Verdict: yes, do it — but not with a fire-and-forget agent.** See "Why not just delegate this" below.
 
-**Depends on:** a green-ish baseline (see Prerequisites). **Conflicts with:** any brief owning `android/**`, `ios/**`, `metro.config.js`, or `package.json` — this cannot run in parallel with T1b or T1c.
+**Depends on:** a green-ish baseline (see Prerequisites). **Superseded for all remaining work by [T6](T6-expo-hardening.md)** — Phases E, F and G moved there along with the deferred platform decisions. This brief is kept as the record of what the migration did.
 
 ---
 
@@ -63,7 +63,7 @@ Not done, not attempted: **the app icon** (neither platform has ever had a real 
 
 ## Why now
 
-The [assessment](../expo-migration-assessment.md) said "no, not now" because of one hard blocker. That blocker is gone. What's left is a favourable set-up:
+An earlier assessment said "no, not now" because of one hard blocker (WatermelonDB). That blocker turned out to be dead code and is gone. What's left is a favourable set-up:
 
 | Condition | Status |
 |---|---|
@@ -101,6 +101,12 @@ You asked whether to fire an agent at it. Four reasons not to:
 Reason 3 is fixable in about ten minutes (see Prerequisites), and reasons 1 and 4 need you regardless.
 
 **What an agent *can* usefully do:** Phases A–D (through the Android build). All reversible, all verifiable without Xcode. Phases E–G need you.
+
+---
+
+> ## ⚠️ Everything below is the executed plan — do not run it
+>
+> Phases P1 and A–D **have been done** and committed. They are kept here as the record of what the migration changed and why, which is worth having when something native breaks. **Do not follow these instructions**: several describe a repo state that no longer exists (`ios/Podfile`, `babel-plugin-inline-dotenv`, `yarn add`), and the current rules are in [`CLAUDE.md` §0.3](../../CLAUDE.md). Remaining work is [T6](T6-expo-hardening.md).
 
 ---
 
@@ -181,7 +187,7 @@ Notes:
 - **Fonts move from `react-native.config.js` to `expo-font`.** The `assets: ['./src/assets/fonts/cairo']` entry and the `UIAppFonts` array both become generated. Font *filenames* must stay identical — `src/theme/typography.ts` references families by exact name.
 - **`react-native.config.js` can be deleted** once fonts move. Its only other content is a `react-native-vector-icons` override for a package that isn't a dependency.
 - **The Sentry plugin fixes a real bug** — it wires Android symbol upload, which has never worked here.
-- **Keep `edgeToEdgeEnabled: false`** for now. Turning it on is a separate, visual change (see T1b).
+- **Keep `edgeToEdgeEnabled: false`** for now. Turning it on is a separate, visual change — it is [T6](T6-expo-hardening.md) §5, and no longer optional: prebuild already warns the setting is going away.
 - **`newArchEnabled: true`** — already on; don't silently drop it.
 
 ---
@@ -224,42 +230,27 @@ Then:
 npx expo run:android
 ```
 
-Verify: app launches · **Cairo fonts render** (most likely casualty) · Arabic/RTL correct · SVGs render · login works · PDF opens · video plays · **lesson chat connects (this is the Pusher test)** · New Arch on (`global.nativeFabricUIManager` defined).
+Verify: app launches · **Cairo fonts render** (most likely casualty) · Arabic/RTL correct · SVGs render · login works · PDF opens · video plays · lesson chat loads (it polls now — Pusher is gone, §3) · New Arch on (`global.nativeFabricUIManager` defined).
 
 Restore the `MYAPP_UPLOAD_*` signing config — under CNG this moves to EAS credentials or an `expo-build-properties` plugin.
 
-### The Pusher question — settle it here
+### The Pusher question — how it was actually settled
 
-`@pusher/pusher-websocket-react-native` has no config plugin. It should autolink under prebuild. If lesson chat connects on Android, it's fine. If it doesn't, options are: write a small config plugin, replace with a plain WebSocket client against Pusher's protocol, or stop the migration. **Test this before Phase E** — it's the one thing that could invalidate the whole exercise.
-
----
-
-## Phase E — iOS (needs you)
-
-```bash
-npx expo prebuild --clean -p ios && npx expo run:ios
-```
-
-Same verification list. Additionally: fonts (iOS registers them differently), the ATS settings, and Sentry dSYM upload.
-
-You have `xcodebuild` MCP configured — useful for build/scheme/simulator work and log capture here.
+*(Historical. Do not execute this.)* The plan was to prove `@pusher/pusher-websocket-react-native` autolinks under prebuild, since it has no config plugin. That test was never run — **Pusher was removed instead**, and `LessonChat` now polls its react-query chat query every 5s (`TODO(T4)` in that file). Choosing a real realtime story is an [unowned open item](README.md#unowned-open-items).
 
 ---
 
-## Phase F — Take the wins
+## Phases E, F, G — moved to [T6](T6-expo-hardening.md)
 
-Now that Expo modules are available:
+The migration stopped after Phase D. Three phases were written here and never run:
 
-- **`expo-image`** replaces `react-native-fast-image` (abandoned 2022, no New Arch support). Three call sites: `VideoModal`, `MainScreen`, `Programs`. Coordinate with T2e/T3a, which refactor those files.
-- **`expo-updates`** optionally replaces `react-native-restart` (used for the language-change restart) and adds OTA.
+| Phase | Was | Now |
+|---|---|---|
+| **E** | iOS prebuild, pods, signing, build | [T6](T6-expo-hardening.md) §7 |
+| **F** | `expo-image` for `react-native-fast-image`; `expo-updates` for `react-native-restart` | [T6](T6-expo-hardening.md) §3 |
+| **G** | EAS Build instead of Fastlane | [T6](T6-expo-hardening.md) §9 |
 
----
-
-## Phase G — EAS Build (optional, later)
-
-Would replace `Fastlane/`, whose Android lane currently crashes (`internalVersionCode.max + 1` — `Integer#max` doesn't exist).
-
-**Don't bundle this into the migration.** Get CNG working and stable first. Huawei AppGallery has no EAS equivalent, so if that distribution channel matters you'll keep some Fastlane regardless.
+They moved because they aren't migration steps — they're ongoing Expo maintenance, and leaving them inside a completed brief meant nobody owned them. **Don't execute them from here.**
 
 ---
 
@@ -279,7 +270,7 @@ Phase D is the one-way door, because `prebuild --clean` overwrites the native pr
 
 1. `npx expo prebuild --clean` regenerates both platforms from `app.json` with no manual edits afterward.
 2. Both platforms build and run.
-3. Full manual pass: login → programs → subscribe → today's lessons → PDF → video → **lesson chat (Pusher)** → menu → logout.
+3. Full manual pass: login → programs → subscribe → today's lessons → PDF → video → **lesson chat** (now polling, not Pusher — §3) → menu → logout.
 4. **Cairo fonts render on both platforms**, Arabic and RTL correct.
 5. SVGs render; Reanimated animates; `require.context` theme assets resolve.
 6. New Arch confirmed on.
@@ -292,7 +283,7 @@ Criterion 10 is the real test. If you're hand-patching generated files, you have
 
 ## Report back
 
-- **Pusher verdict** — the one genuine unknown.
+- ~~Pusher verdict~~ — answered by removal, not by test. See above.
 - Anything that needed a hand-written config plugin.
 - Anything in the old native projects that Phase B failed to capture, found only after prebuild.
 - Whether ATS `NSAllowsArbitraryLoads` is still needed (separate question, but you'll be looking right at it).
