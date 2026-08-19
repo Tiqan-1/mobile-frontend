@@ -125,10 +125,9 @@ Real work that no brief owns. This is the only list of its kind — everything e
 
 ### Secrets — do these first
 
-- [ ] **`.env` is tracked at HEAD and contains a real Telegram bot token.** T0 moved the values to `EXPO_PUBLIC_*` and added `.env` to `.gitignore`, but **`.gitignore` does nothing to an already-tracked file** — it needs `git rm --cached .env`. The token has since been committed twice more (`5bdf216`, `2c03f8e`).
-- [ ] **Rotate the Telegram bot token** — `@BotFather` → `/revoke`. Human-only, console access required. It is in git history; rotation is the only real fix.
-- [ ] **Rotate the Huawei AppGallery client secret** — AppGallery Connect → regenerate. Human-only.
-- [ ] **Reset the Android upload keystore** — the password `12345678` is in git history. Needs a Play Console upload-key reset. Human-only, lower urgency than the two above.
+- [x] **`.env`'s Telegram bot token and Sentry DSN — confirmed by the owner (2026-08-18) as dummy/test values, not production secrets. No risk, no rotation needed.** `.env` stays tracked deliberately (`06fa36e` removed it from `.gitignore` on purpose — see `CLAUDE.md` §9). `src/App.tsx`'s inline Sentry DSN literal is the same dummy value and is intentionally left as-is.
+- [ ] **Rotate the Huawei AppGallery client secret** — AppGallery Connect → regenerate. Human-only. (Not covered by the dummy-data confirmation above — treat as still live until the owner says otherwise.)
+- [ ] **Reset the Android upload keystore** — the password `12345678` is in git history. Needs a Play Console upload-key reset. Human-only. (Also not covered by the dummy-data confirmation above.)
 
 ### Decisions nobody owns
 
@@ -139,9 +138,11 @@ Real work that no brief owns. This is the only list of its kind — everything e
 ### T0 (2026-08-17), found but not fixed — outside its `Owns`
 
 - **C3 (MMKV `encryptionKey`) could not be done.** It requires editing `src/store/index.ts` (the `new MMKV()` call), which is [T2d](T2d-data-layer.md)'s file per the table above — T0's `Owns` only carved out `src/store/subscriptionSlice.ts`. The auth token sits unencrypted until then. Recommend T2d picks it up, or the owner explicitly widens scope for one file. [T6](T6-expo-hardening.md) will exercise it as part of the `react-native-mmkv` 3 → 4 bump.
-- **`src/screens/auth/ForgotPassword/index.tsx:24`** has the same hardcoded `__DEV__ ? 'm@m.com' : ''` pattern T0 fixed in `Login`. That file and `src/screens/auth/signup/index.tsx` also have the missing-`.catch` bug T0 fixed as C8 — neither `GET`/`POST` call has error handling. Nobody's `Owns` list covers `auth/ForgotPassword` or `auth/signup`.
+- **`src/screens/auth/ForgotPassword/index.tsx:24`** has the same `__DEV__ ? 'm@m.com' : ''` pattern `Login` had (`Login`'s own "Fast Login Dev" button still has it too — reverted by the owner 2026-08-18 after a PR-review pass removed it, since it's confirmed dummy/test data with no real risk, `__DEV__`-gated). That file and `src/screens/auth/signup/index.tsx` also have the missing-`.catch` bug T0 fixed as C8 — neither `GET`/`POST` call has error handling. Nobody's `Owns` list covers `auth/ForgotPassword` or `auth/signup`.
 - **`package-old.json`** is a tracked, stale leftover (duplicate of `package.json` pre-migration). Not in T0's enumerated deletion list, not referenced anywhere live.
-- **`Fastlane/APPCONST`** has `IOS_APP_SPECIFIER`/`AND_APP_SPECIFIER = 'com.ebda3.binaa'`, disagreeing with `app.json`'s `com.binaa`. With the known `Fastlane/Appfile` iOS mismatch (`com.dl.sdccards`) that's **three different bundle IDs** across `app.json`, `Appfile`, and `APPCONST` — which is why T0's Fastfile fix can't be verified end-to-end. Blocks the EAS decision in [T6](T6-expo-hardening.md) §9.
+- **`Fastlane/APPCONST`** now matches `app.json` (`com.binaa` on both platforms) — fixed since this note was written. `Fastlane/Appfile`'s iOS block still has the stale `com.dl.sdccards` (commented out, inactive) and an empty Android `package_name`; confirmed inert — every Fastfile action passes `app_identifier:`/`package_name:` explicitly from `APPCONST`, so `Appfile`'s values are never actually consulted. Cosmetic debt, not a live bug, not in T0's `Owns` (only `Fastlane/Fastfile` is).
+- **`Fastlane/Fastfile`'s iOS `beta` lane called `yarn(command: "patch-package")`** (line 110) — guaranteed crash, since `patch-package` was removed as a dependency in T0's A3. Fixed 2026-08-18 in a PR-review pass (line removed).
+- **No Huawei AppGallery upload lane exists in `Fastlane/Fastfile`.** Earlier reports described the Huawei `client_secret` as wired to `Fastlane/.env` via `ENV.fetch("HUAWEI_CLIENT_SECRET")` — that isn't true of the current file: no lane references it, and `Fastlane/.env` doesn't exist on disk (only `.env.example`). Not a live bug (dead code can't crash), but the claim was wrong. Building a real Huawei lane is new functionality, not a hygiene fix — nobody's `Owns` list covers it.
 - **`Gemfile`'s `plugins_path`** points at lowercase `fastlane/Pluginfile`; the real directory is `Fastlane/Pluginfile` (capital F). Works only because macOS's filesystem is case-insensitive — would break on a Linux CI runner if a Fastlane lane were ever added to CI.
 - **`__mocks__/TestAppWrapper.tsx`** imports `queryClient, storage` from `@/App`, neither of which `src/App.tsx` exports (there's no `QueryClientProvider` yet). This is why `src/components/atoms/Skeleton/Skeleton.test.tsx` still fails after T0's Jest fixes. Fixing it needs either those exports from `src/App.tsx` or a rewrite of the wrapper — both outside T0's `Owns`, both natural for [T2d](T2d-data-layer.md).
 
@@ -158,6 +159,13 @@ Newest first. Add a line when something lands — this is the shared record; per
 - **2026-08-17** — T4 Expo migration: P1 + Phases A–D. Pusher removed rather than migrated. Two silent Metro failures found and fixed.
 - **2026-08-17** — WatermelonDB found entirely unused and removed, clearing the last Expo blocker.
 - **2026-08-17** — RN 0.81.4 → 0.86.2 landed by hand (0.87.0 attempted, abandoned).
+
+---
+
+## Secondary review files
+
+- `docs/reviews/secondary-reviewer.md` — remaining review items after T0 PR review (excludes `.env` secrets and `Login` dummy test data, per instruction). Cross-references briefs (T2a theme, T2d data, T6 Expo hardening) and flags deferred decisions (`LessonChat` realtime, `react-native-actionsheet`, bundle-ID misalignment).
+- `docs/reviews/T0-hygiene-pr-review.md` — T0 PR review (updated with missing A1–A8 items: theme mutation, `navigation/types`, MMKV encryption, dead `render-html` import, `Skeleton` test blocker, leftover `package-old.json`, `Gemfile` case mismatch).
 
 ---
 
