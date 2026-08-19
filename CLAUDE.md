@@ -146,10 +146,10 @@ This repo has **three different names for itself**. Getting them straight preven
 | Name | What it refers to |
 |---|---|
 | **Mobadra** | The *folder* on disk (`~/PWS/ReactNative/Mobadra`). Appears nowhere in the code. |
-| **Binaa** (بناء) | The **app**. `app.json`'s `expo.name`/`expo.slug`, `package.json` `"name": "binaa"`, `expo.ios.bundleIdentifier`/`expo.android.package` `com.binaa`. |
-| **Mubadarah** | The **backend**. `https://mubadarah.ce-svcs.cc` (prod) / `https://dev-mubadarah.ce-svcs.cc` (dev). |
+| **Binaa** (بناء) | The **app's codebase identity**: `app.json`'s `expo.slug`, `package.json` `"name": "binaa"`, `expo.ios.bundleIdentifier`/`expo.android.package` `com.binaa`. **Not** the user-visible name — see below. |
+| **Mubadarah** | The **backend**, and — as of 2026-08-19, confirmed by the owner — also the **app's user-visible display name**. `app.json`'s `expo.name` is `"مبادرة"`, shown under the home-screen icon on both platforms. `https://mubadarah.ce-svcs.cc` (prod) / `https://dev-mubadarah.ce-svcs.cc` (dev). |
 
-Git remote is `git@github.com:Tech-Support-Team/mobile-frontend.git`. Default branch `main`.
+Git remote is `git@github.com:Tech-Support-Team/mobile-frontend.git`. Git's configured default branch is `main`, but the active integration branch as of 2026-08-19 (confirmed by the owner) is `feat/expo` — target PRs there, not `main`, until told otherwise.
 
 **What the app does:** an Arabic-first structured-learning app. Students browse multi-level programs, subscribe, follow a daily lesson schedule, consume PDF and video lessons in-app, track completion offline, and chat per-lesson (currently polling, not realtime — see §3).
 
@@ -450,4 +450,4 @@ Do not set coverage thresholds the suite cannot currently meet.
 
 **Neither platform has ever had a real app icon.** Android shows the default React Native robot placeholder (`android/app/src/main/res/mipmap-*/ic_launcher.png` — well, it did, before that directory became generated; the source of truth is now `app.json`'s `icon` field, currently pointed at a generic placeholder). iOS's `AppIcon.appiconset` was completely empty. Pre-existing, unrelated to Expo. Needs a real 1024×1024 Binaa icon before shipping.
 
-**The native display name doesn't match the app's identity.** Before the T4 migration, both platforms' compiled resources showed **"مبادرة"** (Mubadarah — the *backend's* name, §1) as the home-screen label, not "بناء"/"Binaa". `app.json`'s `expo.name` is now `"Binaa"`, matching `package.json` and this doc's identity table — confirm that's actually what's wanted before shipping, since it changes what users see under the icon.
+**The native display name is "مبادرة", not "Binaa" — this is now a settled decision, not an open question.** Before the T4 migration, both platforms' compiled resources showed "مبادرة" as the home-screen label. T4 briefly changed `app.json`'s `expo.name` to `"Binaa"` as a default; **the owner confirmed 2026-08-19 that "مبادرة" is correct** and it was reverted. Don't "fix" this back to Binaa — it's deliberate.

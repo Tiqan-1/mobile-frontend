@@ -1,7 +1,7 @@
 {
   "expo": {
-"name": "مبادرة",
-  "slug": "binaa",
+    "name": "مبادرة",
+    "slug": "binaa",
     "version": "1.0.1",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -21,9 +21,7 @@
     "android": {
       "package": "com.binaa",
       "versionCode": 5,
-      "permissions": [
-        "android.permission.INTERNET"
-      ]
+      "permissions": ["android.permission.INTERNET"]
     },
     "plugins": [
       "expo-system-ui",
@@ -49,10 +47,7 @@
       ],
       "expo-localization",
       "expo-image",
-      [
-        "expo-updates",
-        null
-      ]
+      ["expo-updates", null]
     ],
     "updates": {
       "checkAutomatically": "NEVER"

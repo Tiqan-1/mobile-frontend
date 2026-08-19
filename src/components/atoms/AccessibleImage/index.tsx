@@ -36,6 +36,7 @@ const AccessibleImage: React.FC<AccessibleImageProps> = ({
       accessibilityLabel={isDecorative ? undefined : accessibilityDescription}
       accessibilityHint={isDecorative ? undefined : accessibilityHint}
       accessibilityRole="image"
+      accessibilityIgnoresInvertColors
     />
   );
 };

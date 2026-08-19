@@ -32,8 +32,8 @@ const changeLanguage = (lang: Language) => {
   translate.cache.clear();
   initializeRTL(lang === LANG_AR);
   if (restart) {
-    setTimeout(async () => {
-      await Updates.reloadAsync();
+    setTimeout(() => {
+      Updates.reloadAsync().catch(() => {});
     }, 500);
   }
 };
