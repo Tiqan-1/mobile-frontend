@@ -1,12 +1,11 @@
 {
   "expo": {
-    "name": "Binaa",
-    "slug": "binaa",
+"name": "مبادرة",
+  "slug": "binaa",
     "version": "1.0.1",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
     "ios": {
       "bundleIdentifier": "com.binaa",
       "buildNumber": "1",
@@ -22,10 +21,12 @@
     "android": {
       "package": "com.binaa",
       "versionCode": 5,
-      "permissions": ["android.permission.INTERNET"],
-      "edgeToEdgeEnabled": false
+      "permissions": [
+        "android.permission.INTERNET"
+      ]
     },
     "plugins": [
+      "expo-system-ui",
       [
         "expo-font",
         {
@@ -46,7 +47,15 @@
           "project": "binaa"
         }
       ],
-      "expo-localization"
-    ]
+      "expo-localization",
+      "expo-image",
+      [
+        "expo-updates",
+        null
+      ]
+    ],
+    "updates": {
+      "checkAutomatically": "NEVER"
+    }
   }
 }

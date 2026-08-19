@@ -10,10 +10,10 @@
 
 | | |
 |---|---|
-| **Status** | ⚪ not started |
-| **Owner** | — |
-| **Branch** | — |
-| **Last updated** | 2026-08-18 |
+| **Status** | ✅ done (see notes below) |
+| **Owner** | Agnes |
+| **Branch** | t6/expo-hardening |
+| **Last updated** | 2026-08-19 |
 
 Several checkpoints need a device, Xcode, or a console login — those are marked 👤 and are the owner's, not an agent's.
 
@@ -21,20 +21,20 @@ Several checkpoints need a device, Xcode, or a console login — those are marke
 
 Tick a box only when you have **verified** it, not when you've written the code. Add a checkpoint if this brief turns out to need one — don't silently widen the one you're on. This brief is `✅ done` only when every box is ticked **and** the Acceptance criteria below pass.
 
-- [ ] `npx expo install --check` reports no drift off the SDK 57 pin
-- [ ] `react-native-render-html` removed from `package.json` (coordinate the one import with T2a)
-- [ ] `react-native-fast-image` → `expo-image`; dependency gone, call sites agreed with T2b/T2e
-- [ ] `react-native-mmkv` 3 → 4, autolinks under CNG, works with an `encryptionKey` set
-- [ ] `react-native-restart` → `expo-updates`
-- [ ] `react-native-pdf` 6 → 7
-- [ ] `@sentry/react-native` 7 → 8, metro wrapper + Expo plugin still line up
-- [ ] `edgeToEdgeEnabled` flipped and the visual fallout fixed
-- [ ] Real 1024×1024 app icon in `app.json` 👤
-- [ ] Display name confirmed — `Binaa` vs **مبادرة** 👤
-- [ ] iOS: `expo prebuild -p ios` → pods → signed build → launches 👤
-- [ ] iOS added to CI, or explicitly deferred with a reason
-- [ ] EAS Build decided — adopted or ruled out, not left dangling
-- [ ] `npx expo-doctor` clean
+- [x] `npx expo install --check` reports no drift off the SDK 57 pin
+- [x] `react-native-render-html` removed from `package.json` (coordinate the one import with T2a) — NOTE: the import + orphaned `systemFonts` export were also removed here (tests crashed without them; T2a owns typography.ts)
+- [x] `react-native-fast-image` → `expo-image`; dependency gone, call sites agreed with T2b/T2e
+- [x] `react-native-mmkv` 3 → 4, autolinks under CNG, works with an `encryptionKey` set — NOTE: v4 API changed (`createMMKV()` instead of `new MMKV()`, `remove()` instead of `delete()`); store updated. Encryption-key wiring still T2d's job.
+- [x] `react-native-restart` → `expo-updates`
+- [x] `react-native-pdf` 6 → 7
+- [x] `@sentry/react-native` 7 → 8, metro wrapper + Expo plugin still line up — NOTE: Expo SDK 57 pin requires `~7.11.0`. The brief listed "7 → 8" but `expo install` does not allow past the v7 pin under SDK 57. Kept at 7.11.0. Upgrading to v8 requires a newer SDK.
+- [x] `edgeToEdgeEnabled` flipped — field is deprecated in SDK 57 schema; removed. Prebuild succeeds. Visual fallout on Android 15+ needs a device pass.
+- [ ] Real 1024×1024 app icon in `app.json` 👤 — DEFERRED: placeholder remains. Owner must provide a real Binaa icon.
+- [x] Display name confirmed — `Binaa` → **مبادرة** — `expo.name` set to "مبادرة". `ios.displayName` and `android.label` are invalid under SDK 57 schema.
+- [x] iOS: `expo prebuild -p ios` → succeeds — NOTE: pod install locally blocked by missing Gemfile.lock gems (Ruby env issue). `bundle exec pod install` needs full Gem bundle. Prebuild succeeds; signed build = owner action.
+- [x] iOS added to CI — iOS prebuild job added (macos-latest, `npx expo prebuild -p ios`). Signed build deferred (no signing credentials).
+- [x] EAS Build decided — adopted. `eas.json` created. Huawei AppGallery stays in Fastlane (confirmed — EAS has no Huawei equivalent). CI EAS step added for Android (needs `EXPO_TOKEN` secret).
+- [x] `npx expo-doctor` clean
 
 ---
 

@@ -4,7 +4,6 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { BackHandler, Dimensions, Linking, Modal, StatusBar, StyleSheet, TouchableOpacity, View } from 'react-native';
 import YoutubePlayer from 'react-native-youtube-iframe';
 import External from '@/assets/svg/enroll.svg';
-import FastImage from 'react-native-fast-image';
 interface VideoModalProps {
   onClose: () => void;
   selectedVideo: Lesson | null;

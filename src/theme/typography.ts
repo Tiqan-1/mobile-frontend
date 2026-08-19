@@ -1,6 +1,5 @@
 import { isRTL } from '@/utils/constants';
 import { StyleSheet } from 'react-native';
-import { defaultSystemFonts } from 'react-native-render-html';
 import { PALETTE } from './colors';
 
 export const getFonts = () =>
@@ -85,7 +84,6 @@ const St = StyleSheet.create({
   },
 });
 export const bold = {...fonts.bold};
-export const systemFonts = [...defaultSystemFonts, 'Cairo-Regular', 'Cairo-Black', 'Cairo-SemiBold', 'Cairo-Bold', 'Cairo-Heavy'];
 
 export const tagsStylesHTML = {
   p: {

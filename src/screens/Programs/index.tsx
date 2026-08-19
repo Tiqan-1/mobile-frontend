@@ -15,7 +15,7 @@ import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FlatList, ScrollView, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
-import FastImage from 'react-native-fast-image';
+import { Image } from 'expo-image';
 
 const ProgramCard = ({ program }: { program: Program }) => {
   const { colors } = useTheme();
@@ -38,10 +38,9 @@ const ProgramCard = ({ program }: { program: Program }) => {
       </View>
 
       <View style={styles.cardContent}>
-        <FastImage
-          resizeMode="contain"
+        <Image
+          contentFit="contain"
           source={program.thumbnail ? { uri: `data:image/png;base64,${program.thumbnail}` } : require('@/assets/images/noImage.png')}
-          defaultSource={require('@/assets/images/noImage.png')}
           style={styles.programImage}
         />
         <View style={styles.programInfo}>
@@ -395,13 +394,13 @@ function Programs({ navigation }: RootScreenProps<Paths.Programs>) {
               <View style={styles.emptyContainer}>
                 {apiState.error ? (
                   <>
-                    <FastImage source={require('@/assets/images/warning.png')} style={styles.emptyStateImage} resizeMode="contain" />
+                    <Image source={require('@/assets/images/warning.png')} style={styles.emptyStateImage} contentFit="contain" />
                     <Text style={[styles.emptyStateTitle, { color: colors.ERROR }]}>يوجد مشكله فى الوصول الى المعلومات</Text>
                     <Text style={[styles.emptyStateText, { color: colors.BLACK }]}>حاول مرة اخرى لاحقا</Text>
                   </>
                 ) : (
                   <>
-                    <FastImage source={require('@/assets/images/noImage.png')} style={styles.emptyStateImage} resizeMode="contain" />
+                    <Image source={require('@/assets/images/noImage.png')} style={styles.emptyStateImage} contentFit="contain" />
                     <Text isBold style={[styles.emptyStateTitle, { color: colors.BLACK }]}>لا يوجد برامج متاحة</Text>
                     <Text style={[styles.emptyStateText, { color: colors.BLACK }]}>حاول البحث بمعايير أخرى</Text>
                   </>
