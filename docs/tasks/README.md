@@ -61,8 +61,8 @@ Three briefs were **deleted** rather than carried forward, because the work they
                      │        │   deletions end in T2a/T2b/T2e files
                      ▼        ▼
         ┌────────────────────────┐    ┌────────────────────────┐
-        │ T1d  react-nav v6→v7   │    │ T2a  token layer +     │   (parallel)
-        │                        │    │      single theme      │
+        │ T1d  react-nav v6→v7   │    │ ✅ T2a  token layer +  │   (parallel)
+        │                        │    │       single theme     │
         └────────────────────────┘    └───────────┬────────────┘
                                      ┌────────────┴────────────────┐
                                      ▼                             ▼
@@ -103,7 +103,7 @@ The Status column here is a **convenience snapshot and goes stale**. Each brief'
 |---|---|---|---|---|---|
 | T0 | [Repo hygiene, CI, high-severity fixes](T0-hygiene.md) | ✅ done (caveats below) | tooling configs, `Fastlane/Fastfile`, 6 source files, deletions | — | **none** |
 | T1d | [react-navigation v6 → v7](T1d-navigation.md) 👤 | ⚪ | `src/navigation/**` | T0 | T2a, T6 |
-| T2a | [Token layer + single theme](T2a-theme.md) | ⚪ | `src/theme/**` | T0 | T1d, T6 |
+| T2a | [Token layer + single theme](T2a-theme.md) | ✅ done (caveats below) | `src/theme/**` | T0 | T1d, T6 |
 | T2b | [Normalize atoms & molecules](T2b-components.md) | ⚪ | `src/components/atoms/**`, `molecules/**` | T2a | T2c, T2d |
 | T2c | [Storybook](T2c-storybook.md) | ⚪ | `.rnstorybook/**`, `*.stories.tsx` | T2b | T2d |
 | T2d | [Data layer](T2d-data-layer.md) | ⚪ | `src/services/**`, `src/store/**`, `src/App.tsx` | T2a | T2b, T2c |
@@ -148,12 +148,18 @@ Real work that no brief owns. This is the only list of its kind — everything e
 - **`Gemfile`'s `plugins_path`** points at lowercase `fastlane/Pluginfile`; the real directory is `Fastlane/Pluginfile` (capital F). Works only because macOS's filesystem is case-insensitive — would break on a Linux CI runner if a Fastlane lane were ever added to CI.
 - **`__mocks__/TestAppWrapper.tsx`** imports `queryClient, storage` from `@/App`, neither of which `src/App.tsx` exports (there's no `QueryClientProvider` yet). This is why `src/components/atoms/Skeleton/Skeleton.test.tsx` still fails after T0's Jest fixes. Fixing it needs either those exports from `src/App.tsx` or a rewrite of the wrapper — both outside T0's `Owns`, both natural for [T2d](T2d-data-layer.md).
 
+### T2a (2026-08-19), found but not fixed — outside its `Owns`
+
+- **`getTagsStylesHTML` / `getTagsStylesHTMLBrand` / `getTagsStylesHTMLWhite`** (`src/theme/tokens/typography.ts`) are now fully orphaned. T2a's brief said to keep them "for react-native-render-html"; T6 (which landed first) removed that package entirely, and nothing in `src/` renders HTML any more. No consumer outside the theme's own barrel/legacy re-export. Candidate for deletion whenever someone next touches that file — see [T2a's own review notes](T2a-theme.md#review-findings-2026-08-19-independent-verification).
+- **`eslint.config.mjs`'s flat-config `ignores` doesn't exclude `vendor/`**, even though `.gitignore` does (ESLint 9 flat config doesn't read `.gitignore` automatically). Harmless on CI (never runs `bundle install`), but any local machine that has run `bundle install` for Fastlane (per [`CLAUDE.md` §2](../../CLAUDE.md)) will see `yarn lint:rules` explode from ~26 problems to ~1,700, since it starts linting `vendor/bundle/ruby/**/*.js`. Found while re-verifying T2a's lint numbers; not theme-scoped, so not fixed there.
+
 ---
 
 ## History
 
 Newest first. Add a line when something lands — this is the shared record; per-brief detail belongs in that brief's Status block.
 
+- **2026-08-19** — [T2a](T2a-theme.md) executed (Agnes/opencode) and independently re-verified (Claude) against the actual files rather than its own claims — `yarn lint:rules`, `tsc --noEmit`, `yarn test` numbers all matched, `OldThem` gone, mutable `var PALETTE` gone (only a frozen deprecated alias remains). Two checkpoints were reworded because they overstated reality (theme-toggle re-render scope; `ThemeContext` still forwards `keyboardHeight` intentionally for `KeyBoardSpace`) — see the brief's own review-findings section for detail, plus two new unowned items it surfaced (below) and a `tsconfig.json` edit that fell outside its `Owns` list but was verified harmless.
 - **2026-08-19** — [T6](T6-expo-hardening.md) executed and pushed (`t6/expo-hardening`, `221b330`). Display name settled: owner confirmed `مبادرة`, not `Binaa` — `CLAUDE.md` §1/§9 corrected. CI reworked to stop burning Actions minutes: trigger scoped to `feat/expo` (the active integration branch, not `main`), expensive jobs (native builds, EAS) gated to `push` only. A same-day review pass found two of the brief's checkpoints were ticked without being true (`react-native-mmkv` 4 missing its native peer dep, `jest.config.js` not updated for `expo-updates`) — both broke real things (launch crash, both test suites) and were fixed; see the brief's own note.
 - **2026-08-18** — Docs pass: the bare-RN era removed. `T1a`/`T1b`/`T1c` and `expo-migration-assessment.md` deleted (~640 lines); **[T6 Expo hardening](T6-expo-hardening.md)** created to own the residue — dependency audit, `expo-image`, mmkv/pdf/sentry majors, edge-to-edge, app icon, display name, iOS, EAS. `CLAUDE.md` §2/§8/§9 corrected to the post-T0 reality. Found: `react-native-render-html` is dead weight, not an upgrade risk.
 - **2026-08-17** — [T0](T0-hygiene.md) executed and committed (`5bdf216`, `2c03f8e`). Lint runs for the first time; Jest harness wired; CI green locally through a real `assembleDebug`. C3 blocked, three rotations outstanding.

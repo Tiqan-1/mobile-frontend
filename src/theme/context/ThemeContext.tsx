@@ -1,18 +1,27 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
-import { Keyboard, useColorScheme } from 'react-native';
+import React, { createContext, useContext, useMemo, useState } from 'react';
 import type { MMKV } from 'react-native-mmkv';
-import { PALETTEDARK, PALETTELIGHT, usePALETTE } from '../colors';
+import { PALETTEDARK, PALETTELIGHT } from '@/theme/tokens/colors';
+import { spacing } from '@/theme/tokens/spacing';
+import { radii } from '@/theme/tokens/radii';
+import { getShadows } from '@/theme/tokens/shadows';
+import { getTypographyStyles } from '@/theme/tokens/typography';
 import { enableDark } from '@/utils/constants';
+import { isRTL } from '@/utils/constants';
+import { useKeyboard } from '@/theme/useKeyboard';
 
-type ThemeColors = typeof PALETTEDARK | typeof PALETTELIGHT;
+type Palette = typeof PALETTEDARK | typeof PALETTELIGHT;
 
-type ThemeContextType = {
-  colors: ThemeColors;
+export type ThemeContextType = {
+  colors: Palette;
+  spacing: typeof spacing;
+  radii: typeof radii;
+  shadows: ReturnType<typeof getShadows>;
+  typography: ReturnType<typeof getTypographyStyles>;
   isDark: boolean;
-  isKeyboardVisible: boolean;
-  keyboardHeight: number;
-  PALETTE: ThemeColors;
+  isRTL: boolean;
+  PALETTE: Palette;
   toggleTheme: () => void;
+  keyboardHeight: number;
 };
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
@@ -21,62 +30,49 @@ export const ThemeProvider: React.FC<{
   children: React.ReactNode;
   storage: MMKV;
 }> = ({ children, storage }) => {
-  const systemColorScheme = useColorScheme();
-  const { PALETTE, toLight, toDark } = usePALETTE();
-  const [isKeyboardVisible, setKeyboardVisible] = useState<boolean>(false);
-  const [keyboardHeight, setKeyboardHeight] = useState<number>(0);
+  const { keyboardHeight } = useKeyboard();
 
-  const [isDark, setIsDark] = useState(() => {
+  const [isDark, setIsDark] = useState<boolean>(() => {
     const savedTheme = storage.getString('theme');
     if (savedTheme) {
       return savedTheme === 'dark';
     }
-    return systemColorScheme === 'dark';
+    return false;
   });
 
-  useEffect(() => {
-    storage.set('theme', isDark ? 'dark' : 'light');
-  }, [isDark, storage]);
+  // Fallback: if no saved theme and system preference is unavailable, default to light
+  const resolvedIsDark = isDark ?? false;
+
+  React.useEffect(() => {
+    storage.set('theme', resolvedIsDark ? 'dark' : 'light');
+  }, [resolvedIsDark, storage]);
 
   const toggleTheme = () => {
     setIsDark(prev => !prev);
-    if (isDark) {
-      toLight();
-    } else {
-      toDark();
-    }
   };
 
-  useEffect(() => {
-    const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', frames => {
-      setKeyboardVisible(true); // or some other action
-      setKeyboardHeight(frames.endCoordinates.height);
-    });
-    const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => {
-      setKeyboardVisible(false); // or some other action
-      setKeyboardHeight(0);
-    });
+  const colors: Palette = enableDark && resolvedIsDark ? PALETTEDARK : PALETTELIGHT;
 
-    return () => {
-      keyboardDidHideListener.remove();
-      keyboardDidShowListener.remove();
-    };
-  }, []);
-
-  const colors = enableDark && isDark ? PALETTEDARK : PALETTELIGHT;
+  // Memoize the entire theme value so consumers get a stable reference across
+  // renders where nothing relevant has changed.
+  const themeValue = useMemo<ThemeContextType>(
+    () => ({
+      colors,
+      spacing,
+      radii,
+      shadows: getShadows(colors),
+      typography: getTypographyStyles(colors),
+      isDark: resolvedIsDark,
+      isRTL,
+      PALETTE: colors,
+      toggleTheme,
+      keyboardHeight,
+    }),
+    [colors, resolvedIsDark, keyboardHeight],
+  );
 
   return (
-    <ThemeContext.Provider
-      value={{
-        colors,
-        isDark,
-        toggleTheme,
-        PALETTE,
-        isKeyboardVisible,
-        keyboardHeight,
-      }}>
-      {children}
-    </ThemeContext.Provider>
+    <ThemeContext.Provider value={themeValue}>{children}</ThemeContext.Provider>
   );
 };
 

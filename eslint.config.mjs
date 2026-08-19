@@ -46,6 +46,17 @@ export default [
       // once those briefs land.
       'no-console': 0,
       'no-const-assign': 2,
+      'no-restricted-imports': [
+        'error',
+        {
+          paths: [
+            {
+              name: '@/theme/colors',
+              message: 'Use `useTheme().colors` instead. Direct PALETTE imports are deprecated.',
+            },
+          ],
+        },
+      ],
       'no-constant-binary-expression': 2,
       'no-extra-parens': [2, 'functions'],
       'no-irregular-whitespace': 2,
