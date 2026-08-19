@@ -146,10 +146,10 @@ This repo has **three different names for itself**. Getting them straight preven
 | Name | What it refers to |
 |---|---|
 | **Mobadra** | The *folder* on disk (`~/PWS/ReactNative/Mobadra`). Appears nowhere in the code. |
-| **Binaa** (بناء) | The **app**. `app.json`'s `expo.name`/`expo.slug`, `package.json` `"name": "binaa"`, `expo.ios.bundleIdentifier`/`expo.android.package` `com.binaa`. |
-| **Mubadarah** | The **backend**. `https://mubadarah.ce-svcs.cc` (prod) / `https://dev-mubadarah.ce-svcs.cc` (dev). |
+| **Binaa** (بناء) | The **app's codebase identity**: `app.json`'s `expo.slug`, `package.json` `"name": "binaa"`, `expo.ios.bundleIdentifier`/`expo.android.package` `com.binaa`. **Not** the user-visible name — see below. |
+| **Mubadarah** | The **backend**, and — as of 2026-08-19, confirmed by the owner — also the **app's user-visible display name**. `app.json`'s `expo.name` is `"مبادرة"`, shown under the home-screen icon on both platforms. `https://mubadarah.ce-svcs.cc` (prod) / `https://dev-mubadarah.ce-svcs.cc` (dev). |
 
-Git remote is `git@github.com:Tech-Support-Team/mobile-frontend.git`. Default branch `main`.
+Git remote is `git@github.com:Tech-Support-Team/mobile-frontend.git`. Git's configured default branch is `main`, but the active integration branch as of 2026-08-19 (confirmed by the owner) is `feat/expo` — target PRs there, not `main`, until told otherwise.
 
 **What the app does:** an Arabic-first structured-learning app. Students browse multi-level programs, subscribe, follow a daily lesson schedule, consume PDF and video lessons in-app, track completion offline, and chat per-lesson (currently polling, not realtime — see §3).
 
@@ -198,7 +198,7 @@ Ruby deps are pinned in `Gemfile` (CocoaPods `>= 1.13`, with specific bad versio
 > - **`yarn lint:rules` runs and exits 0** (0 errors, 15 warnings). Before T0 it hard-crashed with `sourceCode.getRange is not a function` — ESLint 8 against a config needing ESLint 9. Lint *existing at all* is new.
 > - **`tsc` reports 147 errors** (was 170 before T0). Do not assume a green baseline and **do not chase zero**: the bulk belong to T2b/T2d/T2e/T2f and get fixed when those briefs run. The single worst file is `src/components/atoms/FlashMessage/index.tsx` at 23. The number is a ratchet, not a gate.
 > - **`yarn test`: 1 of 2 suites passes** (1 of 4 tests). `__tests__/App.test.tsx` renders the real `src/App.tsx` (Redux, PersistGate, ThemeProvider, navigator, Sentry) instead of the deleted root template. The failure is `src/components/atoms/Skeleton/Skeleton.test.tsx`, blocked on a pre-existing `__mocks__/TestAppWrapper.tsx` bug — see §8.
-> - **CI exists** (`.github/workflows/ci.yml`): install → lint → type-check + format (non-blocking) → test → `expo prebuild -p android` → `assembleDebug`. iOS is deliberately not in CI yet ([T6](docs/tasks/T6-expo-hardening.md)).
+> - **CI exists** (`.github/workflows/ci.yml`): install → lint → type-check + format (non-blocking) → test → `expo prebuild -p android` → `assembleDebug`. **As of [T6](docs/tasks/T6-expo-hardening.md), 2026-08-19**: an iOS prebuild-only job runs on `macOS-latest` (no signing yet), and an EAS build job exists for Android. The trigger is scoped to `feat/expo` (not every branch): the cheap `checks` job runs on PRs into it, the three expensive jobs (Android build, iOS prebuild, EAS build) only run on `push` — i.e. after merge — to keep Actions minutes and EAS credits from being spent on WIP branches.
 
 ---
 
@@ -436,11 +436,11 @@ Do not set coverage thresholds the suite cannot currently meet.
 
 **New Architecture is ON** (`newArchEnabled: true` in `app.json`). Any native module you add must support it.
 
-**Abandoned dependencies** — `react-native-fast-image`, `react-native-actionsheet` and `react-native-render-html` were all last published in 2022 and have no New Arch commitment. Don't build new features on them. Their status differs:
+**Abandoned dependencies** — `react-native-fast-image`, `react-native-actionsheet` and `react-native-render-html` were all last published in 2022 and have no New Arch commitment. **As of [T6](docs/tasks/T6-expo-hardening.md), 2026-08-19, two of three are gone:**
 
-- **`react-native-render-html` is dead weight, not a risk to manage.** It is imported once, in `src/theme/typography.ts`, for `defaultSystemFonts` — which feeds a `systemFonts` export nothing consumes. Nothing in `src/` renders HTML. [T6](docs/tasks/T6-expo-hardening.md) deletes the dependency; T2a deletes the import.
-- **`react-native-fast-image` → `expo-image`** is a near drop-in (`resizeMode` becomes `contentFit`). Three call sites. Also [T6](docs/tasks/T6-expo-hardening.md).
-- **`react-native-actionsheet` is live** in `Login` and **no brief owns replacing it** — it's an [unowned open item](docs/tasks/README.md#unowned-open-items).
+- **`react-native-render-html` is removed.** It was dead weight, not a risk to manage — imported once, in `src/theme/typography.ts`, for `defaultSystemFonts`, which fed a `systemFonts` export nothing consumed. Nothing in `src/` renders HTML.
+- **`react-native-fast-image` is removed, replaced by `expo-image`.** `resizeMode` became `contentFit`. Three call sites (`MainScreen`, `Programs`, `AccessibleImage`).
+- **`react-native-actionsheet` is still live** in `Login` and **no brief owns replacing it** — it's an [unowned open item](docs/tasks/README.md#unowned-open-items).
 
 **Navigation params are effectively untyped.** `src/navigation/types.ts` references `Lesson`/`Program`/`Subscription` without importing them, so they silently resolve to globals. Prefer passing IDs over whole domain objects.
 
@@ -450,4 +450,4 @@ Do not set coverage thresholds the suite cannot currently meet.
 
 **Neither platform has ever had a real app icon.** Android shows the default React Native robot placeholder (`android/app/src/main/res/mipmap-*/ic_launcher.png` — well, it did, before that directory became generated; the source of truth is now `app.json`'s `icon` field, currently pointed at a generic placeholder). iOS's `AppIcon.appiconset` was completely empty. Pre-existing, unrelated to Expo. Needs a real 1024×1024 Binaa icon before shipping.
 
-**The native display name doesn't match the app's identity.** Before the T4 migration, both platforms' compiled resources showed **"مبادرة"** (Mubadarah — the *backend's* name, §1) as the home-screen label, not "بناء"/"Binaa". `app.json`'s `expo.name` is now `"Binaa"`, matching `package.json` and this doc's identity table — confirm that's actually what's wanted before shipping, since it changes what users see under the icon.
+**The native display name is "مبادرة", not "Binaa" — this is now a settled decision, not an open question.** Before the T4 migration, both platforms' compiled resources showed "مبادرة" as the home-screen label. T4 briefly changed `app.json`'s `expo.name` to `"Binaa"` as a default; **the owner confirmed 2026-08-19 that "مبادرة" is correct** and it was reverted. Don't "fix" this back to Binaa — it's deliberate.

@@ -1,6 +1,14 @@
 name: CI
 
-on: [push, pull_request]
+# Cheap checks (lint/type-check/test) run on every PR into feat/expo, so
+# problems surface before merge. The expensive jobs — native builds and the
+# EAS cloud build — only run on push, i.e. once a PR actually merges, so a
+# WIP branch or an open PR never burns runner minutes or EAS build credits.
+on:
+  push:
+    branches: [feat/expo]
+  pull_request:
+    branches: [feat/expo]
 
 jobs:
   checks:
@@ -51,6 +59,8 @@ jobs:
   android-build:
     name: Android debug build
     needs: checks
+    # Post-merge only — see the trigger comment above.
+    if: github.event_name == 'push'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -91,3 +101,53 @@ jobs:
   # iOS is intentionally left out of CI for now — it needs a macOS runner
   # and signing setup that hasn't been decided yet. Follow-up, not scoped
   # to T0 (docs/tasks/T0-hygiene.md Part E).
+  # Re-enabled as prebuild-only job: pod install / xcodebuild would need
+  # signing credentials which are not yet configured. See T6 brief.
+  ios-prebuild:
+    name: iOS prebuild
+    needs: checks
+    # Post-merge only — macOS runners bill at a much higher rate than
+    # Linux ones, so this is the job most worth keeping off every PR.
+    if: github.event_name == 'push'
+    runs-on: macOS-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'yarn'
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Prebuild iOS project
+        run: npx expo prebuild -p ios --no-install
+
+  eas-build:
+    name: EAS build (Android & iOS)
+    needs: checks
+    # Post-merge only — branch filter is on the workflow trigger above.
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'yarn'
+          registry-url: 'https://registry.npmjs.org'
+      - name: Install EAS CLI
+        run: npm install -g eas-cli
+      - name: EAS build (Android)
+        # `secrets` isn't allowed in a job-level `if:`, so the missing-token
+        # case is handled here instead: skip quietly rather than fail red.
+        run: |
+          if [ -z "$EXPO_TOKEN" ]; then
+            echo "EXPO_TOKEN not set — skipping EAS build."
+            exit 0
+          fi
+          eas build --platform android --non-interactive --no-wait
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}

@@ -1,8 +1,8 @@
 import React from 'react';
-import { ImageProps, StyleSheet } from 'react-native';
-import FastImage from 'react-native-fast-image';
+import { type StyleProp, type ImageStyle } from 'react-native';
+import { Image, type ImageProps as ExpoImageProps } from 'expo-image';
 
-interface AccessibleImageProps extends ImageProps {
+interface AccessibleImageProps extends Omit<ExpoImageProps, 'tintColor'> {
   /**
    * Description of the image for screen readers
    */
@@ -15,6 +15,7 @@ interface AccessibleImageProps extends ImageProps {
    * Whether the image is decorative (not important for understanding the content)
    */
   isDecorative?: boolean;
+  style?: StyleProp<ImageStyle>;
 }
 
 /**
@@ -28,22 +29,16 @@ const AccessibleImage: React.FC<AccessibleImageProps> = ({
   ...rest
 }) => {
   return (
-    <FastImage
+    <Image
       {...rest}
       style={style}
       accessible={!isDecorative}
       accessibilityLabel={isDecorative ? undefined : accessibilityDescription}
       accessibilityHint={isDecorative ? undefined : accessibilityHint}
       accessibilityRole="image"
-      accessibilityIgnoresInvertColors={true}
+      accessibilityIgnoresInvertColors
     />
   );
 };
-
-const styles = StyleSheet.create({
-  image: {
-    resizeMode: 'contain',
-  },
-});
 
 export default AccessibleImage;

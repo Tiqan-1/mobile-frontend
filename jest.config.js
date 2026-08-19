@@ -11,6 +11,11 @@ module.exports = {
     // this — see __mocks__/nativeStub.js.
     '^react-native-pdf$': '<rootDir>/__mocks__/nativeStub.js',
     '^react-native-youtube-iframe$': '<rootDir>/__mocks__/nativeStub.js',
+    '^expo-image$': '<rootDir>/__mocks__/expo-image.ts',
+    // react-native-mmkv v4 is built on the native react-native-nitro-modules
+    // Turbo Module, which doesn't exist under Jest — see the mock file.
+    '^react-native-mmkv$': '<rootDir>/__mocks__/react-native-mmkv.ts',
+    '^expo-updates$': '<rootDir>/__mocks__/expo-updates.ts',
   },
   setupFiles: [
     '<rootDir>/__mocks__/getAssetsContext.ts',
@@ -26,6 +31,6 @@ module.exports = {
   // too, e.g. @reduxjs/toolkit -> immer's ESM build, which crashed the
   // suite outright before this (see docs/tasks/T0-hygiene.md).
   transformIgnorePatterns: [
-    'node_modules/(?!((jest-)?react-native|@react-native(-community)?|expo(nent)?|@expo(nent)?/.*|expo-modules-core|@expo-google-fonts/.*|react-navigation|@react-navigation/.*|react-native-.*|@reduxjs/toolkit|immer|@sentry/react-native|@tanstack/react-query|redux-persist|react-redux)/)',
+    'node_modules/(?!((jest-)?react-native|@react-native(-community)?|expo(nent)?|@expo(nent)?/.*|expo-modules-core|@expo-google-fonts/.*|react-navigation|@react-navigation/.*|react-native-.*|@reduxjs/toolkit|immer|@sentry/react-native|@tanstack/react-query|redux-persist|react-redux|expo-image|expo-updates)/)',
   ],
 };

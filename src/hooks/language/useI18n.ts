@@ -3,7 +3,7 @@ import type { Language } from './schema';
 import i18next from 'i18next';
 import memoize from 'lodash.memoize';
 import { I18nManager } from 'react-native';
-import RNRestart from 'react-native-restart';
+import * as Updates from 'expo-updates';
 import { storage } from '@/store';
 import { SupportedLanguages } from './schema';
 import { resources } from '@/translations';
@@ -33,7 +33,7 @@ const changeLanguage = (lang: Language) => {
   initializeRTL(lang === LANG_AR);
   if (restart) {
     setTimeout(() => {
-      RNRestart.Restart();
+      Updates.reloadAsync().catch(() => {});
     }, 500);
   }
 };
