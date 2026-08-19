@@ -32,6 +32,8 @@ Running more than one tool at once? Read [T5](T5-parallel-workflow.md) first —
 
 **[T0](T0-hygiene.md) — hygiene, CI, high-severity fixes — landed and is committed** (`5bdf216`, `2c03f8e`). `yarn lint` runs for the first time, the Jest harness is wired, CI builds a debug APK through `expo prebuild`, and 7 of the 8 high-severity bugs are fixed. Its residue is in the unowned list below.
 
+**[T6](T6-expo-hardening.md) — Expo hardening — landed and pushed to `t6/expo-hardening`** (`221b330`). Dependency majors done (`react-native-mmkv` 4, `react-native-pdf` 7, `@sentry/react-native` pinned at `7.11.0` — the SDK 57 ceiling, not the `8.x` the brief hoped for), `react-native-fast-image`/`react-native-render-html` gone, `expo-image`/`expo-updates` in, iOS added to CI as a prebuild-only job, EAS Build adopted. A review pass the same day found the brief's own checklist had ticked two things that weren't true — `react-native-mmkv` 4 was missing its `react-native-nitro-modules` peer dep (crashed at launch) and `jest.config.js` wasn't updated for the new `expo-updates` import (broke both test suites) — both fixed; see the brief's own "Found and fixed in a review pass" note. Still open: the real app icon and a signed iOS build, both 👤 owner-only.
+
 Three briefs were **deleted** rather than carried forward, because the work they described stopped existing:
 
 | Deleted | Why |
@@ -48,9 +50,9 @@ Three briefs were **deleted** rather than carried forward, because the work they
 
 ```
       ┌──────────────────────────────┐        ┌──────────────────────────────┐
-      │ ✅ T0  hygiene + CI +        │        │ ⚪ T6  Expo hardening        │
+      │ ✅ T0  hygiene + CI +        │        │ ✅ T6  Expo hardening        │
       │       high-severity fixes    │        │       deps, iOS, identity    │
-      │       (landed, committed)    │        │       (config only)          │
+      │       (landed, committed)    │        │       (landed, caveats below)│
       └──────────────┬───────────────┘        └──────────────┬───────────────┘
                      │                                       │
                      │        ┌──────────────────────────────┘
@@ -112,7 +114,7 @@ The Status column here is a **convenience snapshot and goes stale**. Each brief'
 | T3c | [Parent screens](T3c-parent-screens.md) | ⚪ | `src/features/family/screens/**` | T3b | T3d |
 | T3d | [Learner side + progress sync](T3d-learner-sync.md) | ⚪ | `src/features/family/sync/**`, `screens/TodayLessons/**` | T3b, T3a | T3c |
 | T4 | [Migrate to Expo (SDK 57 / CNG)](T4-expo-migration.md) 👤 | ✅ done — remainder is T6 | `app.json`, `metro.config.js`, `package.json` | — | n/a |
-| T6 | [Expo hardening](T6-expo-hardening.md) 👤 | ⚪ | `app.json`, `package.json`, `eas.json`, CI, app icon | T0 | T1d, T2a |
+| T6 | [Expo hardening](T6-expo-hardening.md) 👤 | ✅ done (caveats below) | `app.json`, `package.json`, `eas.json`, CI, app icon | T0 | T1d, T2a |
 | T5 | [Parallel workflow across Claude Code / opencode / Trae](T5-parallel-workflow.md) | ✅ | *reference doc — no deliverable* | — | n/a |
 
 👤 = Mahmoud is running these personally. ⚪ not started · 🔵 in progress · ✅ done · 🟣 superseded
@@ -152,6 +154,7 @@ Real work that no brief owns. This is the only list of its kind — everything e
 
 Newest first. Add a line when something lands — this is the shared record; per-brief detail belongs in that brief's Status block.
 
+- **2026-08-19** — [T6](T6-expo-hardening.md) executed and pushed (`t6/expo-hardening`, `221b330`). Display name settled: owner confirmed `مبادرة`, not `Binaa` — `CLAUDE.md` §1/§9 corrected. CI reworked to stop burning Actions minutes: trigger scoped to `feat/expo` (the active integration branch, not `main`), expensive jobs (native builds, EAS) gated to `push` only. A same-day review pass found two of the brief's checkpoints were ticked without being true (`react-native-mmkv` 4 missing its native peer dep, `jest.config.js` not updated for `expo-updates`) — both broke real things (launch crash, both test suites) and were fixed; see the brief's own note.
 - **2026-08-18** — Docs pass: the bare-RN era removed. `T1a`/`T1b`/`T1c` and `expo-migration-assessment.md` deleted (~640 lines); **[T6 Expo hardening](T6-expo-hardening.md)** created to own the residue — dependency audit, `expo-image`, mmkv/pdf/sentry majors, edge-to-edge, app icon, display name, iOS, EAS. `CLAUDE.md` §2/§8/§9 corrected to the post-T0 reality. Found: `react-native-render-html` is dead weight, not an upgrade risk.
 - **2026-08-17** — [T0](T0-hygiene.md) executed and committed (`5bdf216`, `2c03f8e`). Lint runs for the first time; Jest harness wired; CI green locally through a real `assembleDebug`. C3 blocked, three rotations outstanding.
 - **2026-08-17** — Docs pass: `CLAUDE.md` §0 working agreement added (including the Karpathy guidelines as §0.8); per-brief **Status & checkpoints** blocks added to every brief.
