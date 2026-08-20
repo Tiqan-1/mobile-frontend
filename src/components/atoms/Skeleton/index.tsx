@@ -1,5 +1,6 @@
 import type { DimensionValue, ViewProps } from 'react-native';
-
+import { forwardRef, memo } from 'react';
+import type { Ref } from 'react';
 import { useEffect } from 'react';
 import { View } from 'react-native';
 import Animated, {
@@ -10,8 +11,11 @@ import Animated, {
 } from 'react-native-reanimated';
 
 import { useTheme } from '@/theme';
+import type { Theme } from '@/theme';
 
-type Props = {
+import { getStyles } from './style';
+
+export type SkeletonProps = {
   height?: DimensionValue;
   loading?: boolean;
   width?: DimensionValue;
@@ -20,14 +24,10 @@ type Props = {
 const FROM = 0.2;
 const TO = 1;
 
-function SkeletonLoader({
-  children,
-  height = 24,
-  loading = false,
-  width = '100%',
-  ...props
-}: Props) {
-  const { backgrounds, borders } = useTheme();
+const SkeletonLoader = forwardRef<View, SkeletonProps>((props, ref: Ref<View>) => {
+  const { children, height = 24, loading = false, width = '100%', ...rest } = props;
+  const { colors, radii } = useTheme();
+  const styles = getStyles({ colors, radii } as Theme);
 
   const opacity = useSharedValue(FROM);
 
@@ -44,20 +44,16 @@ function SkeletonLoader({
 
   return (
     <View
-      {...props}
-      style={[{ minHeight: height, minWidth: width }, props.style]}
+      ref={ref}
+      {...rest}
+      style={[styles.container, rest.style]}
     >
       {loading ? (
         <Animated.View
           style={[
             animatedStyles,
-            backgrounds.skeleton,
-            borders.rounded_4,
-            {
-              height,
-              width,
-            },
-            props.style,
+            styles.skeleton,
+            { height, width },
           ]}
           testID="skeleton-loader"
         />
@@ -66,6 +62,7 @@ function SkeletonLoader({
       )}
     </View>
   );
-}
+});
+SkeletonLoader.displayName = 'Skeleton';
 
-export default SkeletonLoader;
+export default memo(SkeletonLoader);

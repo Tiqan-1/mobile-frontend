@@ -1,20 +1,21 @@
 import Clear from '@/assets/svg/input-clear.svg';
 import Text, { ExSmallText } from '@/components/atoms/Text';
-import { PALETTE } from '@/theme/colors';
-import { SHADOWINPUT } from '@/theme/styles';
-import typography from '@/theme/typography';
+import { useTheme } from '@/theme';
 import { DEVICE_WIDTH, isRTL } from '@/utils/constants';
 import { sizeY } from '@/utils/helpers';
 import _debounce from 'lodash/debounce';
-import React, { forwardRef, useState } from 'react';
+import React, { forwardRef, memo, useMemo, useState } from 'react';
 import type { TextInputProps, TextStyle, ViewStyle } from 'react-native';
-import { Platform, Pressable, StyleSheet, TextInput as TextInputReact, View } from 'react-native';
+import { Platform, Pressable, View } from 'react-native';
+import { TextInput as TextInputReact } from 'react-native';
+
+import { getStyles } from './style';
 
 const isIOS = Platform.OS === 'ios';
 
 // Define a type for the icon components
 type IconComponentProps = {
-  style?: unknown; // Using any here to avoid complex style type issues
+  style?: unknown;
 };
 
 // Define types for the component props
@@ -37,18 +38,6 @@ export interface TI extends TextInputProps {
   value?: string;
   withClearIcon?: boolean;
 }
-
-// Function to check nested arrays outside the component
-const checkNestedArray = (el: unknown): boolean => {
-  if (Array.isArray(el) && el.length > 0) {
-    const flatted = el.flat(1);
-    return flatted.some(error => {
-      return typeof error === 'string' && !!error;
-    });
-  } else {
-    return typeof el === 'string' && !!el;
-  }
-};
 
 const TextInput = forwardRef<TextInputReact, TI>((props, ref) => {
   const {
@@ -87,37 +76,12 @@ const TextInput = forwardRef<TextInputReact, TI>((props, ref) => {
     ...rest
   } = props;
 
-  const [inputWidth, setInputWidth] = useState('99%');
-  const [Height, setHeight] = useState(0);
+  const theme = useTheme();
+  const styles = useMemo(() => getStyles(theme), [theme]);
 
-  React.useMemo(() => {
-    setInputWidth('100%');
-  }, []);
+  const [Height] = useState(0);
 
-  const haveError = checkNestedArray(errors);
 
-  const _renderErrorFlat = () => {
-    const errrorFlat =
-      Array.isArray(errors) && errors.length > 0
-        ? errors
-            .flat(1)
-            .filter(el => !!el)
-            .join(' ')
-        : errors;
-
-    if (typeof errrorFlat === 'string' && !!errrorFlat) {
-      return (
-        <View
-          onLayout={event => {
-            setHeight(event.nativeEvent.layout?.height);
-          }}
-          style={styles.error}>
-          <ExSmallText style={styles.errorText}>{errrorFlat}</ExSmallText>
-        </View>
-      );
-    }
-    return <View />;
-  };
   const _renderError = () => {
     if (Array.isArray(errors)) {
       return (
@@ -155,7 +119,7 @@ const TextInput = forwardRef<TextInputReact, TI>((props, ref) => {
                     height: sizeY(numberOfLines < 2 ? numberOfLines * 60 : numberOfLines * 50),
                   }
                 : {},
-              shadow ? { ...SHADOWINPUT } : {},
+              shadow ? theme.shadows.input : {},
               containerStyle,
             ]}>
             {!!value && enablePlaceHolder ? (
@@ -192,11 +156,11 @@ const TextInput = forwardRef<TextInputReact, TI>((props, ref) => {
               onChangeText={debounce > 0 ? _debounce(onChangeText, debounce) : onChangeText}
               onSubmitEditing={onSubmitEditing}
               placeholder={placeholder}
-              placeholderTextColor={placeholderTextColor ? placeholderTextColor : PALETTE.GREY}
+              placeholderTextColor={placeholderTextColor ? placeholderTextColor : theme.colors.GREY}
               spellCheck={autoCorrect}
               style={[
                 // Use a type-safe approach for typography
-                typography['text'] || {},
+                theme.typography.text,
                 style,
                 styles.textInput,
                 !!value && enablePlaceHolder ? { paddingTop: isIOS ? 15 : 15 } : {},
@@ -227,101 +191,6 @@ const TextInput = forwardRef<TextInputReact, TI>((props, ref) => {
   );
 });
 
-const styles = StyleSheet.create({
-  shadow: {
-    shadowColor: 'rgba(0,0,0,0.4)',
-    shadowOffset: {
-      width: 1,
-      height: 5,
-    },
-    shadowOpacity: 0.34,
-    shadowRadius: 6.27,
-    elevation: 10,
-  },
-  iconClose: {
-    marginRight: 5,
-    marginTop: 8,
-    marginLeft: isRTL ? 5 : undefined,
-    height: 40,
-  },
-  iconCloseRigh: {
-    marginRight: isRTL ? undefined : 5,
-    marginLeft: isRTL ? 5 : undefined,
-    marginTop: 8,
-    height: 40,
-  },
-  phoneContainer: {
-    flexDirection: 'row',
-    backgroundColor: '#fff',
-    height: sizeY(40),
-    borderRadius: 8,
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    alignContent: 'center',
-    justifyContent: 'center',
-    zIndex: 10,
-  },
-  phoneInput: {
-    flex: 7,
-    writingDirection: 'ltr',
-    textAlign: 'left',
-    marginLeft: 20,
-  },
-  textInput: {
-    flex: 7,
-    padding: 0,
-    textAlign: isRTL ? 'left' : undefined,
-    writingDirection: 'rtl',
-  },
-  dropDownImage: {
-    height: 14,
-    width: 12,
-    marginLeft: 11,
-  },
-  placeholder: {
-    position: 'absolute',
-    top: isRTL ? (isIOS ? 8 : 6) : isIOS ? 10 : 7,
-    left: 20,
-    color: '#C5C5C5',
-  },
-  icon: {
-    width: 24,
-    height: 24,
-    color: PALETTE.BUTTON_MAIN_COLOR,
-  },
-  iconContainer: {
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginHorizontal: 15,
-  },
-  error: {
-    // position: 'absolute',
-    // top: isRTL ? '99%' : '105%',
-    // left: 10,
-    // right: 10,
-    flexDirection: 'row',
-    width: '100%',
-    flexWrap: 'wrap',
-    alignItems: 'center',
-    justifyContent: 'flex-start',
-    // paddingLeft: 20,
-    marginTop: 2,
-    // zIndex: 99999,
-  },
-  errorText: {
-    writingDirection: isRTL ? 'rtl' : 'auto',
-    color: PALETTE.ERROR,
-    maxWidth: '95%',
-  },
-  iconButton: {
-    // ...SHADOW,
-    justifyContent: 'center',
-    alignItems: 'center',
-    // borderRadius: 100,
-    // backgroundColor: PALETTE.WHITE,
-    zIndex: 9999,
-  },
-});
-export default TextInput;
+TextInput.displayName = 'TextInput';
+
+export default memo(TextInput);

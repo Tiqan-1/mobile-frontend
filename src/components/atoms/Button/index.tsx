@@ -1,22 +1,14 @@
+import { useTheme } from '@/theme';
 import React from 'react';
-import type {
-  TextStyle,
-  ViewStyle} from 'react-native';
-import {
-  ActivityIndicator,
-  StyleSheet,
-  TouchableOpacity,
-  View
-} from 'react-native';
+import { forwardRef, memo } from 'react';
+import type { View } from 'react-native';
+import { ActivityIndicator, TouchableOpacity } from 'react-native';
 
-// Use require for modules without type declarations
-
-import { PALETTE } from '@/theme/colors';
-
-// Import Text component and its types
 import Text from '@/components/atoms/Text';
 
 import { bestButtonColor, isLight } from '@/utils/helpers';
+
+import { getStyles } from './style';
 
 export type ButtonTypes = 'icon' | 'main' | 'outline' | 'underline';
 
@@ -40,11 +32,11 @@ export interface ButtonProps {
   /**
    * Additional style for the text
    */
-  style?: TextStyle;
+  style?: import('react-native').TextStyle;
   /**
    * Additional style for the button container
    */
-  buttonStyle?: ViewStyle;
+  buttonStyle?: import('react-native').ViewStyle;
   /**
    * Whether the text should be dotted
    */
@@ -101,34 +93,35 @@ export interface ButtonProps {
   accessibilityRole?: 'button' | 'link' | 'none';
 }
 
-/**
- * A reusable button component that supports different styles
- */
-const Button: React.FC<ButtonProps> = ({
-  type = 'main',
-  textType = 'text',
-  title,
-  onPress = () => {},
-  style = {},
-  buttonStyle = {},
-  dotted = false,
-  disabled = false,
-  testID,
-  children,
-  isLoading = false,
-  loadingColor,
-  bgColor,
-  withRTL = false,
-  accessibilityLabel,
-  accessibilityHint,
-  accessibilityState,
-  accessibilityRole = 'button',
-}) => {
-  // Simplified color handling without external helpers
+const Button = forwardRef<View, ButtonProps>((props, ref) => {
+  const {
+    type = 'main',
+    textType = 'text',
+    title,
+    onPress = () => {},
+    style = {},
+    buttonStyle = {},
+    dotted = false,
+    disabled = false,
+    testID,
+    children,
+    isLoading = false,
+    loadingColor,
+    bgColor,
+    withRTL = false,
+    accessibilityLabel,
+    accessibilityHint,
+    accessibilityState,
+    accessibilityRole = 'button',
+  } = props;
+
+  const theme = useTheme();
+  const styles = React.useMemo(() => getStyles(theme), [theme]);
+
   const buttonStyles = React.useMemo(() => {
     if (bgColor) {
       const backgroundColor = bestButtonColor(bgColor);
-      const color = isLight(backgroundColor) ? PALETTE.BLACK : PALETTE.WHITE;
+      const color = isLight(backgroundColor) ? theme.colors.BLACK : theme.colors.WHITE;
 
       return {
         backgroundColor,
@@ -139,16 +132,15 @@ const Button: React.FC<ButtonProps> = ({
       backgroundColor: undefined,
       color: undefined,
     };
-  }, [bgColor]);
+  }, [bgColor, theme]);
 
-  // Button styles based on type
   const buttonStyleByType = React.useMemo(
     () => ({
       main: {
-        backgroundColor: PALETTE.BUTTON_MAIN_COLOR,
-        borderRadius: 8,
-        paddingVertical: 12,
-        paddingHorizontal: 16,
+        backgroundColor: theme.colors.BUTTON_MAIN_COLOR,
+        borderRadius: theme.radii.sm,
+        paddingVertical: theme.spacing.lg,
+        paddingHorizontal: theme.spacing.xl,
       },
       underline: {
         backgroundColor: 'transparent',
@@ -156,39 +148,38 @@ const Button: React.FC<ButtonProps> = ({
       outline: {
         backgroundColor: 'transparent',
         borderWidth: 1,
-        borderColor: PALETTE.BUTTON_MAIN_COLOR,
-        borderRadius: 8,
+        borderColor: theme.colors.BUTTON_MAIN_COLOR,
+        borderRadius: theme.radii.sm,
       },
       icon: {
-        backgroundColor: PALETTE.BUTTON_MAIN_COLOR,
-        borderRadius: 8,
+        backgroundColor: theme.colors.BUTTON_MAIN_COLOR,
+        borderRadius: theme.radii.sm,
         flexDirection: 'row',
       },
     }),
-    []
+    [theme],
   );
 
-  // Text styles based on button type
   const textStyleByType = React.useMemo(
     () => ({
       main: {
-        color: PALETTE.WHITE,
+        color: theme.colors.WHITE,
         textAlign: 'center',
       },
       underline: {
-        color: PALETTE.BUTTON_MAIN_COLOR,
+        color: theme.colors.BUTTON_MAIN_COLOR,
         textDecorationLine: 'underline',
       },
       outline: {
-        color: PALETTE.BUTTON_MAIN_COLOR,
+        color: theme.colors.BUTTON_MAIN_COLOR,
         textAlign: 'center',
       },
       icon: {
-        color: PALETTE.WHITE,
+        color: theme.colors.WHITE,
         textAlign: 'center',
       },
     }),
-    []
+    [theme],
   );
 
   const handlePress = () => {
@@ -204,7 +195,7 @@ const Button: React.FC<ButtonProps> = ({
           <ActivityIndicator
             color={
               loadingColor ||
-              (type === 'main' ? PALETTE.WHITE : PALETTE.BUTTON_MAIN_COLOR)
+              (type === 'main' ? theme.colors.WHITE : theme.colors.BUTTON_MAIN_COLOR)
             }
             style={styles.activity}
           />
@@ -213,7 +204,7 @@ const Button: React.FC<ButtonProps> = ({
           <Text
             dotted={dotted}
             style={[
-              textStyleByType[type],
+              textStyleByType[type] as import('react-native').TextStyle,
               buttonStyles.color && { color: buttonStyles.color },
               style,
             ]}
@@ -228,53 +219,35 @@ const Button: React.FC<ButtonProps> = ({
   };
 
   return (
-    <View>
-      <TouchableOpacity
-        activeOpacity={disabled ? 1 : 0.7}
-        disabled={disabled || isLoading}
-        onPress={handlePress}
-        style={[
-          styles.button,
-          buttonStyleByType[type],
-          buttonStyles.backgroundColor && {
-            backgroundColor: buttonStyles.backgroundColor,
-          },
-          disabled && styles.disabled,
-          buttonStyle,
-        ]}
-        testID={testID}
-        accessible={true}
-        accessibilityLabel={accessibilityLabel || title}
-        accessibilityHint={accessibilityHint}
-        accessibilityRole={accessibilityRole}
-        accessibilityState={{
-          disabled: disabled || isLoading,
-          busy: isLoading,
-          ...accessibilityState,
-        }}>
-        {renderButtonContent()}
-      </TouchableOpacity>
-    </View>
+    <TouchableOpacity
+      ref={ref}
+      activeOpacity={disabled ? 1 : 0.7}
+      disabled={disabled || isLoading}
+      onPress={handlePress}
+      style={[
+        styles.button,
+        buttonStyleByType[type],
+        buttonStyles.backgroundColor && {
+          backgroundColor: buttonStyles.backgroundColor,
+        },
+        disabled && styles.disabled,
+        buttonStyle,
+      ]}
+      testID={testID}
+      accessible={true}
+      accessibilityLabel={accessibilityLabel || title}
+      accessibilityHint={accessibilityHint}
+      accessibilityRole={accessibilityRole}
+      accessibilityState={{
+        disabled: disabled || isLoading,
+        busy: isLoading,
+        ...accessibilityState,
+      }}>
+      {renderButtonContent()}
+    </TouchableOpacity>
   );
-};
-
-const styles = StyleSheet.create({
-  container: {
-    width: '100%',
-  },
-  button: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    flexDirection: 'row',
-    paddingHorizontal:2,
-    paddingVertical:5,
-  },
-  activity: {
-    marginRight: 8,
-  },
-  disabled: {
-    opacity: 0.6,
-  },
 });
 
-export default Button;
+Button.displayName = 'Button';
+
+export default memo(Button);
