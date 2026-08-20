@@ -2,7 +2,7 @@ import { type StyleProp, type ImageStyle } from 'react-native';
 import { forwardRef, memo } from 'react';
 import { Image, type ImageProps as ExpoImageProps } from 'expo-image';
 
-interface AccessibleImageProps extends Omit<ExpoImageProps, 'tintColor'> {
+export interface AccessibleImageProps extends Omit<ExpoImageProps, 'tintColor'> {
   /**
    * Description of the image for screen readers
    */

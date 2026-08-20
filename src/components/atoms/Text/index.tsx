@@ -19,7 +19,7 @@ export type TextTypes =
   | 'title'
   | undefined;
 
-interface Txt extends TextProps {
+export interface TextBlockProps extends TextProps {
   accessibilityHint?: string;
   accessibilityLabel?: string;
   accessibilityRole?:
@@ -49,7 +49,7 @@ interface Txt extends TextProps {
   isBold?: boolean;
 }
 
-const TextBlockInner = forwardRef<RNText, Txt>(
+const TextBlockInner = forwardRef<RNText, TextBlockProps>(
   (
     {
       children,
@@ -146,7 +146,7 @@ TextBlock.displayName = 'Text';
 
 export default TextBlock;
 
-export function Title(params: Txt) {
+export function Title(params: TextBlockProps) {
   const { children, ...rest } = params;
   return (
     <TextBlockInner type="title" {...rest}>
@@ -154,7 +154,7 @@ export function Title(params: Txt) {
     </TextBlockInner>
   );
 }
-export function SmallTitle(params: Txt) {
+export function SmallTitle(params: TextBlockProps) {
   const { children, ...rest } = params;
   return (
     <TextBlockInner type="smallTitle" {...rest}>
@@ -163,7 +163,7 @@ export function SmallTitle(params: Txt) {
   );
 }
 export { TextBlock as Text };
-export function SmallText(params: Txt) {
+export function SmallText(params: TextBlockProps) {
   const { children, ...rest } = params;
   return (
     <TextBlockInner type="smallText" {...rest}>
@@ -171,7 +171,7 @@ export function SmallText(params: Txt) {
     </TextBlockInner>
   );
 }
-export function ExSmallText(params: Txt) {
+export function ExSmallText(params: TextBlockProps) {
   const { children, ...rest } = params;
   return (
     <TextBlockInner type="extraSmallText" {...rest}>
@@ -180,7 +180,7 @@ export function ExSmallText(params: Txt) {
   );
 }
 
-export function SuSmallText(params: Txt) {
+export function SuSmallText(params: TextBlockProps) {
   const { children, ...rest } = params;
   return (
     <TextBlockInner type="superSmallText" {...rest}>

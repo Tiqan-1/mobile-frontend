@@ -15,7 +15,7 @@ import type { Theme } from '@/theme';
 
 import { getStyles } from './style';
 
-type Props = {
+export type SkeletonProps = {
   height?: DimensionValue;
   loading?: boolean;
   width?: DimensionValue;
@@ -24,7 +24,7 @@ type Props = {
 const FROM = 0.2;
 const TO = 1;
 
-const SkeletonLoader = forwardRef<View, Props>((props, ref: Ref<View>) => {
+const SkeletonLoader = forwardRef<View, SkeletonProps>((props, ref: Ref<View>) => {
   const { children, height = 24, loading = false, width = '100%', ...rest } = props;
   const { colors, radii } = useTheme();
   const styles = getStyles({ colors, radii } as Theme);

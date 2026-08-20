@@ -7,11 +7,11 @@ import type { Ref } from 'react';
 
 import { getStyles } from './style';
 
-type Props = {
+export type CircleStatusProps = {
   Dtstatus: Date;
 };
 
-const CircleStatus = forwardRef<View, Props>((props, ref: Ref<View>) => {
+const CircleStatus = forwardRef<View, CircleStatusProps>((props, ref: Ref<View>) => {
   const { Dtstatus } = props;
   const theme = useTheme();
   const styles = useMemo(() => getStyles(theme), [theme]);

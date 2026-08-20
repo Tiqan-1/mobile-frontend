@@ -2,7 +2,7 @@ import { useTheme } from '@/theme';
 import { View } from 'react-native';
 import { memo } from 'react';
 
-interface KeyBoardSpaceProps {
+export interface KeyBoardSpaceProps {
   height?: number;
   isPlus?: boolean;
 }
