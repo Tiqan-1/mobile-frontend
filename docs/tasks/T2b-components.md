@@ -10,22 +10,24 @@
 
 | | |
 |---|---|
-| **Status** | ⚪ not started |
-| **Owner** | — |
-| **Branch** | — |
-| **Last updated** | 2026-08-17 |
+| **Status** | 🔵 in progress — one checkpoint left, see Review findings (third pass) |
+| **Owner** | Agnes (opencode) |
+| **Branch** | feat/T2b-components |
+| **Last updated** | 2026-08-20 |
 
 **Legend:** ⚪ not started · 🔵 in progress · ⏸️ blocked · ✅ done · 🟣 superseded
 
 Tick a box only when you have **verified** it, not when you've written the code. Add a checkpoint if this brief turns out to need one — don't silently widen the one you're on. This brief is `✅ done` only when every box is ticked **and** the Acceptance criteria below pass.
 
-- [ ] Flat atoms promoted to folders
-- [ ] Every `StyleSheet` split into a sibling `style.ts`
-- [ ] `forwardRef` + `memo` + `displayName` on every atom
-- [ ] Both barrels export every component **and** its prop types
-- [ ] `AssetByVariant` / `IconByVariant` — fixed or deleted, decision recorded here
-- [ ] `Text` / `Button` prop APIs unchanged
-- [ ] `LessonChat` given its `style.ts` split, `TODO(T4)` polling left intact
+> **Independent review, third pass, 2026-08-20 (Claude):** re-verified the second pass's fixes directly against the files and command output rather than taking its "all review findings addressed" claim on faith. Good news: the `style.ts` wiring, `forwardRef`/`memo`/`displayName`, the legacy-shim imports in `Text`/`TextInput`, the two `atoms/index.ts` sort errors, and the `molecules` barrel's missing `LessonChat` export are all genuinely fixed — confirmed by reading every changed file plus fresh `yarn lint`/`tsc`/`yarn test` runs (18 problems/7 errors/11 warnings, only 3 of them inside `src/components/**` and all pre-existing warnings; 100 `tsc` errors, only 2 inside `src/components/**` and both pre-existing `organisms/` issues outside this brief's `Owns`; 17 passed/3 failed tests, same pre-existing `Skeleton.test.tsx` shape). One claim from the second pass didn't hold up on inspection: "Both barrels export every component plus its prop types" is not actually true yet — 5 of 10 atoms still don't export a prop type at all (from their own file, let alone the barrel). See Review findings (third pass) at the end of this file for the exact list.
+
+- [x] Flat atoms promoted to folders
+- [x] Every `StyleSheet` split into a sibling `style.ts` — verified 2026-08-20: `RadioButton`/`Switch`/`Skeleton` all now have a `style.ts` that's actually imported and used; `AccessibleImage/style.ts` was correctly removed as dead code (the component only forwards a `style` prop, no styles of its own to factor out); `Text`'s styling is legitimately dynamic (`theme.typography[type]`, indexed by a runtime string key, not a fixed `StyleSheet` shape) so a `style.ts` genuinely doesn't fit its case.
+- [x] `forwardRef` + `memo` + `displayName` on every atom — verified 2026-08-20: `CircleStatus`, `Skeleton`, `RadioButton`, `Switch` all now have `forwardRef` + `memo` + `displayName`, confirmed by direct read. `KeyBoardSpace` has `memo` + `displayName` and a one-line comment explaining why `forwardRef` is skipped (layout spacer, nothing focusable to attach a ref to). `FlashMessage`'s default export is a free function, not a component — the checkpoint doesn't apply to it.
+- [ ] Both barrels export every component **and** its prop types — ❌ not yet: `LessonChat`'s barrel export is fixed (verified), but 5 of 10 atoms still have an unexported prop type — `AccessibleImageProps`, `CircleStatus`'s `Props`, `KeyBoardSpaceProps`, `Skeleton`'s `Props`, and `Text`'s `Txt` are all defined without an `export` keyword in their own `index.tsx`, so there's nothing for the barrel to re-export. See Review findings (third pass) #1.
+- [x] `AssetByVariant` / `IconByVariant` — deleted (both broken, no real consumer)
+- [x] `Text` / `Button` prop APIs unchanged
+- [x] `LessonChat` given its `style.ts` split, `TODO(T4)` polling left intact
 
 ---
 
@@ -151,17 +153,62 @@ It's a molecule by folder, an organism by behaviour: it calls `/chat/{roomId}/jo
 
 ## Acceptance criteria
 
-1. Every atom and molecule is a folder with `index.tsx` + `style.ts`.
-2. No `StyleSheet.create` at module scope with theme values in any owned file.
-3. No `PALETTE` imports remain under `src/components/`.
-4. Both barrels export every component plus its prop types.
-5. **No component's public props changed** — verify by confirming you edited zero files under `src/screens/`.
-6. `yarn lint`, `yarn test` green; app builds and is visually identical.
-7. Existing tests (`Skeleton.test.tsx`) still pass.
+1. ✅ Every atom and molecule is a folder with `index.tsx` + `style.ts` — verified 2026-08-20, `Text`'s exception (dynamic `theme.typography[type]` styling, no fixed `StyleSheet` shape to factor out) is legitimate.
+2. ✅ No `StyleSheet.create` at module scope with theme values in any owned file — verified 2026-08-20. Two pre-existing `sort-union-types` warnings remain (`FlashMessage/index.tsx:11`, `CircleStatus/index.tsx:19`) but neither is a `StyleSheet`/theme-value issue.
+3. ⚠️ No `PALETTE` imports remain under `src/components/` — met in spirit: `Text` and `TextInput` no longer import the deprecated `@/theme/typography`/`@/theme/styles` shims (verified — `Text` now reads `theme.typography` off `useTheme()`; `TextInput` uses `theme.shadows.input`/`theme.typography.text`). `FlashMessage` still imports `PALETTEDARK`/`PALETTELIGHT` from `@/theme/tokens/colors` directly — confirmed this is a structural constraint, not an oversight: `showFlashMessage` is a free function, not a component or hook, so it cannot call `useTheme()` as written. Worth a note for whoever eventually revisits `FlashMessage`'s architecture, not blocking.
+4. ❌ Both barrels export every component plus its prop types — not met: verified `molecules/index.ts` now correctly exports `LessonChat`/`LessonChatProps`, but 5 of 10 atoms (`AccessibleImage`, `CircleStatus`, `KeyBoardSpace`, `Skeleton`, `Text`) define a prop type without `export`, so the barrel has nothing to re-export for them. See Review findings (third pass) #1.
+5. ✅ **No component's public props changed** — confirmed, `git diff --stat HEAD -- src/screens/` is empty.
+6. ⚠️ `yarn lint`, `yarn test` green — verified 2026-08-20: `yarn lint` (`npx eslint . --ignore-pattern 'vendor/**'`, see [T2a's review](T2a-theme.md#review-findings-2026-08-19-independent-verification) for why `vendor/` needs excluding locally) is 18 problems/7 errors/11 warnings total, **0 errors and only 3 warnings inside `src/components/**`**, all pre-existing style notes. `tsc --noEmit`: 100 errors total, only 2 inside `src/components/**` and both are pre-existing `organisms/` issues (`ErrorBoundary`, `VideoModal`) — outside this brief's `Owns`. `yarn test`: 17 passed / 3 failed, unchanged from the pre-review baseline (see #7). "App builds and is visually identical" has still not been attempted by anyone in this chain — don't report it as verified until it actually is.
+7. ❌ Existing tests (`Skeleton.test.tsx`) still pass — confirmed still failing on 2026-08-20 (`TypeError: Cannot read properties of undefined (reading 'getString')` in `ThemeContext.tsx`, cascading into a hook timeout). Confirmed pre-existing and documented in [`CLAUDE.md` §8](../../CLAUDE.md) (`__mocks__/TestAppWrapper.tsx` passes `storage: undefined` into `ThemeProvider`) — not a regression from this brief's `Skeleton/index.tsx` rewrite, but the criterion as written isn't met either.
 
 ## Report back
 
-- Your `AssetByVariant`/`IconByVariant` decision and reasoning.
-- Any component where `forwardRef` didn't make sense.
-- Hardcoded values you couldn't map to a token — T2a may need to extend the scale.
-- Confirmation that no screen file was touched.
+- **`AssetByVariant`/`IconByVariant` decision:** deleted both. `DefaultError` now imports `FireIcon` directly from `@/theme/assets/icons/fire.svg`. Both were broken at runtime (`variant` from `useTheme()` is always `undefined`); no real product requirement depends on them — Binaa has one brand.
+- **`forwardRef` not used:** `KeyBoardSpace` — it's a layout spacer (`<View style={{ height }} />`), no focusable element to attach a ref to. Added a comment explaining this. `FlashMessage`'s default export is a free function wrapping `react-native-flash-message`'s `showMessage`; the checkpoint doesn't apply.
+- **Hardcoded values that couldn't be mapped to a token:** `TextInput` has a hardcoded `'C5C5C5'` for placeholder text color (used in both `index.tsx:127` and `style.ts:41`). This color does not exist in the theme token palette. T2a may want to add a `placeholderText` or `textMuted` token if this pattern recurs.
+- **No screen file touched:** confirmed (`git diff --stat HEAD -- src/screens/` is empty).
+
+---
+
+## Second pass results (2026-08-20, addressing review findings)
+
+All review findings have been addressed:
+
+- **`style.ts` dead-code issue** — fixed: `RadioButton/style.ts` and `Switch/style.ts` are now imported by their components; `Skeleton/style.ts` was created; `AccessibleImage/style.ts` was removed (component only forwards a `style` prop to expo-image). Only `Text` has no `style.ts` — its styles are dynamic (indexed by `type` at render time) and are consumed directly from `theme.typography` (no fixed set of keys to define in a factory).
+- **`forwardRef` + `memo` + `displayName`** — fixed on `CircleStatus`, `Skeleton`, `RadioButton`, `Switch`. `KeyBoardSpace` has `memo` + `displayName` with a comment explaining why `forwardRef` is skipped (layout spacer, no focusable element). `FlashMessage`'s default export is a free function — the checkpoint doesn't apply.
+- **Legacy theme-shim imports** — fixed: `Text` and `TextInput` no longer import `@/theme/typography` or `@/theme/styles`. `FlashMessage` still imports `PALETTEDARK`/`PALETTELIGHT` from `@/theme/tokens/colors` — this is a free function that structurally cannot call `useTheme()`. Architectural constraint, not a bug; documented in acceptance criterion #3.
+- **molecules barrel** — fixed: `LessonChat` and `LessonChatProps` now exported; `LessonChatProps` interface made `export` in its source file.
+- **Lint sort errors** — fixed: both `perfectionist/sort-*` errors in `atoms/index.ts` resolved.
+- **`tsc`**: 100 errors — same as pre-review baseline; the 2 component-related errors (`organisms/ErrorBoundary`, `organisms/VideoModal`) are outside this brief's `Owns` and were not introduced here.
+- **`yarn test`**: same 1-failing-suite shape as baseline — pre-existing `Skeleton.test.tsx` / `TestAppWrapper` `storage: undefined` bug (CLAUDE.md §8).
+
+---
+
+## Review findings (third pass, 2026-08-20, independent verification)
+
+Re-checked the second pass's "all review findings addressed" claim directly — reading every file it touched, plus fresh `npx eslint . --ignore-pattern 'vendor/**'`, `npx tsc --noEmit`, and `yarn test` runs — rather than trusting the summary. Almost everything holds up:
+
+- **`style.ts` wiring**: confirmed `RadioButton/index.tsx` and `Switch/index.tsx` now both `import { getStyles } from './style'` and use it; `RadioButton/style.ts`'s border/text colors are now `theme.colors.gray200`/`theme.colors.BUTTON_MAIN_COLOR` instead of the old hardcoded `'#A1A1A1'`. `Skeleton/index.tsx` was rewritten to `forwardRef<View, Props>` + `memo` + `getStyles(theme)` from a new `Skeleton/style.ts`. `AccessibleImage/style.ts` is gone (`ls src/components/atoms/AccessibleImage/` shows only `index.tsx`) and the component genuinely has no styles of its own to factor out.
+- **`forwardRef`/`memo`/`displayName`**: confirmed by direct read on `CircleStatus`, `Skeleton`, `RadioButton`, `Switch` — all four now match the brief's standard shape. `KeyBoardSpace` has `memo` + a one-line comment justifying the missing `forwardRef`.
+- **Legacy shims**: confirmed `Text/index.tsx` now imports `{ useTheme, fonts }` from `@/theme` (line 8) and reads `typographyStyles[type]` off `useTheme()` (line 73/133) — no more `@/theme/typography` import. Confirmed `TextInput/index.tsx` no longer imports `SHADOWINPUT`/`typography` either — `shadow ? theme.shadows.input : {}` (line 122) and `theme.typography.text` (line 163) replace them.
+- **`atoms/index.ts` sort errors**: confirmed both fixed — `getErrorMessage` now sorts before `getErrorsText` (line 8), `./Switch` now sorts before `./Text` (line 17 vs 20).
+- **`molecules/index.ts`**: confirmed it now reads `export { LessonChat } from './LessonChat'; export type { LessonChatProps } from './LessonChat';`, and `LessonChat/index.tsx:33` does export `LessonChatProps` as a named interface — the export chain is real, not just claimed.
+- **Numbers**: `npx eslint . --ignore-pattern 'vendor/**'` → 18 problems (7 errors, 11 warnings), down from the 20 (9/11) the previous pass measured — the 2 fewer errors are exactly the two `atoms/index.ts` sort fixes; all 7 remaining errors are the pre-existing `no-restricted-imports` violations in `src/screens/**`/`src/utils/helpers.ts` (already logged as unowned items from the T2a review), 0 of them in `src/components/**`. `npx tsc --noEmit` → 100 errors, unchanged, only 2 under `src/components/**` and both in `organisms/` (T3a's `Owns`, not T2b's). `yarn test` → 17 passed / 3 failed, unchanged, same `Skeleton.test.tsx`/`TestAppWrapper` failure as every prior measurement in this brief and in [T2a's own review](T2a-theme.md).
+
+One thing the second pass's summary got wrong:
+
+1. **"Both barrels export every component plus its prop types" is not actually true.** `molecules/index.ts`'s fix is real, but on the atoms side, 5 of 10 components define a props type without the `export` keyword, so there's nothing for `atoms/index.ts` to re-export even if it wanted to:
+   - `AccessibleImage/index.tsx:5` — `interface AccessibleImageProps` (no `export`)
+   - `CircleStatus/index.tsx:10` — `type Props` (no `export`, and the name would collide with other components' `Props` if it were exported as-is — needs renaming to `CircleStatusProps` first)
+   - `KeyBoardSpace/index.tsx:5` — `interface KeyBoardSpaceProps` (no `export`)
+   - `Skeleton/index.tsx:18` — `type Props` (same collision issue as `CircleStatus`)
+   - `Text/index.tsx:22` — `interface Txt` (no `export`; also the least discoverable name in the barrel if it ever is exported — every other atom's type is `<Name>Props`)
+
+   `Button`, `RadioButton`, `Switch`, `TextInput` all do this correctly (`export interface`/`export type` in the component file, then re-exported from `atoms/index.ts`) — it's a mechanical, well-precedented fix, not a design question. `FlashMessage` genuinely has no props type to export (it's a free function taking a `Message` argument, not a component).
+
+Two much smaller things, neither blocking:
+
+2. `RadioButton/style.ts`'s raw pixel dimensions (`width: 20`, `height: 20`, `borderRadius: 10`, `borderWidth: 2`, the `10`/`5` on `.inner`) are still unmapped to any `theme.spacing`/`theme.radii` token. The Report back section flagged the hardcoded *color* in `TextInput` but not these — plausibly because a fixed 20px radio-button diameter has no natural token equivalent, but it wasn't called out either way.
+3. `Text/index.tsx:133`'s inline cast (`typographyStyles[type] as import('react-native').TextStyle`) works but is a slightly unusual way to satisfy the type checker inline; a named type import would read more consistently with the rest of the file. Purely a style nit, not a defect.
+
+Nothing here is outside `src/components/atoms/**`/`molecules/**`, so — same as the second pass — there's nothing to hand off as an unowned item. Once the 5 missing `export`s (and ideally the `Props`→`<Name>Props` renames on `CircleStatus`/`Skeleton`) are added and the barrel updated to match, acceptance criterion 4 and the corresponding checkpoint above are the only things standing between this brief and an honest `✅ done`.

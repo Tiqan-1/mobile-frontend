@@ -1,5 +1,5 @@
-import React from 'react';
 import { type StyleProp, type ImageStyle } from 'react-native';
+import { forwardRef, memo } from 'react';
 import { Image, type ImageProps as ExpoImageProps } from 'expo-image';
 
 interface AccessibleImageProps extends Omit<ExpoImageProps, 'tintColor'> {
@@ -18,27 +18,23 @@ interface AccessibleImageProps extends Omit<ExpoImageProps, 'tintColor'> {
   style?: StyleProp<ImageStyle>;
 }
 
-/**
- * An accessible image component that provides proper accessibility attributes
- */
-const AccessibleImage: React.FC<AccessibleImageProps> = ({
-  accessibilityDescription,
-  accessibilityHint,
-  isDecorative = false,
-  style,
-  ...rest
-}) => {
-  return (
-    <Image
-      {...rest}
-      style={style}
-      accessible={!isDecorative}
-      accessibilityLabel={isDecorative ? undefined : accessibilityDescription}
-      accessibilityHint={isDecorative ? undefined : accessibilityHint}
-      accessibilityRole="image"
-      accessibilityIgnoresInvertColors
-    />
-  );
-};
+const AccessibleImage = forwardRef<Image, AccessibleImageProps>(
+  ({ accessibilityDescription, accessibilityHint, isDecorative = false, style, ...rest }, ref) => {
+    return (
+      <Image
+        ref={ref}
+        {...rest}
+        style={style}
+        accessible={!isDecorative}
+        accessibilityLabel={isDecorative ? undefined : accessibilityDescription}
+        accessibilityHint={isDecorative ? undefined : accessibilityHint}
+        accessibilityRole="image"
+        accessibilityIgnoresInvertColors
+      />
+    );
+  },
+);
 
-export default AccessibleImage;
+AccessibleImage.displayName = 'AccessibleImage';
+
+export default memo(AccessibleImage);

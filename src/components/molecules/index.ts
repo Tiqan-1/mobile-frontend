@@ -1,2 +1,4 @@
 export { default as DefaultError } from './DefaultError/DefaultError';
-export * from './LanguageSwitcher';
+export { LanguageSwitcher } from './LanguageSwitcher';
+export { LessonChat } from './LessonChat';
+export type { LessonChatProps } from './LessonChat';

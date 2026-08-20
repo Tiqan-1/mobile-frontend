@@ -18,7 +18,6 @@ module.exports = {
     '^expo-updates$': '<rootDir>/__mocks__/expo-updates.ts',
   },
   setupFiles: [
-    '<rootDir>/__mocks__/getAssetsContext.ts',
     // react-native-gesture-handler's own mock — every screen tree pulls it
     // in (src/App.tsx imports it directly) and it hits a TurboModule that
     // doesn't exist under Jest without this.

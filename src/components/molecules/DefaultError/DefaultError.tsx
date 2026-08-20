@@ -1,10 +1,10 @@
+import FireIcon from '@/theme/assets/icons/fire.svg';
 import { useErrorBoundary } from 'react-error-boundary';
 import { useTranslation } from 'react-i18next';
-import {  TouchableOpacity, View } from 'react-native';
+import { TouchableOpacity, View } from 'react-native';
 
 import { useTheme } from '@/theme';
 
-import { IconByVariant } from '@/components/atoms';
 import { Text } from '@/components/atoms/Text';
 
 type Props = {
@@ -25,11 +25,10 @@ function DefaultErrorScreen({ onReset = undefined }: Props) {
         marginTop: 16,
         padding: 16,
       }}>
-      <IconByVariant
+      <FireIcon
         height={42}
-        path="fire"
-        stroke={colors.red500}
         width={42}
+        stroke={colors.red500}
       />
       <Text >
         {t('error_boundary.title')}
