@@ -60,10 +60,10 @@ Three briefs were **deleted** rather than carried forward, because the work they
                      │        │   package.json only, but two of its
                      │        │   deletions end in T2a/T2b/T2e files
                      ▼        ▼
-        ┌────────────────────────┐    ┌────────────────────────┐
-        │ T1d  react-nav v6→v7   │    │ ✅ T2a  token layer +  │   (parallel)
-        │                        │    │       single theme     │
-        └────────────────────────┘    └───────────┬────────────┘
+         ┌────────────────────────┐    ┌────────────────────────┐
+         │ ✅ T1d  react-nav v6→v7│    │ ✅ T2a  token layer +  │   (parallel)
+         │                        │    │       single theme     │
+         └────────────────────────┘    └───────────┬────────────┘
                                      ┌────────────┴────────────────┐
                                      ▼                             ▼
                          ┌───────────────────────┐    ┌──────────────────────┐
@@ -102,7 +102,7 @@ The Status column here is a **convenience snapshot and goes stale**. Each brief'
 | # | Brief | Status | Owns | Depends on | Parallel-safe with |
 |---|---|---|---|---|---|
 | T0 | [Repo hygiene, CI, high-severity fixes](T0-hygiene.md) | ✅ done (caveats below) | tooling configs, `Fastlane/Fastfile`, 6 source files, deletions | — | **none** |
-| T1d | [react-navigation v6 → v7](T1d-navigation.md) 👤 | ⚪ | `src/navigation/**` | T0 | T2a, T6 |
+| T1d | [react-navigation v6 → v7](T1d-navigation.md) 👤 | ✅ done (caveats below) | `src/navigation/**` | T0 | T2a, T6 |
 | T2a | [Token layer + single theme](T2a-theme.md) | ✅ done (caveats below) | `src/theme/**` | T0 | T1d, T6 |
 | T2b | [Normalize atoms & molecules](T2b-components.md) | ✅ done | `src/components/atoms/**`, `molecules/**` | T2a | T2c, T2d |
 | T2c | [Storybook](T2c-storybook.md) | ⚪ | `.rnstorybook/**`, `*.stories.tsx` | T2b | T2d |
@@ -159,6 +159,7 @@ Real work that no brief owns. This is the only list of its kind — everything e
 
 Newest first. Add a line when something lands — this is the shared record; per-brief detail belongs in that brief's Status block.
 
+- **2026-08-20** — [T1d](T1d-navigation.md) executed (Agnes/opencode, branch `feat/T1d-navigation`). `@react-navigation/*` bumped to v7 (`native` 7.3.17, `stack` 7.10.23, `bottom-tabs` 7.18.17, `native-stack` 7.18.9 added). Root stack migrated from `createStackNavigator` to `createNativeStackNavigator`. `NavigationContainer` theme fontWeight values updated to numeric strings with `as const`. Removed dead imports (`LibraryScreen`, `useNavigation`, `AccessibilityTab` placeholder) and fixed `tabBarIcon` signature for v7. Added `RootTabScreenProps` to `types.ts`. tsc: 92 errors (down from 100); lint: 18 problems (unchanged); tests: 17/3 (unchanged). Device smoke pass remains outstanding — requires physical device/simulator, outside agent scope. Full detail in the brief's own Execution notes section.
 - **2026-08-20** (fourth pass) — [T2b](T2b-components.md) closed to `✅ done`. The one item left from the third pass (5 of 10 atoms — `AccessibleImage`, `CircleStatus`, `KeyBoardSpace`, `Skeleton`, `Text` — defining a prop type without `export`) was fixed directly by Claude rather than reported again: added `export` to `AccessibleImageProps`/`KeyBoardSpaceProps`, renamed `CircleStatus`'s and `Skeleton`'s collision-prone `Props` to `CircleStatusProps`/`SkeletonProps`, renamed `Text`'s internal `Txt` (7 call sites) to `TextBlockProps` (named to avoid colliding with the `TextProps` already imported from `react-native` in that file), and added all five to `atoms/index.ts`. Re-ran `yarn lint`/`tsc`/`yarn test` after the fix — identical numbers to the third pass, nothing regressed. See the brief's own fourth-pass review-findings section.
 - **2026-08-20** (third pass) — [T2b](T2b-components.md) mostly closed out the gaps from the first review pass (below): `style.ts` wiring, `forwardRef`/`memo`/`displayName`, the `Text`/`TextInput` legacy-shim imports, the `atoms/index.ts` lint sort errors, and the `LessonChat` barrel export are all now confirmed fixed by direct re-read plus fresh `yarn lint`/`tsc`/`yarn test` runs. One claim didn't hold up: "both barrels export every component plus its prop types" is still false — 5 of 10 atoms (`AccessibleImage`, `CircleStatus`, `KeyBoardSpace`, `Skeleton`, `Text`) define a prop type without `export`, so the barrel has nothing to re-export. Left `🔵 in progress` with that one item outstanding; see the brief's own third-pass review-findings section.
 - **2026-08-20** (first pass) — [T2b](T2b-components.md) (executed by Agnes/opencode, marked `✅ done`) reopened to `🔵 in progress` after independent re-verification (Claude) — three of its own checkpoints didn't hold: `RadioButton`/`Switch` have an unused, never-imported `style.ts` (real styling stayed inline with hardcoded hex/pixel values), four atoms (`CircleStatus`, `Skeleton`, `RadioButton`, `Switch`) never got `forwardRef`/`memo`/`displayName`, and the molecules barrel (`src/components/molecules/index.ts`) was never touched — `LessonChat` isn't exported despite being edited in the same brief. Also found `FlashMessage`/`Text`/`TextInput` still importing the deprecated theme shims (`@/theme/tokens/colors`, `@/theme/typography`, `@/theme/styles`) that T2a's own file comments told T2b to migrate off of, and 2 new lint errors inside the atoms barrel itself. All findings are inside T2b's own `Owns` — nothing unowned came out of this pass. Full detail in the brief's own review-findings section.

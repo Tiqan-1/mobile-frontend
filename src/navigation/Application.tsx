@@ -11,12 +11,12 @@ import Subscription from '@/screens/Subscription';
 import { useTheme } from '@/theme';
 import typography, { fonts } from '@/theme/typography';
 import { DarkTheme, DefaultTheme, NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import BottomTabNavigation from './BottomTabNavigation';
 import TodayLessons from '@/screens/TodayLessons';
 
-const Stack = createStackNavigator<RootStackParamList>();
+const Stack = createNativeStackNavigator<RootStackParamList>();
 const NAVIGATION_OPTIONS = {
   headerShown: false,
   headerTitleStyle: typography['text'],
@@ -33,7 +33,6 @@ function AuthNavigation() {
         options={{
           headerShown: true,
           title: translate('auth.sign_up'),
-          headerBackAccessibilityLabel: translate('auth.sign_up'),
         }}
       />
       <Stack.Screen
@@ -42,7 +41,6 @@ function AuthNavigation() {
         options={{
           headerShown: true,
           title: translate('auth.forgot_password'),
-          headerBackAccessibilityLabel: translate('auth.forgot_password'),
         }}
       />
     </Stack.Navigator>
@@ -57,19 +55,19 @@ function ApplicationNavigator() {
     fonts: {
       regular: {
         fontFamily: fonts.regular.fontFamily,
-        fontWeight: 'normal',
+        fontWeight: '400' as const,
       },
       medium: {
         fontFamily: fonts.medium.fontFamily,
-        fontWeight: '500',
+        fontWeight: '500' as const,
       },
       bold: {
         fontFamily: fonts.bold.fontFamily,
-        fontWeight: 'bold',
+        fontWeight: '700' as const,
       },
       heavy: {
         fontFamily: fonts.extrabold.fontFamily,
-        fontWeight: '900',
+        fontWeight: '900' as const,
       },
     },
     colors: {
