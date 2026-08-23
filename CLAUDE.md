@@ -451,3 +451,15 @@ Do not set coverage thresholds the suite cannot currently meet.
 **Neither platform has ever had a real app icon.** Android shows the default React Native robot placeholder (`android/app/src/main/res/mipmap-*/ic_launcher.png` — well, it did, before that directory became generated; the source of truth is now `app.json`'s `icon` field, currently pointed at a generic placeholder). iOS's `AppIcon.appiconset` was completely empty. Pre-existing, unrelated to Expo. Needs a real 1024×1024 Binaa icon before shipping.
 
 **The native display name is "مبادرة", not "Binaa" — this is now a settled decision, not an open question.** Before the T4 migration, both platforms' compiled resources showed "مبادرة" as the home-screen label. T4 briefly changed `app.json`'s `expo.name` to `"Binaa"` as a default; **the owner confirmed 2026-08-19 that "مبادرة" is correct** and it was reverted. Don't "fix" this back to Binaa — it's deliberate.
+
+## From T2c — 2026-08-23
+
+- TypeScript's `include: ["**/*.ts", "**/*.tsx"]` glob does not match files under a dot-prefixed directory (`.rnstorybook/`, `.expo/`, etc.) — dot-directories need an explicit `include` entry. Silent when run through `tsc` alone (files just excluded, no error); loud when `eslint`'s `parserOptions.project` hits the same files ("file not found in project"). Found while wiring T2c's Storybook config into `tsconfig.json`.
+
+## From T2c — 2026-08-23
+
+- A package's `peerDependencies` listing a dep as `*` (any-version-if-present) reads as optional — it may not be. `@storybook/addon-ondevice-controls` statically imports `@react-native-community/datetimepicker`/`slider` unconditionally in its own entry file, so a Metro bundle fails outright without both installed, regardless of whether any story uses a date/slider control. Only discovered by building a real bundle, not by reading the package's metadata. Found during T2c.
+
+## From T2c — 2026-08-23
+
+- A structural check that a config file *loads* (e.g. `node -e "require('./metro.config.js')"`) proves nothing about whether the *dependency graph it configures* actually resolves — different failure modes. T2c's first verification pass caught the former and missed the latter (the peer-dep gap above); only a real `expo start` + bundle fetch surfaced it.
