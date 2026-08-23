@@ -105,7 +105,7 @@ The Status column here is a **convenience snapshot and goes stale**. Each brief'
 | T1d | [react-navigation v6 → v7](T1d-navigation.md) 👤 | ✅ done (caveats below) | `src/navigation/**` | T0 | T2a, T6 |
 | T2a | [Token layer + single theme](T2a-theme.md) | ✅ done (caveats below) | `src/theme/**` | T0 | T1d, T6 |
 | T2b | [Normalize atoms & molecules](T2b-components.md) | ✅ done | `src/components/atoms/**`, `molecules/**` | T2a | T2c, T2d |
-| T2c | [Storybook](T2c-storybook.md) | ⚪ | `.rnstorybook/**`, `*.stories.tsx` | T2b | T2d |
+| T2c | [Storybook](T2c-storybook.md) | 🔵 in progress | `.rnstorybook/**`, `*.stories.tsx` | T2b | T2d |
 | T2d | [Data layer](T2d-data-layer.md) | ⚪ | `src/services/**`, `src/store/**`, `src/App.tsx` | T2a | T2b, T2c |
 | T2e | [Screens — Programs, MainScreen](T2e-screens-a.md) | ⚪ | those two dirs | T2b, T2d | T2f |
 | T2f | [Screens — Program, Library, Today, Subscription](T2f-screens-b.md) | ⚪ | those dirs | T2b, T2d | T2e |

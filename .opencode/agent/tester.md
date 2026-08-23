@@ -30,6 +30,8 @@ permission:
     "npm test*": allow
     "npm run test*": allow
     "npm install *": allow
+    "yarn *": allow
+    "npx *": allow
     "git status*": allow
     "git diff*": allow
     "cat *": allow

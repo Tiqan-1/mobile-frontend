@@ -47,7 +47,8 @@
       ],
       "expo-localization",
       "expo-image",
-      ["expo-updates", null]
+      ["expo-updates", null],
+      "@react-native-community/datetimepicker"
     ],
     "updates": {
       "checkAutomatically": "NEVER"

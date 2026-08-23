@@ -11,6 +11,6 @@
       "utils/*": ["./src/utils/*"]
     }
   },
-  "include": ["**/*.ts", "**/*.tsx"],
+  "include": ["**/*.ts", "**/*.tsx", ".rnstorybook/**/*.ts", ".rnstorybook/**/*.tsx"],
   "exclude": ["**/node_modules", "**/Pods"]
 }
