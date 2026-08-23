@@ -4,7 +4,7 @@ import MainScreen from '@/screens/MainScreen';
 import Menu from '@/screens/Menu';
 import Programs from '@/screens/Programs';
 import TodayLessons from '@/screens/TodayLessons';
-import { PALETTE } from '@/theme/colors';
+import { useTheme } from '@/theme';
 import typography, { fonts } from '@/theme/typography';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Book from 'assets/svg-app/book.svg';
@@ -17,6 +17,7 @@ const Tab = createBottomTabNavigator();
 const BottomTabNavigation = () => {
   const { translate } = useI18n();
   const { t } = useTranslation();
+  const { colors } = useTheme();
 
   const TAB_SCREEN_OPTIONS = {
     drawerPosition: 'right',
@@ -35,8 +36,8 @@ const BottomTabNavigation = () => {
       ...typography['superSmallText'],
       fontFamily: fonts.regular.fontFamily,
     },
-    tabBarInactiveTintColor: PALETTE.BLACK,
-    tabBarActiveTintColor: PALETTE.PRIMARY_COLOR,
+    tabBarInactiveTintColor: colors.BLACK,
+    tabBarActiveTintColor: colors.PRIMARY_COLOR,
   };
 
   return (
