@@ -77,6 +77,10 @@ junit.xml
 !.yarn/releases
 !.yarn/sdks
 !.yarn/versions
+# /feature pipeline raw event logs — diagnostic scratch, not the record
+# (.agents/T-<id>.md and .agents/T-<id>.diff are; keep committing those)
+.agents/*.jsonl
+
 .clinerules/byterover-rules.md
 .kilocode/rules/byterover-rules.md
 .roo/rules/byterover-rules.md
