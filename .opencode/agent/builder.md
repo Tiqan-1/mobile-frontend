@@ -1,7 +1,7 @@
 ---
 description: Cross-vendor implementer for Mobadra. Reads an approved .agents/T-<id>.md and writes the code, as an alternative to the Claude-side senior-dev. Use when Claude capacity is unavailable or a second implementation vendor is wanted.
 mode: primary
-model: hcnsec/auto
+model: hcnsec/DeepSeek-V4-Pro
 temperature: 0.1
 permission:
   edit: allow
