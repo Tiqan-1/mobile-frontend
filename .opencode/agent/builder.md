@@ -24,6 +24,8 @@ permission:
     "node *": allow
     "npm test*": allow
     "npm run *": allow
+    "yarn *": allow
+    "npx *": allow
     "cat *": allow
     "sed -n *": allow
     "rg *": allow
@@ -31,6 +33,9 @@ permission:
     "ls *": allow
     "find *": allow
     "mkdir *": allow
+    "tail *": allow
+    "head *": allow
+    "wc *": allow
     "rm -rf /*": deny
     "sudo *": deny
     "curl *": deny
@@ -77,23 +82,30 @@ the files in scope.
 
 1. Restate the acceptance criteria as the checks you will run.
 2. Implement in small, separately-explained commits.
-3. Run this project's test command on every file touched. New pure logic
-   arrives with tests.
+3. Run this project's fast, deterministic checks on what you touched — a
+   type check, a linter, its test suite if that suite runs in seconds. These
+   catch a regression here, cheaply, instead of it surfacing as a whole
+   review→test→fail loop later. **Skip anything slow or environment-heavy**
+   — e2e, integration against real services, a suite that takes minutes —
+   that's the dedicated `tester` role's job, later in this same pipeline;
+   running it yourself there would just delay your handoff without saving
+   anything, since the tester runs it anyway as the verified record.
 4. Write `.agents/T-<id>.diff` from `git diff` against the branch point.
-5. Append decisions **with reasons**, including a one-line test summary —
-   not verbatim output — a decision without a reason reads as a preference
-   and the reviewer will treat it as such.
+5. Append decisions **with reasons** — a decision without a reason reads as
+   a preference and the reviewer will treat it as such.
 6. Set Status to `in-review`.
 
 ## Report
 
-The state file is the record, not your reply — files changed, criteria met,
-and test results belong in the Decisions log and diff per the rhythm above.
-Anything you did not actually execute is **unverified**, not passing. Do not
-claim otherwise.
+The state file is the record, not your reply — files changed and criteria
+met belong in the Decisions log and diff per the rhythm above. Your own
+checks are informational, not the verified record — the tester's
+independent run is what the state file trusts. Do not claim a criterion
+passed based only on what you ran yourself; leave anything slow or
+environment-heavy to that step.
 
 Before you stop, set **Latest handoff** at the top of the file, e.g.
-`builder → implemented, N/N tests pass → next: reviewer` — or, if you
+`builder → implemented, ready for review → next: reviewer` — or, if you
 appended an Open question instead, `builder → blocked, see Open questions
 → next: lead`. **Your reply to the lead is that line, plus one more only if
 something is blocking or unverified** — not a second copy of the diff,

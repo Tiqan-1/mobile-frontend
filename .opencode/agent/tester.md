@@ -30,8 +30,9 @@ permission:
     "npm test*": allow
     "npm run test*": allow
     "npm install *": allow
-    "git status*": allow
-    "git diff*": allow
+    "yarn *": allow
+    "npx *": allow
+    "git *": allow
     "cat *": allow
     "sed -n *": allow
     "rg *": allow
@@ -39,6 +40,9 @@ permission:
     "ls *": allow
     "find *": allow
     "mkdir *": allow
+    "tail *": allow
+    "head *": allow
+    "wc *": allow
     "sudo *": deny
     "rm -rf /*": deny
 ---
