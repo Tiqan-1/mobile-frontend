@@ -1,7 +1,7 @@
 ---
 description: Independent read-only review of a diff against its spec for Mobadra, plus a project-specific audit pass. Returns PASS or CHANGES_REQUESTED with numbered findings.
 mode: primary
-model: routerplex/glm-5.2
+model: hcnsec/MiniMax-M3
 temperature: 0.1
 # Default is blanket-deny: the reviewer reports its verdict as text and the
 # lead pastes it into the state file. That's slower but has no enforcement
