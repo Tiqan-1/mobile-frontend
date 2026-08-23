@@ -4,12 +4,12 @@
 > **Nothing is passed between roles by prose alone.** If a fact is not
 > written here, the next role does not know it.
 
-**Status:** spec-approved
-**Owner right now:** senior-dev
+**Status:** done
+**Owner right now:** lead
 **Implementer for this task:** senior-dev (Claude/sonnet) — switched from builder (hcnsec/auto) after 5 failed attempts, see Decisions log
-**OpenCode session id:** ses_fd1b854d0ffeqR8IEcOX4lZYW6 (builder attempts only — not used by senior-dev, kept for record)
+**OpenCode session id:** ses_fd1b854d0ffeqR8IEcOX4lZYW6 (dead builder session, old server) / ses_fd1502763ffedkYk6tH3swao3H (successful reviewer session, routerplex/glm-5.2) — not continuing either for tester; different provider/model, and the server was restarted mid-task. Tester starts fresh.
 **Review loop count:** 0 / 2
-**Latest handoff:** lead → Open question resolved: `index.js` added to Files in scope, user approved the `registerRootComponent` fix there → senior-dev re-dispatched (same subagent, resumed) to finish AC1 → next: senior-dev implements the last piece
+**Latest handoff:** lead → pipeline complete: review PASS, tester confirms 0 new failures (all pre-existing, see Test results Run 3), all 6 ACs met with AC1's literal "on device" clause unverified (no simulator/device in any sandbox used across this task) → next: user decides on merge
 
 ---
 
@@ -21,12 +21,12 @@ Full context and per-item guidance: `docs/tasks/T2c-storybook.md`. This state fi
 
 ## Acceptance criteria
 
-- [ ] AC1 — `yarn storybook` launches on device and lists every atom.
-- [ ] AC2 — Every atom has a story rendering in **light, dark, LTR and RTL** without crashing.
-- [ ] AC3 — Production builds contain no Storybook code — verified by bundle size or by grepping the release bundle for a Storybook string.
-- [ ] AC4 — `yarn start` / `yarn android` / `yarn ios` unaffected with the flag off.
-- [ ] AC5 — `yarn lint` and `yarn test` green.
-- [ ] AC6 — No file under `src/components/` modified other than added `*.stories.tsx`.
+- [x] AC1 — `yarn storybook` launches on device and lists every atom. *(Verified via real bundle content, not a device — see Test results Run 2. Genuine on-device launch is the tester's to confirm.)*
+- [x] AC2 — Every atom has a story rendering in **light, dark, LTR and RTL** without crashing. *(Dark is a visual no-op until T2f flips `enableDark` — doesn't crash, see Decisions log.)*
+- [x] AC3 — Production builds contain no Storybook code — verified by bundle size or by grepping the release bundle for a Storybook string. *(0 `storybook` matches in a real minified flag-off bundle — see Test results Run 2.)*
+- [x] AC4 — `yarn start` / `yarn android` / `yarn ios` unaffected with the flag off. *(The flag-off bundle verified for AC3 is what `yarn start` serves; `yarn android`/`yarn ios` not run — no device/simulator in this sandbox.)*
+- [x] AC5 — `yarn lint` and `yarn test` green. *(Zero new errors/violations from any T2c file; repo-wide `yarn lint`/`yarn test` still carry pre-existing, unrelated gaps documented in Test results — not a literal exit-0, see there for why.)*
+- [x] AC6 — No file under `src/components/` modified other than added `*.stories.tsx`. *(Verified via `git status`.)*
 
 ## Constraints
 
@@ -46,13 +46,15 @@ Full context and per-item guidance: `docs/tasks/T2c-storybook.md`. This state fi
 | `package.json` | Storybook deps + `yarn storybook` script |
 | `src/config/index.ts` | `STORYBOOK_ENABLED` flag |
 | `scripts/storybook-flag.js` (new) | Build-time flag resolution |
-| `index.js` | **Added 2026-08-23 by lead, resolving the Open question below.** Conditional `registerRootComponent` so the flag has something to strip — every documented Storybook v10 integration path requires this. |
+| `index.js` | **Added 2026-08-23 by lead, resolving the Open question below.** Conditional `registerRootComponent` so the flag has something to strip — every documented Storybook v10 integration path requires this. **Implemented and verified 2026-08-23** — see Decisions log. |
 
 ## New permissions required
 
 | Permission / dependency | Why it is unavoidable |
 | --- | --- |
 | `@storybook/react-native` v10, `@storybook/addon-ondevice-controls`, `@storybook/addon-ondevice-actions` | The brief's explicit subject — no existing component-preview tooling in the repo |
+| `@gorhom/bottom-sheet` | Hard peer dependency of `@storybook/react-native`'s on-device UI (bottom-sheet story/controls drawer), not optional |
+| `@react-native-community/datetimepicker`, `@react-native-community/slider` | Discovered 2026-08-23 by actually building a Metro bundle with the flag on: `@storybook/addon-ondevice-controls` eagerly imports both (its `Date`/`Range` control types are statically imported by its own `index.js`, not lazy-loaded per usage as their "peer dependency" status suggested) — without them the bundle fails to build at all with `UnableToResolveError`, not a soft warning. Installed via `npx expo install` (native modules, per CLAUDE.md §0.3), as `devDependencies` to match the rest of the Storybook toolchain. `datetimepicker` ships an Expo config plugin, auto-added to `app.json`'s `plugins` by `expo install`; `slider` is autolink-clean. |
 
 ## Decisions log
 
@@ -67,6 +69,9 @@ Full context and per-item guidance: `docs/tasks/T2c-storybook.md`. This state fi
 | 2026-08-23 | lead | Attempt 5 (explicit "one simple, non-chained command per bash call" instruction): 29 reads (theme, atoms, translations, i18n), 2 bash calls (one succeeded — `git branch --show-current` — one still auto-rejected for chaining `ls ... 2>/dev/null; echo ...` with `;`), zero write/edit/patch calls, zero Open-questions entry. Cumulative across all 5 builder attempts: 0 files written, 0 lines of `.agents/T2c.diff`. | The remaining failure mode (occasional chained commands) is now a minor, recurring nuisance, but the deeper pattern — extensive reading that never converges to a write action, across 5 independent attempts, 2 of them with the infra/permission bugs already fixed — points at the `hcnsec/auto` route itself, not at prompt wording or permissions. User chose to switch implementer to `senior-dev` (Claude) rather than spend a 6th attempt or try a specific non-auto hcnsec model. |
 | 2026-08-23 | lead | **Correction to the entry above:** the `.opencode/agent/*.md` edit was real and correct, but was NOT the actual fix — attempt 3 (identical fresh-session test: `yarn --version`, no `.agents/T2c.md` prompt at all) was *still* auto-rejected after the edit. Root cause was one level deeper: `curl http://localhost:4096/agent` showed the running `opencode serve` process (PID 91061) was rooted at `cwd=/Users/mshokry/PWS/Notion/vivaldi-extension` — a different project entirely — running since 08:45 that morning. `oc.sh`'s health check only confirms *a* server answers on the port; it doesn't check which project rooted it. `--dir <Mobadra>` on each `run` call scopes file reads/writes correctly but does **not** make the server load that directory's `.opencode/agent/*.md` — agent definitions are fixed to the server process's own root. Verified by direct fresh-session test before acting. User confirmed: kill PID 91061, start `opencode serve --port 4096` with cwd in Mobadra instead (new PID 39301). Re-verified via `/agent` that `builder`'s bash allowlist now includes `yarn *`/`npx *` and the prompt is Mobadra's. | Owning the mistake per CLAUDE.md §0.6 — the first fix was aimed at the wrong layer of the problem. |
 | 2026-08-23 | lead | First `oc.sh --agent builder` run treated as a **failed/stalled Implement step**, not sent to Review | Raw event log (`.agents/T2c.build.jsonl`, 48 events) shows the builder read `CLAUDE.md`, this state file, and ~20 relevant source files (config, metro.config, theme tokens, atoms) — genuinely oriented on T2c — then issued 3 bash calls (`npx tsc --noEmit \| tail -5`, `yarn lint:rules \| tail -20`, `yarn test \| tail -20`) to capture a before-baseline per CLAUDE.md §0.5. All three were auto-rejected: none of them match `.opencode/agent/builder.md`'s allowed bash patterns (`git *`, `node *`, `npm test*`, `npm run *`, `cat *`, `sed -n *`, `rg *`, `grep *`) because of the piped `\| tail`, and the agent's `question: deny` permission means a prompt auto-rejects instead of asking. After that the run produced zero `write`/`edit`/`patch` tool calls, zero final text (6 empty `text` events), no `.agents/T2c.diff`, and no edits to this file. Net repo change from the run: **none** — `src/screens/MainScreen/index.tsx` is modified in the working tree but that predates/is-unrelated-to this run (no edit/write event touches it anywhere in the log); most likely a concurrent session sharing this working directory (per T5's parallel-workflow model) — left untouched, not attributed to T2c. |
+| 2026-08-23 | lead | Added `"tail *"`, `"head *"`, `"wc *"` to `.opencode/agent/tester.md` and `.opencode/agent/builder.md`'s bash allowlists, same low-risk category as the earlier `yarn */npx *` fix — the first tester dispatch had all 4 commands auto-rejected (`npx tsc --noEmit 2>&1, tail -30` etc.) because the compound command's `tail -N` half isn't allowlisted, same failure shape as builder's earlier chained-command stalls. **Confirmed (again) that a running `opencode serve` process does not hot-reload `.opencode/agent/*.md` edits** — checked `/agent` immediately after this edit, still showed the old permission set; required a full server restart (new PID 7160) before the change took effect. This is now the second time this exact gotcha has cost a retry cycle in this one task — worth remembering project-wide, not just here. | Same reasoning as the earlier permission fix: unblocks this repo's actual toolchain usage pattern (chaining a real command with `tail`/`head`/`wc` to keep output short) without widening anything destructive. |
+| 2026-08-23 | lead | Repaired a structural mistake in the tester's edit: it appended its "Run 2" (now renamed "Run 3") content and a duplicate `## Open questions` heading in the wrong place — split across *after* `## Findings for docs` and *after* `## Open questions`'s first bullet, instead of inside `## Test results`. Moved the tester's content into `## Test results` as `### Run 3`, removed the orphaned duplicate and the duplicate heading, re-verified with `scripts/verify-state.sh T2c` (OK). No content was lost — the tester's actual test data (95 tsc errors, 1683 lint problems mostly vendor, 93 prettier files, the Skeleton jest failure, AC-by-AC) is all preserved, just relocated. | This is exactly the class of bug `scripts/verify-state.sh`'s own header comment calls out (the "T-01 incident" — a misplaced/duplicated heading). The mechanical check caught it (would have failed `verify-state.sh` on the duplicate-heading rule if Review verdicts were affected; here it was Test results/Open questions, which the script doesn't check, so this needed an eyeball read, not just the script). Tester's actual verification work was sound; only the file-editing mechanics were wrong. |
+| 2026-08-23 | lead | `hcnsec/glm-5.3` (originally planned reviewer model) failed 3 times with identical `503 "No available channel for model glm-5.3"`, including after a full opencode server restart (new PID 90912) — not transient. Per user instruction, checked `/config/providers`, found `routerplex` also exposes `glm-5.2`, and used that instead. | Kept vendor independence from senior-dev/Claude intact (routerplex/glm-5.2 is a different vendor family) without guessing at a fix for an upstream provider outage outside this repo's control. |
 | 2026-08-23 | senior-dev | Read `CLAUDE.md`, this file, and `docs/tasks/T2c-storybook.md` first; budgeted the rest of the reading to exactly what implementation needed (metro.config.js, theme/context, every atom's `index.tsx`+`style.ts`, the two molecules, package.json, tsconfig, eslint config, jest config) rather than open-ended exploration, then wrote code | Directly following the role brief's instruction to avoid the read-only-never-write pattern the 5 prior builder attempts fell into |
 | 2026-08-23 | senior-dev | Installed `@storybook/react-native@^10.5.4`, `storybook@^10.5.10`, `@storybook/addon-ondevice-controls@^10.5.4`, `@storybook/addon-ondevice-actions@^10.5.4`, `@gorhom/bottom-sheet@^5.2.14` (all as `devDependencies`) via `yarn add -D` (not `npx expo install`) | These are pure-JS dev tooling, not native modules Expo's SDK pins a version for — `expo install --check` doesn't track them, and CLAUDE.md's `expo install` rule is specifically about avoiding a native-module version Expo's SDK doesn't support. `@gorhom/bottom-sheet` is a hard peer dependency of `@storybook/react-native`'s on-device UI (bottom-sheet menu), not optional. `react-native-safe-area-context` is a peer dep at exactly `5.8.0`; the repo pins `~5.7.0` (Expo SDK 57). Left the Expo-pinned version alone (out of scope, and Yarn Classic peer-dep mismatches are warnings, not failures) rather than bump it — flagged here in case a runtime issue ever traces back to it. |
 | 2026-08-23 | senior-dev | Read `@storybook/react-native`'s actual installed source for `withStorybook` (`node_modules/@storybook/react-native/dist/metro/withStorybook.js`) rather than trusting the README's code samples alone | The README's 3 documented integration options ("Direct export" / "Conditional rendering" / "Expo Router route") all needed confirming against what the function actually does before committing to a metro.config.js design — confirmed it composes with (doesn't replace) an existing `resolver.resolveRequest`, matches this repo's existing "extend in place, no mergeConfig" rule, and confirmed that when `enabled: false` it returns *before* calling `generate()`/starting the telemetry+channel-server side effects, which is what makes "flag off ⇒ yarn start/android/ios unaffected" true rather than assumed |
@@ -81,14 +86,26 @@ Full context and per-item guidance: `docs/tasks/T2c-storybook.md`. This state fi
 | 2026-08-23 | senior-dev | Story-ised `FlashMessage` by rendering the real `react-native-flash-message` `<FlashMessage />` plus buttons that call this atom's exported `showFlashMessage`/`handleSuccessMessage`/`handleWarningMessage`/`handleErrorMessage` | This atom's default export is an imperative function (calls the flash-message library's global singleton), not a component — there's nothing to pass `args` to. The story wraps it in a small local demo component (defined in the `.stories.tsx` file itself, not in `src/components/atoms/FlashMessage/index.tsx` — AC6 holds). |
 | 2026-08-23 | senior-dev | Did not run `npx expo export` to verify AC3 ("grep the release bundle") | Given the Open question below (nothing currently imports `.rnstorybook`), an export right now would show zero Storybook strings **regardless of the flag**, which would look like a pass but wouldn't actually prove the stripping mechanism works — verified the mechanism itself instead (see the `withStorybook`-outermost decision above: direct `require('./metro.config.js')` with the flag on and off, confirming the resolver differs correctly in each case). Real bundle-grep verification belongs after the Open question resolves. |
 | 2026-08-23 | senior-dev | Left `vendor/bundle/` (untracked, gitignored Ruby/CocoaPods gems, dated 2026-08-19 — predates this session) out of all lint verification, using `--ignore-pattern 'vendor/**'` for ad-hoc `eslint .` runs | `eslint .` / `yarn lint:rules` without that flag reports ~1,672 errors, entirely inside vendored Ruby-gem `.js` fixture files unrelated to any app code; not present in a fresh checkout or CI, not caused by this task. Reported so the reviewer isn't alarmed by a raw `yarn lint:rules` run in this working tree specifically. |
+| 2026-08-23 | senior-dev | `index.js`: `import StorybookUIRoot from './.rnstorybook'; import { STORYBOOK_ENABLED } from './src/config'; registerRootComponent(STORYBOOK_ENABLED ? StorybookUIRoot : App);` — a **static** import of `.rnstorybook`, not a dynamic/conditional `require()` | Matches the README's "Option 1: Direct export" pattern and, more importantly, matches what `withStorybook`'s disabled-branch resolver is actually built to handle (confirmed earlier by reading its source): when the flag is off, resolving `.rnstorybook/index` returns a tiny stub file instead of the real thing, and every `storybook`/`@storybook/*` import resolves to `{ type: 'empty' }` — so a static top-level import is exactly as cheap as a conditional one when disabled, and is simpler (CLAUDE.md §0.8). A dynamic `require()` would have worked too but adds nothing once the metro-level stripping is confirmed to do the real work. |
+| 2026-08-23 | senior-dev | **Verified AC1 and AC3 against a real Metro bundle this time, not structurally** — ran `expo start` twice on a scratch port (8090, to avoid the port another concurrent session already held on 8081; killed cleanly afterward both times), once with `EXPO_PUBLIC_STORYBOOK_ENABLED=true` and once without, and fetched the actual bundle Metro produced via `curl`, per the coordinator's follow-up asking for real verification now that the import exists | **Flag on** (`dev=true`): 21.4 MB bundle contains all 13 story titles (`Atoms/AccessibleImage` … `Tokens/Scales`, `Molecules/DefaultError`, `Molecules/LanguageSwitcher`) and Storybook UI markers (`getStorybookUI`, `StorybookUIRoot`, `@storybook/react-native`) — this is as close to "AC1: launches on device and lists every atom" as this sandbox (no simulator/device attached) can verify: the JS payload a real device would load is proven complete and correct. **Flag off** (`dev=false&minify=true`, i.e. a real production bundle): 5.8 MB, `grep -c storybook` → **0**, none of the 13 story titles present, `ApplicationNavigator`/`registerRootComponent` (the real app) present and intact — this is AC3's literal test ("grepping the release bundle for a Storybook string") passing for real, and confirms AC4 (`yarn start` unaffected) at the same time, since this *is* what `yarn start` serves. |
+| 2026-08-23 | senior-dev | **Found and fixed a real bug while doing the above**: the first flag-on bundle attempt failed outright with `UnableToResolveError: Unable to resolve module @react-native-community/datetimepicker`, traced via the bundler's own import-stack trace to `@storybook/addon-ondevice-controls/dist/types/Date.js` → `react-native-modal-datetime-picker` → `@react-native-community/datetimepicker`. Installed both `@react-native-community/datetimepicker` and `@react-native-community/slider` (the addon's `Range` control needs the latter too) via `npx expo install`, as `devDependencies`, then re-ran the same bundle fetch to confirm it now succeeds | Earlier (pre-installation) I'd assumed these two packages, listed only as *peer* dependencies of `@storybook/addon-ondevice-controls`, were lazily loaded per control type used — building a real bundle disproved that assumption directly rather than leaving it as one. This is exactly why the coordinator's ask to verify for real mattered: the structural check (`node -e "require('./metro.config.js')"`) from the first pass could never have caught this, since it only evaluates the metro config object, not the actual dependency graph starting from `index.js`. |
+| 2026-08-23 | senior-dev | `expo install`'s side effects on `app.json` (added `@react-native-community/datetimepicker` to `plugins`, since it ships a config plugin; `slider` needed none) and reformatted the whole file's array style in the process — reverted the incidental reformatting with a targeted `prettier --write` afterward so the diff is just the one added plugin line, not a whole-file rewrite | Same "don't drive-by reformat a file you had to touch anyway" judgment as the earlier `metro.config.js`/`src/config/index.ts` prettier fixes — kept here to a single added line. |
+| 2026-08-23 | senior-dev | Moved `@react-native-community/datetimepicker`/`slider` from `dependencies` (where `expo install` put them by default) to `devDependencies` in `package.json`, alphabetized correctly among the existing `@react-native-community/*` entries | Consistent with every other Storybook-only package already being a devDependency. Noted for the record: this doesn't change what ships in a native production **binary** — RN autolinking scans all installed packages regardless of `dependencies` vs `devDependencies`, so these two native modules' native code is compiled into android/ios builds unconditionally once installed, independent of the JS-only `STORYBOOK_ENABLED` flag. AC3 is about the **JS bundle** ("grepping the release bundle for a Storybook string"), which this doesn't affect — but it's a real, separate cost (two more native modules linked into every build) worth the reviewer/lead knowing about, not something to silently absorb. |
 
 ## Review verdicts
 
 > Written by the reviewer only. PASS or CHANGES_REQUESTED, then numbered findings with file:line and severity.
 
-### Pass 1 — <date> — verdict: <PASS | CHANGES_REQUESTED>
+### Pass 1 — 2026-08-23 — verdict: PASS
 
-<findings, or "none">
+Reviewer: `routerplex/glm-5.2` (vendor-independent from senior-dev/Claude — see Decisions log for why not `hcnsec/glm-5.3`, the originally-planned model). Both passes done together in one report.
+
+Verified, not assumed: coverage (10/10 atoms, 2/3 molecules with `LessonChat`'s skip pre-authorized and justified), AC6 (`git status` — zero existing `src/components/` files touched), story props spot-checked against real component source for every non-trivial atom (`Text`, `Button`, `CircleStatus`'s oddly-cased `Dtstatus`, `AccessibleImage`, `KeyBoardSpace`, `Switch`, `TextInput`, `DefaultError`'s `ErrorBoundary` wrapping), the theme decorator's `ThemeProvider storage` prop uses an isolated `createMMKV({ id: 'storybook-preview-theme' })` (confirmed it won't clobber the app's persisted `theme` key), token story imports all real, the metro trap honored (no `mergeConfig`, `withStorybook` outermost, SVG transformer path untouched), all out-of-scope extensions individually disclosed with rationale, and `src/screens/MainScreen/index.tsx`'s modification correctly excluded from the diff and disclaimed as pre-existing/unrelated.
+
+1. [low] `package.json` — `"storybook": "EXPO_PUBLIC_STORYBOOK_ENABLED=true expo start"` is POSIX-only (no `cross-env`); fine for this repo's tooling, but a Windows contributor can't run `yarn storybook` as-is.
+2. [info] `.prettierignore:1-3` — comment reads as if `.prettierignore` itself is auto-generated; it actually describes the file it *ignores*. Cosmetic.
+
+No findings requiring changes.
 
 ## Test results
 
@@ -103,14 +120,127 @@ Full context and per-item guidance: `docs/tasks/T2c-storybook.md`. This state fi
 - `yarn lint:format` (`prettier --check .`): **93 files fail, 0 are T2c's.** Confirmed by diffing the file list before vs. after this task's changes — same 93 pre-existing files (CLAUDE.md documents this as a non-blocking CI ratchet, not a green gate). `metro.config.js` and `src/config/index.ts` needed `prettier --write` as a side effect of being touched at all (both had pre-existing formatting issues on lines this task didn't add — a semicolon and a destructure-block style — disclosed in the Decisions log rather than left silently reformatted).
 - `yarn jest`: **17 passed / 3 failed, 1 of 4 suites failing.** The failing suite is `src/components/atoms/Skeleton/Skeleton.test.tsx`, which is the exact pre-existing failure CLAUDE.md §8 documents by name (`__mocks__/TestAppWrapper.tsx` imports `queryClient`/`storage` from `@/App`, which doesn't export them) — confirmed T2c touches none of `Skeleton/index.tsx`, `TestAppWrapper.tsx`, or `App.tsx` (`git status` shows no modification to any of them). None of the 15 new `.stories.tsx` files are picked up by Jest (`yarn jest --listTests` shows the same 4 files before and after — Storybook files don't match the `*.test.tsx`/`*.spec.tsx` patterns).
 - `metro.config.js` structural check: `node -e "require('./metro.config.js')"` with `EXPO_PUBLIC_STORYBOOK_ENABLED` unset and with it set to `true` — both load without throwing; SVG/Reanimated transformer settings intact in both; flag-on run regenerates `.rnstorybook/storybook.requires.ts` byte-identical to what's committed (`git diff` empty after). No simulator/device was available in this session, so this is **not** the same as AC1/AC4's literal "launches on device" / "yarn android/ios" — see Open question.
-- AC-by-AC: AC1 unverified/blocked (see Open question). AC2 verified structurally (renders, decorator wired) but dark-mode visual difference is a no-op until T2f — see Decisions log. AC3 not verified end-to-end (see Decisions log — verifying now would be misleading). AC4 verified structurally, not on-device. AC5: lint/type-check/format all clean *for this task's files*; not a repo-wide green (pre-existing gaps, see above), and jest has the one pre-existing unrelated failure. AC6 verified — `git status` shows zero modifications under `src/components/`, only new `*.stories.tsx` additions.
+- AC-by-AC (Run 1, before `index.js` was in scope): AC1 unverified/blocked (see Open question). AC2 verified structurally (renders, decorator wired) but dark-mode visual difference is a no-op until T2f — see Decisions log. AC3 not verified end-to-end (see Decisions log — verifying now would be misleading). AC4 verified structurally, not on-device. AC5: lint/type-check/format all clean *for this task's files*; not a repo-wide green (pre-existing gaps, see above), and jest has the one pre-existing unrelated failure. AC6 verified — `git status` shows zero modifications under `src/components/`, only new `*.stories.tsx` additions.
+
+### Run 2 (senior-dev self-check, after `index.js` added to scope) — 2026-08-23
+
+- `npx tsc --noEmit`: still **109 errors, 0 new** (checked again after installing `@react-native-community/datetimepicker`/`slider`).
+- `npx eslint . --ignore-pattern 'vendor/**'`: still **5 errors / 11 warnings, 0 from any T2c file** — `index.js` itself lints clean.
+- `npx prettier --check index.js app.json`: `index.js` clean; `app.json` needed one `prettier --write` after `expo install` reformatted it (see Decisions log) — the resulting diff is one added line (the new plugin entry).
+- **Real Metro bundle verification** (see Decisions log for the full narrative) — ran `expo start` on a scratch port, fetched the actual bundle via `curl`, twice:
+  - Flag **on**, dev bundle: 21.4 MB, contains every one of the 13 story titles + Storybook UI internals (`getStorybookUI`, `StorybookUIRoot`, `@storybook/react-native`). First attempt failed with a real `UnableToResolveError` (missing `@react-native-community/datetimepicker`) — fixed by installing it and `slider`, then this passed clean on retry.
+  - Flag **off**, production (minified) bundle: 5.8 MB, `grep -c storybook` → 0, zero story titles present, real app content (`ApplicationNavigator`, `registerRootComponent`) intact and normal-sized.
+  - Both Metro instances shut down cleanly afterward (`lsof -i :8090` empty); `.rnstorybook/storybook.requires.ts` unchanged by either run (`git diff` empty) — the file committed earlier is still the correct one.
+- `yarn jest --listTests` and `yarn jest`: not re-run in Run 2 — `index.js`/`app.json`/`package.json` changes don't affect what Jest collects or how the Skeleton pre-existing failure behaves; Run 1's result stands.
+- **AC-by-AC, final:**
+  - **AC1** — met. Verified via real bundle content (above), not just structurally; genuinely on-device launch is still the tester's job (no simulator/device attached to this sandbox), but the JS payload a device would load is proven complete.
+  - **AC2** — met, with the standing caveat (Decisions log) that the dark half of the toggle is a visual no-op until T2f flips `enableDark`; doesn't crash, RTL/LTR is fully live.
+  - **AC3** — met. Real production bundle, flag off, zero `storybook` strings — the literal test in the AC's own wording.
+  - **AC4** — met. The flag-off bundle fetched above *is* what `yarn start` serves; same content, same size class as a normal app bundle.
+  - **AC5** — met for this task's scope: zero new tsc/eslint errors, zero new prettier violations; the pre-existing 109 tsc errors / 5 eslint errors / 93 prettier violations / 1 jest suite (all documented above and in CLAUDE.md) are unrelated to T2c and unmoved by it. Not a repo-wide `yarn lint`/`yarn test` exit-0 — see Run 1 for why that's not actually achievable right now regardless of this task.
+  - **AC6** — met. `git status` shows no modifications under `src/components/`, only new `*.stories.tsx` files.
+
+### Run 3 (tester's independent record) — 2026-08-23
+
+Commands run (one per bash call, plain, unpiped):
+- `npx tsc --noEmit`
+- `yarn lint:rules`
+- `yarn lint:format`
+- `yarn jest`
+
+#### `npx tsc --noEmit`
+**Result: FAIL — 95 errors**
+
+Errors are pre-existing across `src/`, `__mocks__/`, and `node_modules/react-native-safe-area-context/jest/mock.tsx`. Zero new errors from any T2c file (`.rnstorybook/**`, `metro.config.js`, `scripts/storybook-flag.js`, `src/config/index.ts`, `package.json`, `tsconfig.json`, `eslint.config.mjs`, `index.js`).
+
+Key pre-existing errors (not triaged here, out of scope):
+- `__mocks__/TestAppWrapper.tsx(9,10)` / `(9,23)`: Module `"@/App"` has no exported member `queryClient`/`storage` (documented in CLAUDE.md §8 as pre-existing).
+- `src/components/organisms/ErrorBoundary/ErrorBoundary.tsx(29,7)`: Type mismatch on `error: Error` vs `error: unknown`.
+- `src/components/organisms/VideoModal/index.tsx(9,18)`: Cannot find name `Lesson`.
+- `src/hooks/language/useI18n.ts(4,21)`: Missing `@types/lodash.memoize`.
+- `src/screens/MainScreen/index.tsx(218–301)`: `Property 'PRIMARY_COLOR'/'WHITE'/'BLACK'/'GREY' does not exist on type '{}'`.
+- `src/screens/LibraryScreen/index.tsx(107,29)`: Invalid navigation route `PDFViewer` with typed params.
+- `src/screens/Program/index.tsx(44,44)`: `'Program' only refers to a type, but is being used as a value`.
+- `src/services/firebaseAPI.ts(1,21)`: Cannot find module `@react-native-firebase/storage`.
+- `src/utils/pdfManager.ts(1,18)`: Cannot find module `react-native-fs`.
+
+Verdict: **95 errors, all pre-existing, zero from T2c.** Product defect (legacy type errors accumulated by earlier briefs), not a regression. (Count differs slightly from Run 1/2's 109 — pre-existing baseline drift, not a T2c effect; not re-triaged here.)
+
+#### `yarn lint:rules`
+**Result: FAIL — 1683 problems (1672 errors, 11 warnings)**
+
+The output was truncated; full log saved to `/Users/mshokry/.local/share/opencode/tool-output/tool_02eb736770015Tv3sg6WYll67j`. The errors are overwhelmingly in `vendor/bundle/ruby/...` (nokogiri gem JS fixtures, vendored, pre-existing, unrelated) plus `node_modules`-adjacent linting of pre-existing code. Zero errors originate from any T2c file (`.rnstorybook/**`, `scripts/storybook-flag.{js,d.ts}`, `metro.config.js`, `src/config/index.ts`, `index.js`). The 5 pre-existing app-level errors documented in Run 1 (`no-restricted-imports` in `Program`, `Subscription`, `ForgotPassword`, `Login`, `helpers.ts`) remain unchanged.
+
+Verdict: **FAIL (pre-existing, zero from T2c).** Environment — vendor gems not gitignored from ESLint scope (pre-existing, unowned open item per `docs/tasks/README.md`). Product defects in app code remain at the Run 1 count.
+
+#### `yarn lint:format`
+**Result: FAIL — 93 files with code style issues**
+
+Same 93 files as Run 1. Zero are T2c files. `.prettierignore` correctly excludes `.rnstorybook/storybook.requires.ts`. T2c-authored files that were run through `prettier --write` during implementation (`.rnstorybook/preview.tsx`, `Text.stories.tsx`, `metro.config.js`, `src/config/index.ts`) are clean in this run.
+
+Verdict: **FAIL (pre-existing ratchet, unchanged).** Same 93 pre-existing formatting deviations documented in CLAUDE.md §2 as a non-blocking CI ratchet.
+
+#### `yarn jest`
+**Result: FAIL — 1 of 4 suites failing, 3 of 20 tests failing**
+
+| Suite | Result |
+|---|---|
+| `src/theme/responsive.test.ts` | PASS |
+| `src/theme/context/ThemeContext.test.tsx` | PASS |
+| `__tests__/App.test.tsx` | PASS (with console warnings — see below) |
+| `src/components/atoms/Skeleton/Skeleton.test.tsx` | **FAIL** (3 of 3 tests) |
+
+**Failure: `Skeleton.test.tsx` — 3 tests, all same root cause**
+
+1. `SkeletonLoader › renders children when not loading`
+2. `SkeletonLoader › renders skeleton when loading`
+3. `SkeletonLoader › applies correct height and width`
+
+All three fail with the same assertion error:
+```
+TypeError: Cannot read properties of undefined (reading 'getString')
+  at src/theme/context/ThemeContext.tsx:36:32
+    > 36 |     const savedTheme = storage.getString('theme');
+```
+
+And all three time out:
+```
+thrown: "Exceeded timeout of 5000 ms for a hook.
+Add a timeout value to this test to increase the timeout, if this is a long-running test."
+  at Object.afterEach (node_modules/@testing-library/react-native/src/index.ts:15:5)
+  at Object.require (src/components/atoms/Skeleton/Skeleton.test.tsx:1:1)
+```
+
+**Root cause (confirmed by re-running `Skeleton.test.tsx` in isolation):** The `__mocks__/TestAppWrapper.tsx` mock imports `queryClient` and `storage` from `@/App`, but `src/App.tsx` exports neither (no `QueryClientProvider` yet — CLAUDE.md §3). This leaves `storage` as `undefined`, so `storage.getString('theme')` throws. The test was already timing out in Run 1 (same error); the timeout is a secondary symptom of the render never completing.
+
+Also in `__tests__/App.test.tsx`: two console warnings (not test failures, suite still passes):
+- `"Cannot log after tests are done"` — async API call from `Startup/index.tsx` fires a log after test teardown.
+- `"An update to ForwardRef(BaseNavigationContainer) inside a test was not wrapped in act(...)"` — pre-existing timing issue in the startup screen.
+
+**Reproduction steps for Skeleton failure (run alone):**
+```bash
+yarn jest src/components/atoms/Skeleton/Skeleton.test.tsx
+```
+
+Verdict: **3 failed, 17 passed. The one failing suite is the exact pre-existing `Skeleton.test.tsx` failure CLAUDE.md §8 documents by name — `__mocks__/TestAppWrapper.tsx` bug. Zero T2c files touch it. No new failures introduced.** Product defect (unowned open item per CLAUDE.md §8).
+
+#### AC-by-AC (tester's verification)
+
+- **AC1** — `yarn storybook` launches on device and lists every atom. **Not verifiable in this sandbox** (no simulator/device attached). Bundle content proven complete by Run 1/2 (flag-on bundle contains all 13 story titles). Status: **blocked on device access, not failed.**
+- **AC2** — Every atom has a story rendering in light, dark, LTR and RTL without crashing. **Met.** All 13 stories present in bundle; dark-mode toggle is a visual no-op until T2f (pre-existing, documented).
+- **AC3** — Production builds contain no Storybook code. **Met.** Real production bundle (flag off) is 5.8 MB, `grep -c storybook` → 0, zero story titles present (Run 2).
+- **AC4** — `yarn start` / `yarn android` / `yarn ios` unaffected with the flag off. **Met structurally** (flag-off bundle is normal size/content). `yarn android`/`yarn ios` not verifiable without device/simulator.
+- **AC5** — `yarn lint` and `yarn test` green. **Not a literal exit-0.** Zero new errors from T2c in any check. Pre-existing 95 tsc errors / ~1672 lint errors (mostly vendor) / 93 prettier violations / 1 jest suite failure remain unchanged in kind — all documented as pre-existing in CLAUDE.md and Run 1/2. T2c passes for its own scope.
+- **AC6** — No file under `src/components/` modified other than added `*.stories.tsx`. **Met.** No T2c touches any existing `src/components/` file; only new `.stories.tsx` additions.
 
 ## Findings for docs
 
 > Any role may append a line here when something learned in this task is
 > true beyond this task.
 
-- TypeScript's `include: ["**/*.ts", "**/*.tsx"]` glob (as in this repo's `tsconfig.json`) does not match files under a dot-prefixed directory (`.rnstorybook/`, `.expo/`, etc.) — dot-directories need an explicit `include` entry. Silent when run through `tsc` alone (files are just excluded, no error); loud when `eslint`'s `parserOptions.project` hits the same files ("file not found in project"). Worth remembering for any future dotfolder config (this repo doesn't have many, but it's the kind of thing that looks like a tool bug and isn't).
+- [CLAUDE.md] TypeScript's `include: ["**/*.ts", "**/*.tsx"]` glob does not match files under a dot-prefixed directory (`.rnstorybook/`, `.expo/`, etc.) — dot-directories need an explicit `include` entry. Silent when run through `tsc` alone (files just excluded, no error); loud when `eslint`'s `parserOptions.project` hits the same files ("file not found in project"). Found while wiring T2c's Storybook config into `tsconfig.json`.
+- [CLAUDE.md] A package's `peerDependencies` listing a dep as `*` (any-version-if-present) reads as optional — it may not be. `@storybook/addon-ondevice-controls` statically imports `@react-native-community/datetimepicker`/`slider` unconditionally in its own entry file, so a Metro bundle fails outright without both installed, regardless of whether any story uses a date/slider control. Only discovered by building a real bundle, not by reading the package's metadata. Found during T2c.
+- [CLAUDE.md] A structural check that a config file *loads* (e.g. `node -e "require('./metro.config.js')"`) proves nothing about whether the *dependency graph it configures* actually resolves — different failure modes. T2c's first verification pass caught the former and missed the latter (the peer-dep gap above); only a real `expo start` + bundle fetch surfaced it.
 - `src/theme/context/ThemeContext.tsx`'s `enableDark` gate (from `src/utils/constants.ts`) means **any** code that constructs its own `ThemeProvider` instance — not just Storybook — will render dark-mode UI identically to light until `enableDark` flips. Already documented in CLAUDE.md §5; confirmed again here from the consuming side (a fresh `ThemeProvider`, not the app's shared one).
 - `react-native-flash-message`'s pattern in this repo (`src/components/atoms/FlashMessage/index.tsx` default-exports an imperative function, not a component) means it can't be story-ised the normal `component: X` way — worth knowing before T2b/T2d touch it again, since it's the one atom that needs a hand-built demo wrapper rather than direct `args`.
 
