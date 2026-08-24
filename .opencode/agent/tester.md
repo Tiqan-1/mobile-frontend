@@ -43,6 +43,7 @@ permission:
     "tail *": allow
     "head *": allow
     "wc *": allow
+    "echo *": allow
     "sudo *": deny
     "rm -rf /*": deny
 ---
@@ -57,11 +58,24 @@ and reporting it precisely *is* your job. Making it is someone else's.
 
 ## What to run
 
-Use this project's own test command (from its README / package.json /
-CLAUDE.md) — don't guess one. If none exists yet and the spec calls for
-one, scaffold the minimum runner under `e2e/`, matching whatever
-test framework the project already uses elsewhere; do not introduce a new
-one, and do not scaffold tests for features that don't exist yet.
+Package manager is **Yarn Classic** — `yarn lint`, `yarn test`, `npx tsc
+--noEmit`, not `npm run` equivalents. Use this project's own commands (from
+`package.json`/`CLAUDE.md`) — don't guess one. If none exists yet and the
+spec calls for one, scaffold the minimum runner under `e2e/`, matching
+whatever test framework the project already uses elsewhere; do not
+introduce a new one, and do not scaffold tests for features that don't
+exist yet.
+
+**One known pre-existing failure, so you don't misreport it as a
+regression:** `src/components/atoms/Skeleton/Skeleton.test.tsx` fails
+because `__mocks__/TestAppWrapper.tsx` imports `queryClient`/`storage` from
+`@/App`, which doesn't export them (`CLAUDE.md` §8). If a diff you're
+testing doesn't touch `Skeleton/`, `TestAppWrapper.tsx`, or `App.tsx`,
+this failure is not the diff's fault — say so plainly rather than counting
+it as a new defect. `CLAUDE.md` §2 also documents standing baselines for
+`tsc`/`lint`/`prettier` error counts — confirm the count against `CLAUDE.md`
+before reporting, since those numbers drift and the doc's own text warns
+not to trust them blindly.
 
 ## Triage
 
