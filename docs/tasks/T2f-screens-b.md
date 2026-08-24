@@ -1,5 +1,33 @@
 # T2f — Screen refactor: Program, LibraryScreen, TodayLessons, Subscription (+ auth, Menu)
 
+> **Before you start:** read [`CLAUDE.md` §0](../../CLAUDE.md) — the working agreement. In short: **don't commit or push unless asked in this session**; never hand-edit `android/`/`ios/` (they're generated — `app.json` + config plugins instead); install with `npx expo install`, not `yarn add`; stay inside your `Owns` list and report anything outside it rather than fixing it; keep changes surgical (§0.8).
+>
+> **Keep the Status & checkpoints block below current as you work** — it lives in this file, not in a central tracker. Set the status when you start, tick each checkpoint only once you've *verified* it, and update it again when you stop. If you stop mid-brief, name the exact checkpoint you stopped at.
+
+---
+
+## Status & checkpoints
+
+| | |
+|---|---|
+| **Status** | ⚪ not started |
+| **Owner** | — |
+| **Branch** | — |
+| **Last updated** | 2026-08-17 |
+
+**Legend:** ⚪ not started · 🔵 in progress · ⏸️ blocked · ✅ done · 🟣 superseded
+
+Tick a box only when you have **verified** it, not when you've written the code. Add a checkpoint if this brief turns out to need one — don't silently widen the one you're on. This brief is `✅ done` only when every box is ticked **and** the Acceptance criteria below pass.
+
+- [ ] `Program` decomposed
+- [ ] `LibraryScreen` decomposed
+- [ ] `TodayLessons` decomposed
+- [ ] `Subscription` decomposed
+- [ ] No direct `PALETTE` imports left
+- [ ] tsc error count for these files reduced — record before/after
+
+---
+
 **Depends on:** T2b, T2d. **Parallel-safe with:** T2e.
 
 ## Goal
@@ -34,7 +62,7 @@ Coordinate with T2e on shared extractions — don't both create the same card co
 | `Menu/index.tsx` | 156 | account deletion, logout, the admin easter egg (T0 fixed its render-phase `setState`) |
 | `auth/signup` · `Login` · `ForgotPassword` | 218 · 209 · 119 | Formik + yup |
 | `AccessibilitySettings` | 142 | |
-| `PDFViewerScreen/PDFViewer.tsx` | 102 | WatermelonDB progress |
+| `PDFViewerScreen/PDFViewer.tsx` | 102 | read position → Redux `documents` slice |
 
 ---
 
@@ -46,7 +74,7 @@ react-query instead of `REQUESTING`; `useTheme()` instead of `PALETTE`; `style.t
 
 For `Subscription`, `Program` and `PDFViewer`, params were whole `Program`/`Subscription`/`Lesson` objects — now IDs, read from the query cache.
 
-`PDFViewer` also reads/writes WatermelonDB progress via `useProgress`. **Leave the DB access as-is** — T3b owns that layer.
+`PDFViewer` stores read position by dispatching `setCurrentPage` to the Redux `documents` slice. There is no database involved — an earlier draft of this brief claimed WatermelonDB, which was wrong; it was dead code and has been removed.
 
 ### 5. Auth screens
 

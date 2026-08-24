@@ -11,6 +11,7 @@ import { useAppDispatch } from '@/hooks/useAppDispatch';
 import { Paths } from '@/navigation/paths';
 import type { RootScreenProps } from '@/navigation/types';
 import api, { initStateAPIState, isTest, POST } from '@/services/API';
+import { logger } from '@/services/logger';
 import { login } from '@/store/auth';
 import { useTheme } from '@/theme';
 import { PALETTE } from '@/theme/colors';
@@ -52,8 +53,8 @@ function Login({ navigation, route }: RootScreenProps<Paths.Login>) {
   };
 
   const initialValues = {
-    email: emailFromParams || (__DEV__ ? 'm@m.com' : ''),
-    password: __DEV__ ? 'Aa@123123' : '',
+    email: emailFromParams || '',
+    password: '',
   };
   const loginValidationSchema = yup.object().shape({
     email: yup.string().email(t('auth.email_invalid')).required(t('auth.email_required')),
@@ -61,12 +62,16 @@ function Login({ navigation, route }: RootScreenProps<Paths.Login>) {
   });
 
   const handleSubmit = (vlaues: typeof initialValues) => {
-    POST('/api/authentication/login', vlaues, setapiState).then(res => {
-      const token = res.accessToken;
-      api.setHeader('Authorization', `bearer ${token}`);
-      dispatch(login(res));
-      navigation.navigate(Paths.TabNav);
-    });
+    POST('/api/authentication/login', vlaues, setapiState)
+      .then(res => {
+        const token = res.accessToken;
+        api.setHeader('Authorization', `bearer ${token}`);
+        dispatch(login(res));
+        navigation.navigate(Paths.TabNav);
+      })
+      .catch(error => {
+        logger.error('Login failed', error);
+      });
   };
   return (
     <SafeScreen isScroll>

@@ -1,301 +1,100 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+# Binaa (بناء)
 
-## Project Structure
+An Arabic-first structured-learning app. Students browse multi-level programs, subscribe, follow a daily lesson schedule, consume PDF and video lessons in-app, track completion, and chat per lesson.
+
+**Expo SDK 57 · React Native 0.86.2 · New Architecture on.**
+
+> **Three names, one product.** The folder is `Mobadra`, the app is **Binaa** (`com.binaa`), and the backend is **Mubadarah** (`mubadarah.ce-svcs.cc`). They are not the same thing and the mix-up is the most disorienting part of this repo.
+
+---
+
+## Getting started
+
+Requires **Node ≥ 20** (see `.nvmrc`) and **Yarn Classic**. There is only a `yarn.lock` — don't introduce `npm install`.
+
+```bash
+yarn install
+npx expo prebuild        # generates android/ and ios/ — required on a fresh checkout
+yarn android             # expo run:android
+yarn ios                 # expo run:ios
+```
+
+**`android/` and `ios/` are generated output.** They're gitignored and absent from a fresh checkout. This project uses Expo's Continuous Native Generation: `app.json` is the source of truth for bundle IDs, permissions, fonts, Info.plist keys and Sentry, and `npx expo prebuild --clean` regenerates both platforms from it.
+
+**Never hand-edit anything under `android/` or `ios/`** — prebuild will delete your work. A native change you can't express in `app.json` is a missing config plugin.
+
+Copy `.env.example` to `.env` before first run. Env vars reach the bundle as `EXPO_PUBLIC_*`, which `babel-preset-expo` inlines at build time — meaning **they ship inside the app and are not secrets.**
+
+## Scripts
+
+```bash
+yarn start                 # expo start (Metro)
+yarn lint                  # lint:rules && lint:type-check && lint:format
+yarn lint:rules            # eslint .
+yarn lint:type-check       # tsc --noEmit
+yarn lint:format           # prettier --check .
+yarn test                  # jest
+
+npx expo-doctor            # Expo health check
+npx expo install --check   # audit deps against the SDK 57 pin
+```
+
+Install dependencies with **`npx expo install <pkg>`, not `yarn add`** — Expo pins versions per SDK, and `yarn add` fetches `latest`.
+
+> `yarn lint:type-check` and `yarn lint:format` do not currently pass. Both are tracked as ratchets in CI rather than gates; the residual errors belong to refactors that haven't run yet. See `CLAUDE.md` §2 for the measured baseline.
+
+## Layout
 
 ```
 src/
-├── assets/          # Images, fonts, and other static files
-├── components/      # Reusable UI components
-├── config/         # Configuration files and constants
-├── hooks/          # Custom React hooks
-├── navigation/     # Navigation configuration and types
-├── screens/        # Screen components
-├── services/       # API and other service integrations
-├── store/          # State management (Redux/Context)
-├── theme/          # Theme configuration and styles
-├── translations/   # Internationalization files
-├── types/          # TypeScript type definitions
-└── utils/          # Utility functions and helpers
+├── assets/          fonts (Cairo), images, svg
+├── components/      atoms / molecules / organisms / templates
+├── config/          app-level config
+├── hooks/           accessibility, PDF, i18n
+├── navigation/      Application.tsx, BottomTabNavigation.tsx, paths.ts
+├── screens/         one folder per screen
+├── services/        API.ts (apisauce) + documentService, logger, …
+├── store/           Redux Toolkit slices, persisted over MMKV
+├── theme/           colors, typography, ThemeContext
+├── translations/    ar.json, en.json, fr.json
+├── types/           program.ts, pdf.ts, navigation.ts
+└── utils/           constants, dateTime, helpers
 ```
 
-## Features
+The domain model is the spine of the app: **`Program → Level → Task → Lesson`**, plus `Subscription`. A `Task` is a *day*; a `Lesson` is a single item with a URL. Read it as *curriculum → unit → day → item*.
 
-- 🎨 **Theme Support**: Built-in theming system for consistent styling
-- 🌐 **Internationalization**: Ready for multi-language support
-- 📱 **Responsive Design**: Mobile-first approach
-- 🔄 **State Management**: Integrated state management solution using redux-toolkit
-- 🧪 **Testing Setup**: Jest configuration for unit testing
-- 📝 **TypeScript**: Full TypeScript support
-- 🎯 **ESLint & Prettier**: Code quality and formatting tools
-- 🔍 **Reactotron**: Debugging tool integration
-
-## Template Usage
-
-### Initial Setup
-1. Clone the repository
-2. Install dependencies:
-   ```bash
-   yarn install
-   # or
-   npm install
-   ```
-3. Install iOS dependencies:
-   ```bash
-   cd ios && pod install && cd ..
-   ```
-4. Copy environment variables:
-   ```bash
-   cp .env.example .env
-   ```
-
-
-### Available Scripts
-- `yarn start` - Start Metro bundler
-- `yarn android` - Run Android app
-- `yarn ios` - Run iOS app
-- `yarn test` - Run tests
-- `yarn lint` - Run linting
-- `yarn lint:fix` - Fix linting issues
-- `yarn pod-install` - Install iOS dependencies
-
-## Getting Started the Project
-
-> **Note**: Make sure you have completed the [Set Up Your Environment](https://reactnative.dev/docs/set-up-your-environment) guide before proceeding.
-
-## Step 1: Start Metro
-
-First, you will need to run **Metro**, the JavaScript build tool for React Native.
-
-To start the Metro dev server, run the following command from the root of your React Native project:
-
-```sh
-# Using npm
-npm start
-
-# OR using Yarn
-yarn start
-```
-
-## Step 2: Build and run your app
-
-With Metro running, open a new terminal window/pane from the root of your React Native project, and use one of the following commands to build and run your Android or iOS app:
-
-### Android
-
-```sh
-# Using npm
-npm run android
-
-# OR using Yarn
-yarn android
-```
-
-### iOS
-
-For iOS, remember to install CocoaPods dependencies (this only needs to be run on first clone or after updating native deps).
-
-The first time you create a new project, run the Ruby bundler to install CocoaPods itself:
-
-```sh
-bundle install
-```
-
-Then, and every time you update your native dependencies, run:
-
-```sh
-bundle exec pod install
-```
-
-For more information, please visit [CocoaPods Getting Started guide](https://guides.cocoapods.org/using/getting-started.html).
-
-```sh
-# Using npm
-npm run ios
-
-# OR using Yarn
-yarn ios
-```
-
-If everything is set up correctly, you should see your new app running in the Android Emulator, iOS Simulator, or your connected device.
-
-This is one way to run your app — you can also build it directly from Android Studio or Xcode.
-
-## Step 3: Modify your app
-
-Now that you have successfully run the app, let's make changes!
-
-Open `App.tsx` in your text editor of choice and make some changes. When you save, your app will automatically update and reflect these changes — this is powered by [Fast Refresh](https://reactnative.dev/docs/fast-refresh).
-
-When you want to forcefully reload, for example to reset the state of your app, you can perform a full reload:
-
-- **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Dev Menu**, accessed via <kbd>Ctrl</kbd> + <kbd>M</kbd> (Windows/Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (macOS).
-- **iOS**: Press <kbd>R</kbd> in iOS Simulator.
-
-## Congratulations! :tada:
-
-You've successfully run and modified your React Native App. :partying_face:
-
-### Now what?
-
-- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
-- If you're curious to learn more about React Native, check out the [docs](https://reactnative.dev/docs/getting-started).
-
-
-## Configuration
-
-### Environment Variables
-The project uses `react-native-config` for environment variables. Create a `.env` file in the root directory with your variables:
-
-```env
-API_URL=https://api.example.com
-APP_ENV=development
-```
-
-### Babel Configuration
-Located in `babel.config.js`, includes:
-- Module resolver for absolute imports
-- Environment variables support
-- React Native preset
-
-### TypeScript Configuration
-Located in `tsconfig.json`, includes:
-- Strict type checking
-- Path aliases
-- React Native specific types
-
-### ESLint & Prettier
-- ESLint configuration in `eslint.config.mjs`
-- Prettier configuration in `.prettierrc.js`
-- Run `yarn lint:fix` to automatically fix code style issues
+**State is deliberately split.** Redux Toolkit (persisted over MMKV) holds session and app state; `@tanstack/react-query` is for server state. There is no local database.
 
 ## Theming
 
-### Theme Structure
-The theme system is located in `src/theme/` and includes:
+`useTheme()` from `@/theme` is the only supported way to reach colors:
 
-```typescript
-// src/theme/colors.ts
-export const colors = {
-  primary: '#007AFF',
-  secondary: '#5856D6',
-  // ... other colors
-};
-
-// src/theme/typography.ts
-export const typography = {
-  h1: {
-    fontSize: 32,
-    fontWeight: 'bold',
-  },
-  // ... other text styles
-};
-```
-
-### Using the Theme
-
-1. Access theme in components:
-```typescript
+```ts
 import { useTheme } from '@/theme';
-
-const MyComponent = () => {
-  const { colors } = useTheme();
-  
-  return (
-    <View style={{ backgroundColor: colors.primary, padding: spacing.md }}>
-      <Text style={typography.h1}>Hello World</Text>
-    </View>
-  );
-};
+const { colors, isDark, toggleTheme } = useTheme();
 ```
 
-2. Customizing the theme:
-   - Modify colors in `src/theme/colors.ts`
-   - Adjust style in `src/theme/style.ts`
-   - Update typography in `src/theme/typography.ts`
+Styles are `getStyles(theme)` factories in a sibling `style.ts` — never module-scope `StyleSheet.create()` with theme values, which captures colors at import and can never re-render. **Never `import { PALETTE }` directly**; it's a mutable module-level `var` and importing it silently breaks theme changes.
 
-### Dark Mode Support
-The theme system includes built-in dark mode support. Toggle between light and dark mode using the theme context:
+Dark mode is currently gated off by `enableDark = false` in `src/utils/constants.ts`.
 
-```typescript
-import { useTheme } from '@/theme';
+## Language and RTL
 
-const ThemeToggle = () => {
-  const { toggleTheme, isDark } = useTheme();
-  
-  return (
-    <Button onPress={toggleTheme} title={isDark ? 'Light Mode' : 'Dark Mode'} />
-  );
-};
+Arabic-first — `ar` is the fallback language and Cairo is the font throughout. `I18nManager.forceRTL()` runs at module load, so **changing language restarts the app** (by design, given the current architecture). Every user-facing string goes through `t()`.
+
+## Releases
+
+Fastlane lives in `Fastlane/` — **capital F**, which macOS's case-insensitive filesystem hides. It still expects `android/`/`ios/` to exist, so run `expo prebuild` before any lane:
+
+```bash
+bundle exec fastlane android build   # Play internal track + Huawei AppGallery
+bundle exec fastlane ios beta        # TestFlight + Sentry dSYM upload
 ```
 
-### Color Usage Guidelines
+## Contributing
 
-1. **Brand Colors**
-   - Use `primary` for main actions and key UI elements
-   - Use `secondary` for supporting actions and accents
+**Read [`CLAUDE.md`](CLAUDE.md) first — §0 especially.** It's the working agreement and the source of truth for conventions, theming, i18n and the known traps. It binds humans and agents alike; the most important rule is that **nothing gets committed without the repo owner's review**.
 
-2. **Background Colors**
-   - Use `background` for main app background
-   - Use `surface` for cards, modals, and elevated surfaces
+Planned work lives in [`docs/tasks/`](docs/tasks/README.md) as self-contained briefs, each naming the files it owns and tracking its own progress. Start there rather than guessing what needs doing.
 
-3. **Text Colors**
-   - Use `text.primary` for main content
-   - Use `text.secondary` for supporting text
-   - Use `text.disabled` for disabled states
-
-4. **Status Colors**
-   - Use `success` for positive actions and states
-   - Use `error` for errors and destructive actions
-   - Use `warning` for cautionary states
-   - Use `info` for informational states
-
-5. **Border Colors**
-   - Use `border` for dividers and borders
-   - Use `overlay` for modal backgrounds and overlays
-
-## Development Guidelines
-
-### Page Templates
-- use the `rnscreen` for quick page start
-
-### Code Style
-- Follow the established ESLint and Prettier configurations
-- Use TypeScript for all new files
-- Follow the component structure in the `components` directory
-- Keep components small and focused on a single responsibility
-
-### State Management
-- Use the provided store setup for global state
-- Prefer local state when possible
-- Follow the established patterns in the `store` directory
-
-### Navigation
-- Define new routes in the navigation configuration
-- Use typed navigation for better type safety
-- Follow the established navigation patterns
-
-### Testing
-- Write unit tests for utilities and hooks
-- Test components using React Native Testing Library
-- Follow the testing patterns in the `__tests__` directories
-
-## Environment Variables
-
-The project uses `.env` for environment variables. Make sure to:
-1. Copy `.env.example` to `.env`
-2. Fill in the required environment variables
-3. Never commit the `.env` file
-
-# Troubleshooting
-
-If you're having issues getting the above steps to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
-
-# Learn More
-
-To learn more about React Native, take a look at the following resources:
-
-- [React Native Website](https://reactnative.dev) - learn more about React Native.
-- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
-- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
-- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
-- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
+The Family (parent control) feature has an API contract at [`docs/api/family-contract.md`](docs/api/family-contract.md) for the backend team.

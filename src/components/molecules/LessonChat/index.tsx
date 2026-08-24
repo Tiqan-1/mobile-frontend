@@ -1,14 +1,19 @@
 import moment from 'moment';
-import 'moment/locale/ar';
 import type React from 'react';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { ActivityIndicator, Alert, Dimensions, FlatList, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { ActivityIndicator, Alert, FlatList, TextInput, TouchableOpacity, View } from 'react-native';
 import { Text, Title } from '@/components/atoms/Text';
 import { GET, POST } from '@/services/API';
 import { useTheme } from '@/theme';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { connectPusher, disconnectPusher, getSocketId, initializePusher, pusherClient } from '@/config/pusher';
-import { bold } from '@/theme/typography';
+
+import { getStyles } from './style';
+
+// TODO(T4): Pusher was removed during the Expo migration (unproven autolinking
+// under CNG). Real-time delivery is stubbed out with polling below until a
+// replacement (config plugin, or a plain WebSocket client against Pusher's
+// protocol) is chosen. See docs/tasks/T4-expo-migration.md.
+const CHAT_POLL_INTERVAL_MS = 5000;
 
 moment.locale('ar');
 
@@ -25,7 +30,7 @@ interface Sender {
   name: string;
 }
 
-interface LessonChatProps {
+export interface LessonChatProps {
   chatRoomId: string;
   onClose: () => void;
   visible: boolean;
@@ -44,7 +49,7 @@ const chatApi = {
     // Replace with actual API call using GET
     return GET(`/chat/${chatRoomId}/join`);
   },
-  send: async (chatRoomId: string, data: { message: string; socketId?: string }) => {
+  send: async (chatRoomId: string, data: { message: string }) => {
     // Replace with actual API call using POST
     return POST(`/chat/${chatRoomId}/send`, data);
   },
@@ -52,68 +57,11 @@ const chatApi = {
 
 export const LessonChat: React.FC<LessonChatProps> = ({ chatRoomId, visible, onClose }) => {
   const theme = useTheme();
+  const styles = useMemo(() => getStyles(theme), [theme]);
   const queryClient = useQueryClient();
   const [inputText, setInputText] = useState('');
   const flatListRef = useRef<FlatList>(null);
   const isInitialLoad = useRef(true);
-  const { colors } = useTheme();
-
-  // Handle new message from Pusher
-  const handleNewMessage = useCallback((data: Message) => {
-    queryClient.setQueryData(chatQueryKey(chatRoomId), (oldData: { messages?: Message[] }) => {
-      if (!oldData) {
-        return oldData;
-      }
-      
-      // Check if message already exists to avoid duplicates
-      const messageExists = oldData.messages?.some((msg: Message) => msg.id === data.id);
-      if (messageExists) {
-        return oldData;
-      }
-      
-      return {
-        ...oldData,
-        messages: [...(oldData.messages || []), data],
-      };
-    });
-  }, [queryClient, chatRoomId]);
-
-  // Initialize Pusher and handle real-time messages
-  useEffect(() => {
-    if (!visible || !chatRoomId) {
-      return;
-    }
-
-    let channel: any = null; // eslint-disable-line @typescript-eslint/no-explicit-any
-
-    const setupPusher = async () => {
-      try {
-        await initializePusher();
-        await connectPusher();
-        
-        // Subscribe to the chat room channel
-        channel = pusherClient.subscribe(`chat.${chatRoomId}`);
-        
-        // Handle new message events
-        channel.bind('new-message', handleNewMessage);
-        
-        console.log(`Subscribed to channel: chat.${chatRoomId}`); // eslint-disable-line no-console
-      } catch (error) {
-        console.error('Failed to setup Pusher:', error); // eslint-disable-line no-console
-      }
-    };
-
-    setupPusher();
-
-    // Cleanup function
-    return () => {
-      if (channel) {
-        channel.unbind('new-message', handleNewMessage);
-        pusherClient.unsubscribe(`chat.${chatRoomId}`);
-      }
-      disconnectPusher().catch(console.error); // eslint-disable-line no-console
-    };
-  }, [visible, chatRoomId, handleNewMessage]);
 
   const {
     data: chatData,
@@ -125,7 +73,8 @@ export const LessonChat: React.FC<LessonChatProps> = ({ chatRoomId, visible, onC
     queryKey: chatQueryKey(chatRoomId),
     queryFn: () => chatApi.join(chatRoomId),
     enabled: !!chatRoomId && visible,
-    staleTime: Number.POSITIVE_INFINITY,
+    // Was real-time via Pusher; polling stand-in until T4's Pusher decision lands.
+    refetchInterval: visible ? CHAT_POLL_INTERVAL_MS : false,
   });
 
   const messages = useMemo(() => chatData?.messages ?? [], [chatData?.messages]);
@@ -138,9 +87,7 @@ export const LessonChat: React.FC<LessonChatProps> = ({ chatRoomId, visible, onC
 
   const { mutate: sendMessage, isPending: isSending } = useMutation({
     mutationFn: async (text: string) => {
-      // Get socket ID from Pusher connection
-      const socketId = await pusherClient.getSocketId();
-      return chatApi.send(chatRoomId, { message: text, socketId: socketId || 'fallback-socket-id' });
+      return chatApi.send(chatRoomId, { message: text });
     },
     onSuccess: (_data, sentText) => {
       setInputText('');
@@ -195,27 +142,27 @@ export const LessonChat: React.FC<LessonChatProps> = ({ chatRoomId, visible, onC
       <View style={[styles.messageContainer, isCurrentUser ? styles.myMessageContainer : styles.theirMessageContainer]}>
         <View style={styles.messageWrapper}>
           {!isCurrentUser && (
-            <View style={[styles.avatar, { backgroundColor: colors.PRIMARY_COLOR }]}>
+            <View style={[styles.avatar, { backgroundColor: theme.colors.PRIMARY_COLOR }]}>
               <Text isBold style={styles.avatarText}>{item.sender.name.charAt(0).toUpperCase()}</Text>
             </View>
           )}
           <View style={styles.messageContent}>
-            {!isCurrentUser && <Text style={[styles.senderName, { color: colors.BLACK }]}>{item.sender.name}</Text>}
+            {!isCurrentUser && <Text style={[styles.senderName, { color: theme.colors.BLACK }]}>{item.sender.name}</Text>}
             <View style={[
               styles.messageBubble,
               {
-                backgroundColor: isCurrentUser ? colors.PRIMARY_COLOR : colors.SURFACE,
-                borderColor: colors.LINE,
+                backgroundColor: isCurrentUser ? theme.colors.PRIMARY_COLOR : theme.colors.SURFACE,
+                borderColor: theme.colors.LINE,
               }
             ]}>
               <Text style={[
                 styles.messageText,
-                { color: isCurrentUser ? colors.WHITE : colors.BLACK }
+                { color: isCurrentUser ? theme.colors.WHITE : theme.colors.BLACK }
               ]}>
                 {item.text}
               </Text>
             </View>
-            <Text style={[styles.messageTimestamp, { color: colors.GREY }]}>
+            <Text style={[styles.messageTimestamp, { color: theme.colors.GREY }]}>
               {moment(item.createdAt).fromNow()}
             </Text>
           </View>
@@ -228,8 +175,8 @@ export const LessonChat: React.FC<LessonChatProps> = ({ chatRoomId, visible, onC
     if (isLoading) {
       return (
         <View style={styles.centered}>
-          <ActivityIndicator size="large" color={colors.PRIMARY_COLOR} />
-          <Text style={[styles.loadingText, { color: colors.BLACK }]}>جاري تحميل الرسائل...</Text>
+          <ActivityIndicator size="large" color={theme.colors.PRIMARY_COLOR} />
+          <Text style={[styles.loadingText, { color: theme.colors.BLACK }]}>جاري تحميل الرسائل...</Text>
         </View>
       );
     }
@@ -237,10 +184,10 @@ export const LessonChat: React.FC<LessonChatProps> = ({ chatRoomId, visible, onC
     if (isError) {
       return (
         <View style={styles.centered}>
-          <Text isBold style={[styles.errorText, { color: colors.ERROR }]}>
+          <Text isBold style={[styles.errorText, { color: theme.colors.ERROR }]}>
             خطأ في تحميل المحادثة
           </Text>
-          <Text style={[styles.errorDescription, { color: colors.GREY }]}>
+          <Text style={[styles.errorDescription, { color: theme.colors.GREY }]}>
             {error?.message || 'حدث خطأ غير متوقع'}
           </Text>
         </View>
@@ -250,7 +197,7 @@ export const LessonChat: React.FC<LessonChatProps> = ({ chatRoomId, visible, onC
     if (messages.length === 0) {
       return (
         <View style={styles.centered}>
-          <Text style={[styles.emptyText, { color: colors.GREY }]}>لا توجد رسائل بعد. كن أول من يبدأ النقاش!</Text>
+          <Text style={[styles.emptyText, { color: theme.colors.GREY }]}>لا توجد رسائل بعد. كن أول من يبدأ النقاش!</Text>
         </View>
       );
     }
@@ -273,30 +220,30 @@ export const LessonChat: React.FC<LessonChatProps> = ({ chatRoomId, visible, onC
   }
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.SURFACE }]}>
-      <View style={[styles.header, { borderBottomColor: colors.LINE }]}>
-        <Title style={[styles.headerTitle, { color: colors.BLACK }]}>محادثة المهمة</Title>
+    <View style={[styles.container, { backgroundColor: theme.colors.SURFACE }]}>
+      <View style={[styles.header, { borderBottomColor: theme.colors.LINE }]}>
+        <Title style={[styles.headerTitle, { color: theme.colors.BLACK }]}>محادثة المهمة</Title>
         <TouchableOpacity onPress={onClose} style={styles.closeButton} accessibilityLabel="إخفاء المحادثة">
-          <Text isBold style={[styles.closeButtonText, { color: colors.BLACK }]}>×</Text>
+          <Text isBold style={[styles.closeButtonText, { color: theme.colors.BLACK }]}>×</Text>
         </TouchableOpacity>
       </View>
 
       <View style={styles.chatContent}>{renderContent()}</View>
 
-      <View style={[styles.inputContainer, { borderTopColor: colors.LINE }]}>
+      <View style={[styles.inputContainer, { borderTopColor: theme.colors.LINE }]}>
         <TextInput
           style={[
             styles.textInput,
             {
-              backgroundColor: colors.SURFACE,
-              borderColor: colors.LINE,
-              color: colors.BLACK,
+              backgroundColor: theme.colors.SURFACE,
+              borderColor: theme.colors.LINE,
+              color: theme.colors.BLACK,
             }
           ]}
           value={inputText}
           onChangeText={setInputText}
           placeholder="اكتب رسالتك هنا..."
-          placeholderTextColor={colors.GREY}
+          placeholderTextColor={theme.colors.GREY}
           multiline
           maxLength={500}
           editable={!isSending && !isLoading}
@@ -305,147 +252,19 @@ export const LessonChat: React.FC<LessonChatProps> = ({ chatRoomId, visible, onC
           style={[
             styles.sendButton,
             {
-              backgroundColor: colors.PRIMARY_COLOR,
+              backgroundColor: theme.colors.PRIMARY_COLOR,
               opacity: !inputText.trim() || isSending ? 0.5 : 1,
             },
           ]}
           onPress={handleSendMessage}
           disabled={!inputText.trim() || isSending}>
           {isSending ? (
-            <ActivityIndicator size="small" color={colors.WHITE} />
+            <ActivityIndicator size="small" color={theme.colors.WHITE} />
           ) : (
-            <Text isBold style={[styles.sendButtonText, { color: colors.WHITE }]}>إرسال</Text>
+            <Text isBold style={[styles.sendButtonText, { color: theme.colors.WHITE }]}>إرسال</Text>
           )}
         </TouchableOpacity>
       </View>
     </View>
   );
 };
-
-const { width } = Dimensions.get('window');
-
-const styles = StyleSheet.create({
-  container: {
-    width: Math.min(350, width * 0.9),
-    height: '100%',
-    borderLeftWidth: 1,
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: 16,
-    borderBottomWidth: 1,
-  },
-  headerTitle: {
-    margin: 0,
-  },
-  closeButton: {
-    padding: 8,
-  },
-  closeButtonText: {
-    fontSize: 24,
-  },
-  chatContent: {
-    flex: 1,
-  },
-  centered: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
-  },
-  loadingText: {
-    marginTop: 10,
-  },
-  errorText: {
-    fontSize: 16,
-    marginBottom: 8,
-  },
-  errorDescription: {
-    textAlign: 'center',
-  },
-  emptyText: {
-    textAlign: 'center',
-    fontSize: 16,
-  },
-  messageList: {
-    flex: 1,
-  },
-  messageListContent: {
-    padding: 16,
-  },
-  messageContainer: {
-    marginBottom: 16,
-  },
-  myMessageContainer: {
-    alignItems: 'flex-end',
-  },
-  theirMessageContainer: {
-    alignItems: 'flex-start',
-  },
-  messageWrapper: {
-    flexDirection: 'row',
-    maxWidth: '80%',
-  },
-  avatar: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 8,
-  },
-  avatarText: {
-    color: 'white',
-    fontSize: 14,
-  },
-  messageContent: {
-    flex: 1,
-  },
-  senderName: {
-    fontSize: 12,
-    marginBottom: 4,
-    fontWeight: '500',
-  },
-  messageBubble: {
-    padding: 12,
-    borderRadius: 16,
-    borderWidth: 1,
-  },
-  messageText: {
-    fontSize: 14,
-    lineHeight: 20,
-  },
-  messageTimestamp: {
-    fontSize: 11,
-    marginTop: 4,
-  },
-  inputContainer: {
-    flexDirection: 'row',
-    padding: 16,
-    borderTopWidth: 1,
-    alignItems: 'flex-end',
-  },
-  textInput: {
-    flex: 1,
-    borderWidth: 1,
-    borderRadius: 20,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    marginRight: 12,
-    maxHeight: 100,
-    fontSize: 14,
-  },
-  sendButton: {
-    paddingHorizontal: 20,
-    paddingVertical: 12,
-    borderRadius: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
-    minWidth: 60,
-  },
-  sendButtonText: {
-    fontSize: 14,
-  },
-});

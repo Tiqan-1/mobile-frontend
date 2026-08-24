@@ -1,6 +1,6 @@
 #################### iOS ####################
 
-app_identifier("com.dl.sdccards") # The bundle identifier of your app
+# app_identifier("com.dl.sdccards") # The bundle identifier of your app
 apple_id("msn4eg@gmail.com") # Your Apple email address
 
 itc_team_id("120250180") # App Store Connect Team ID

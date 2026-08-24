@@ -1,16 +1,11 @@
-import type {
-  Text as RNText,
-  StyleProp,
-  TextProps,
-  TextStyle,
-} from 'react-native';
-
+import type { StyleProp, Text as RNText, TextProps, TextStyle } from 'react-native';
 import React from 'react';
+import { forwardRef, memo } from 'react';
+
 import { useTranslation } from 'react-i18next';
 import { Text as RNTXT } from 'react-native';
 
-import { useTheme } from '@/theme';
-import typography, { bold } from '@/theme/typography';
+import { useTheme, fonts } from '@/theme';
 
 import { isRTL } from '@/utils/constants';
 import { isLight } from '@/utils/helpers';
@@ -24,7 +19,7 @@ export type TextTypes =
   | 'title'
   | undefined;
 
-interface Txt extends TextProps {
+export interface TextBlockProps extends TextProps {
   accessibilityHint?: string;
   accessibilityLabel?: string;
   accessibilityRole?:
@@ -54,7 +49,7 @@ interface Txt extends TextProps {
   isBold?: boolean;
 }
 
-const TextBlock = React.forwardRef<RNText, Txt>(
+const TextBlockInner = forwardRef<RNText, TextBlockProps>(
   (
     {
       children,
@@ -75,7 +70,7 @@ const TextBlock = React.forwardRef<RNText, Txt>(
     ref
   ) => {
     const { i18n } = useTranslation();
-    const { colors } = useTheme();
+    const { colors, typography: typographyStyles } = useTheme();
     const textContent = () => {
       if (Array.isArray(children)) {
         children = children.map((child) => {
@@ -135,69 +130,61 @@ const TextBlock = React.forwardRef<RNText, Txt>(
         accessibilityRole={defaultAccessibilityRole}
         accessibilityState={accessibilityState}
         {...rest}
-        style={[typography[type], { color: TextBestColor }, override, isBold && bold]}>
+        style={[typographyStyles[type] as import('react-native').TextStyle, { color: TextBestColor }, override, isBold && fonts.bold]}>
         {isRTL ? '\u2067' : ''}
         {textContent()}
         {isRTL ? '\u2069' : ''}
       </RNTXT>
     );
-  }
+  },
 );
 
-TextBlock.defaultProps = {
-  dotted: false,
-  style: undefined,
-  type: 'text',
-};
+TextBlockInner.displayName = 'TextBlock';
+
+const TextBlock = memo(TextBlockInner);
+TextBlock.displayName = 'Text';
 
 export default TextBlock;
 
-export function Title(params: Txt) {
+export function Title(params: TextBlockProps) {
   const { children, ...rest } = params;
   return (
-    <TextBlock type="title" {...rest}>
+    <TextBlockInner type="title" {...rest}>
       {children}
-    </TextBlock>
+    </TextBlockInner>
   );
 }
-export function SmallTitle(params: Txt) {
+export function SmallTitle(params: TextBlockProps) {
   const { children, ...rest } = params;
   return (
-    <TextBlock type="smallTitle" {...rest}>
+    <TextBlockInner type="smallTitle" {...rest}>
       {children}
-    </TextBlock>
+    </TextBlockInner>
   );
 }
-export function Text(params: Txt) {
+export { TextBlock as Text };
+export function SmallText(params: TextBlockProps) {
   const { children, ...rest } = params;
   return (
-    <TextBlock type="text" {...rest}>
+    <TextBlockInner type="smallText" {...rest}>
       {children}
-    </TextBlock>
+    </TextBlockInner>
   );
 }
-export function SmallText(params: Txt) {
+export function ExSmallText(params: TextBlockProps) {
   const { children, ...rest } = params;
   return (
-    <TextBlock type="smallText" {...rest}>
+    <TextBlockInner type="extraSmallText" {...rest}>
       {children}
-    </TextBlock>
-  );
-}
-export function ExSmallText(params: Txt) {
-  const { children, ...rest } = params;
-  return (
-    <TextBlock type="extraSmallText" {...rest}>
-      {children}
-    </TextBlock>
+    </TextBlockInner>
   );
 }
 
-export function SuSmallText(params: Txt) {
+export function SuSmallText(params: TextBlockProps) {
   const { children, ...rest } = params;
   return (
-    <TextBlock type="superSmallText" {...rest}>
+    <TextBlockInner type="superSmallText" {...rest}>
       {children}
-    </TextBlock>
+    </TextBlockInner>
   );
 }

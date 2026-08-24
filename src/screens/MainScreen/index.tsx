@@ -8,7 +8,6 @@ import { GET, initStateAPIState } from '@/services/API';
 import { Pagination, type PaginationState } from '@/services/Pagination';
 import { setSubscriptions } from '@/store/subscriptionSlice';
 import { useTheme } from '@/theme';
-import { PALETTE } from '@/theme/colors';
 import { SHADOW } from '@/theme/styles';
 import { bold } from '@/theme/typography';
 import type { Lesson, Subscription, Task } from '@/types/program';
@@ -18,7 +17,7 @@ import moment from 'moment';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FlatList, Pressable, StyleSheet, View } from 'react-native';
-import FastImage from 'react-native-fast-image';
+import { Image } from 'expo-image';
 
 type ViewMode = 'subscription' | 'timeline';
 
@@ -34,14 +33,13 @@ const ProgramCard = ({ program }: { program: Subscription }) => {
         navigation.navigate(Paths.Subscription, program);
       }}>
       <View style={styles.cardContent}>
-        <FastImage
-          resizeMode="contain"
+        <Image
+          contentFit="contain"
           source={
             program.program.thumbnail
               ? { uri: `data:image/png;base64,${program.program.thumbnail}` }
               : require('@/assets/images/noImage.png')
           }
-          defaultSource={require('@/assets/images/noImage.png')}
           style={styles.programImage}
         />
         <View style={styles.programInfo}>
@@ -127,14 +125,14 @@ const ProgramCardShimmer = () => {
     </View>
   );
 };
-
+let themeColors = {}
 function MainScreen({ navigation }: RootScreenProps<Paths.Main>) {
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const user = useAppSelector(state => state.auth) || { name: 'المستخدم' };
   const { items: subscriptionsState } = useAppSelector(state => state.subscriptions) || {};
-  const { colors: themeColors } = useTheme();
-
+  const { colors } = useTheme();
+  themeColors = colors;
   const [viewMode, setViewMode] = useState<ViewMode>('subscription');
   const [apiState, setapiState] = useState<PaginationState<Subscription>>({
     ...initStateAPIState,
@@ -264,7 +262,7 @@ function MainScreen({ navigation }: RootScreenProps<Paths.Main>) {
                 </View>
               ) : (
                 <View style={styles.emptyStateContainer}>
-                  <FastImage source={require('@/assets/images/noImage.png')} style={styles.emptyStateImage} resizeMode="contain" />
+                  <Image source={require('@/assets/images/noImage.png')} style={styles.emptyStateImage} contentFit="contain" />
                   <Text style={[styles.emptyStateTitle, { color: themeColors.BLACK }]}>لا يوجد اشتراكات</Text>
                   <Text style={[styles.emptyStateText, { color: themeColors.GREY }]}>يمكنك اضافة اشتراك جديد من خلال البرامج المتاحة</Text>
                   <Pressable
@@ -296,7 +294,7 @@ function MainScreen({ navigation }: RootScreenProps<Paths.Main>) {
               onRefresh={onRefresh}
               ListEmptyComponent={() => (
                 <View style={styles.emptyStateContainer}>
-                  <FastImage source={require('@/assets/images/noImage.png')} style={styles.emptyStateImage} resizeMode="contain" />
+                  <Image source={require('@/assets/images/noImage.png')} style={styles.emptyStateImage} contentFit="contain" />
                   <Text isBold style={[styles.emptyStateTitle, { color: themeColors.BLACK }]}>
                     لا يوجد دروس
                   </Text>
@@ -384,7 +382,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 4,
-    backgroundColor: PALETTE.WHITE,
+    backgroundColor: themeColors?.WHITE,
     ...SHADOW,
   },
   buttonText: {

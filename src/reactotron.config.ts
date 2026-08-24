@@ -9,7 +9,7 @@ import { storage } from './App';
 
 
 Reactotron.configure({
-  name: config.name,
+  name: config.expo.name,
   onDisconnect: () => {
   },
 })

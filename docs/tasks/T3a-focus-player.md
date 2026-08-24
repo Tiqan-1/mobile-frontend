@@ -1,5 +1,40 @@
 # T3a — FocusPlayer
 
+> **Before you start:** read [`CLAUDE.md` §0](../../CLAUDE.md) — the working agreement. In short: **don't commit or push unless asked in this session**; never hand-edit `android/`/`ios/` (they're generated — `app.json` + config plugins instead); install with `npx expo install`, not `yarn add`; stay inside your `Owns` list and report anything outside it rather than fixing it; keep changes surgical (§0.8).
+>
+> **Keep the Status & checkpoints block below current as you work** — it lives in this file, not in a central tracker. Set the status when you start, tick each checkpoint only once you've *verified* it, and update it again when you stop. If you stop mid-brief, name the exact checkpoint you stopped at.
+
+---
+
+## Status & checkpoints
+
+| | |
+|---|---|
+| **Status** | ✅ done (2 caveats below) |
+| **Owner** | builder (routerplex/deepseek-v4-pro), reviewed by routerplex/MiniMax-M3 (4 passes) |
+| **Branch** | feat/T3a-focus-player |
+| **Last updated** | 2026-08-23 |
+
+Video library: **`expo-video`** chosen over `react-native-video` — first-party under Expo CNG (SDK 57), no manual native wiring, versioned with the SDK. `CLAUDE.md` §7 updated to match.
+
+**Legend:** ⚪ not started · 🔵 in progress · ⏸️ blocked · ✅ done · 🟣 superseded
+
+Tick a box only when you have **verified** it, not when you've written the code. Add a checkpoint if this brief turns out to need one — don't silently widen the one you're on. This brief is `✅ done` only when every box is ticked **and** the Acceptance criteria below pass.
+
+- [x] Video library chosen and recorded (`expo-video`); `CLAUDE.md` §7 updated to match
+- [x] `expo-keep-awake` installed via `npx expo install`
+- [x] `hosted` playback works — `expo-video`'s `useVideoPlayer`/`VideoView`, `tsc` clean
+- [x] `youtube` playback via `youtube-nocookie.com` — `react-native-youtube-iframe` (2.4.1, latest) never exposes this itself; patched via `patch-package` to set the IFrame Player API's `host` option (reviewer verified the patch is correctly applied)
+- [x] Navigation interception rejects every off-origin request — `onShouldStartLoadWithRequest` allowlist confirmed by reviewer against actual code
+- [ ] **`startSec`/`endSec` clipping — deferred, not blocked.** `Lesson` (`src/types/program.ts`) has no `source` field yet; clipping logic is correct and in place but has nothing to clip against until the Family feature's `LessonSource` union lands on the type. Honestly disclosed, not silently broken.
+- [ ] **Adversarial pass: unverified — needs a real device.** No simulator/device was available in any sandbox this task ran in. The mechanism itself (`onShouldStartLoadWithRequest`, `setSupportMultipleWindows={false}`, `allowsFullscreenVideo={false}`) is in place and reviewer-verified against source; the literal on-device test per AC4's wording is the one thing nobody in this pipeline could run.
+- [x] `VideoModal` deleted, including its `Linking.openURL` button — confirmed via `grep -rn "Linking.openURL" src/components/organisms/` (empty)
+- [x] Screen stays awake through a full lesson — `expo-keep-awake`, gated on `lesson` truthiness, race-condition-hardened over 2 review rounds
+- [x] Call-site swap done directly (`Subscription`, `TodayLessons`, `MainScreen`) — no parallel T2f dispatch existed in this pipeline run to coordinate with; recorded in `.agents/T3a.md`'s Decisions log for T2f's visibility whenever it runs
+- [x] **Real regression found and fixed post-review:** `expo-keep-awake` broke `yarn test` (`transformIgnorePatterns` gap, same class of issue T0 already solved for other packages) — fixed, `yarn test` now matches the exact pre-T3a baseline
+
+---
+
 **Depends on:** T2b. **Parallel-safe with:** T3b.
 
 ## Goal
@@ -14,8 +49,22 @@ Replace `VideoModal` with a distraction-free lesson player that gives a child no
 src/components/organisms/FocusPlayer/**     (new)
 src/components/organisms/VideoModal/**      (deleted)
 src/components/organisms/index.ts
-package.json    (react-native-video, keep-awake)
+package.json    (video + keep-awake — see below)
+app.json        (only if the video library needs a config plugin entry)
 ```
+
+> ### Decide the video library first — this is a real choice, not a formality
+>
+> This project is Expo CNG now, which puts a first-party option on the table that didn't exist when this brief was written. **Install whichever you pick with `npx expo install`, never `yarn add`** ([`CLAUDE.md` §0.3](../../CLAUDE.md)).
+>
+> | Option | Case for it | Case against |
+> |---|---|---|
+> | **`expo-video`** | First-party, config plugin included, New-Arch-clean, versioned with the SDK so it can't drift. The lower-risk default under CNG. | Newer API; verify it covers what you need (HLS, poster, precise seek for `startSec`/`endSec` clipping) before committing. |
+> | **`react-native-video` v6** | What `CLAUDE.md` §7 names, mature, widely used. Ships an Expo config plugin (`react-native-video/expo-plugins`) for its optional features — caching, background playback, notification controls. | Third-party under CNG. **Verify the plugin autolinks and prebuilds cleanly before you build the player on it** — don't assume. |
+>
+> **Recommendation: try `expo-video` first**, and fall back to `react-native-video` if it can't do precise clipping or HLS the way you need. Either way: **record which you chose and why** in your report and in this brief's Status & checkpoints block, because `CLAUDE.md` §7 currently names `react-native-video` and will need updating to match your decision. Don't leave the doc and the code disagreeing.
+>
+> Whichever you pick, the **rules in `CLAUDE.md` §7 are unchanged**: `hosted` plays in-app, `youtube` goes through the locked `youtube-nocookie.com` embed, and **never** `Linking.openURL()` on a lesson URL.
 
 Call sites live in `Subscription`, `LibraryScreen`, `TodayLessons` — **coordinate with T2f**, which owns those files. Give it the new component's API and let T2f swap the call sites, or agree that you do it and T2f stays clear. Agree before either of you starts.
 
@@ -72,7 +121,7 @@ Also handle: long-press on the video (context menu → "open in YouTube"), taps 
 ### Focus behaviour
 
 - Full screen; hide the tab bar
-- Keep the screen awake (`react-native-keep-awake` or equivalent) — no sleep mid-lesson
+- Keep the screen awake — **use `expo-keep-awake`** (`npx expo install expo-keep-awake`). It's first-party, ships a config plugin, and needs no native wiring under CNG. The `react-native-keep-awake` this brief originally named is unmaintained; don't use it.
 - Android hardware back closes the player, doesn't background the app
 - Optional: auto-advance to the next lesson in the task on completion
 - Emit lifecycle callbacks — `onStart`, `onProgress(watchedSec)`, `onComplete` — for **T3d**'s telemetry. Define this API now even though T3d consumes it later.

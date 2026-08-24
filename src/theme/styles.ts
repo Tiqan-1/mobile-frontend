@@ -1,17 +1,14 @@
-import { PALETTE } from "./colors";
+/**
+ * @deprecated Import from `@/theme/tokens/shadows` instead.
+ *
+ * Kept as re-exports for legacy consumers. `SHADOW` maps to `shadows.sm`;
+ * `SHADOWINPUT` maps to `shadows.input`. Both are evaluated against the
+ * light palette to preserve current appearance.
+ */
+import { PALETTELIGHT } from './tokens/colors';
+import { getShadows } from './tokens/shadows';
 
-export const SHADOW = {
-  shadowColor: PALETTE.GREY,
-  shadowOffset: { width: 0, height: 0 },
-  shadowOpacity: 0.25,
-  shadowRadius: 4,
-  elevation: 5,
-  boxShadow: '0px 5px 20px 0px #00000014',
-};
-export const SHADOWINPUT = {
-  shadowColor: PALETTE.BLACK,
-  shadowOffset: { width: 0, height: 0 },
-  shadowOpacity: 0.25,
-  shadowRadius: 5,
-  elevation: 5,
-};
+const legacy = getShadows(PALETTELIGHT);
+
+export const SHADOW = legacy.sm;
+export const SHADOWINPUT = legacy.input;

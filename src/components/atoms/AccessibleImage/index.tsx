@@ -1,8 +1,8 @@
-import React from 'react';
-import { ImageProps, StyleSheet } from 'react-native';
-import FastImage from 'react-native-fast-image';
+import { type StyleProp, type ImageStyle } from 'react-native';
+import { forwardRef, memo } from 'react';
+import { Image, type ImageProps as ExpoImageProps } from 'expo-image';
 
-interface AccessibleImageProps extends ImageProps {
+export interface AccessibleImageProps extends Omit<ExpoImageProps, 'tintColor'> {
   /**
    * Description of the image for screen readers
    */
@@ -15,35 +15,26 @@ interface AccessibleImageProps extends ImageProps {
    * Whether the image is decorative (not important for understanding the content)
    */
   isDecorative?: boolean;
+  style?: StyleProp<ImageStyle>;
 }
 
-/**
- * An accessible image component that provides proper accessibility attributes
- */
-const AccessibleImage: React.FC<AccessibleImageProps> = ({
-  accessibilityDescription,
-  accessibilityHint,
-  isDecorative = false,
-  style,
-  ...rest
-}) => {
-  return (
-    <FastImage
-      {...rest}
-      style={style}
-      accessible={!isDecorative}
-      accessibilityLabel={isDecorative ? undefined : accessibilityDescription}
-      accessibilityHint={isDecorative ? undefined : accessibilityHint}
-      accessibilityRole="image"
-      accessibilityIgnoresInvertColors={true}
-    />
-  );
-};
-
-const styles = StyleSheet.create({
-  image: {
-    resizeMode: 'contain',
+const AccessibleImage = forwardRef<Image, AccessibleImageProps>(
+  ({ accessibilityDescription, accessibilityHint, isDecorative = false, style, ...rest }, ref) => {
+    return (
+      <Image
+        ref={ref}
+        {...rest}
+        style={style}
+        accessible={!isDecorative}
+        accessibilityLabel={isDecorative ? undefined : accessibilityDescription}
+        accessibilityHint={isDecorative ? undefined : accessibilityHint}
+        accessibilityRole="image"
+        accessibilityIgnoresInvertColors
+      />
+    );
   },
-});
+);
 
-export default AccessibleImage;
+AccessibleImage.displayName = 'AccessibleImage';
+
+export default memo(AccessibleImage);

@@ -1,4 +1,60 @@
 {
-  "name": "Binaa",
-  "displayName": "Binaa"
+  "expo": {
+    "name": "مبادرة",
+    "slug": "binaa",
+    "version": "1.0.1",
+    "orientation": "portrait",
+    "icon": "./assets/images/icon.png",
+    "userInterfaceStyle": "automatic",
+    "ios": {
+      "bundleIdentifier": "com.binaa",
+      "buildNumber": "1",
+      "infoPlist": {
+        "CADisableMinimumFrameDurationOnPhone": true,
+        "NSLocationWhenInUseUsageDescription": "",
+        "NSAppTransportSecurity": {
+          "NSAllowsArbitraryLoads": false,
+          "NSAllowsLocalNetworking": true
+        }
+      }
+    },
+    "android": {
+      "package": "com.binaa",
+      "versionCode": 5,
+      "permissions": [
+        "android.permission.INTERNET"
+      ]
+    },
+    "plugins": [
+      "expo-system-ui",
+      [
+        "expo-font",
+        {
+          "fonts": [
+            "./src/assets/fonts/cairo/Cairo-Black.ttf",
+            "./src/assets/fonts/cairo/Cairo-Bold.ttf",
+            "./src/assets/fonts/cairo/Cairo-ExtraLight.ttf",
+            "./src/assets/fonts/cairo/Cairo-Light.ttf",
+            "./src/assets/fonts/cairo/Cairo-Regular.ttf",
+            "./src/assets/fonts/cairo/Cairo-SemiBold.ttf"
+          ]
+        }
+      ],
+      [
+        "@sentry/react-native/expo",
+        {
+          "organization": "binaa",
+          "project": "binaa"
+        }
+      ],
+      "expo-localization",
+      "expo-image",
+      ["expo-updates", null],
+      "@react-native-community/datetimepicker",
+      "expo-video"
+    ],
+    "updates": {
+      "checkAutomatically": "NEVER"
+    }
+  }
 }

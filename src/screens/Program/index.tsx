@@ -40,7 +40,7 @@ const ProgramCard = ({ level, program }: { level: Level; program: Program }) => 
   );
 };
 
-function Program({ navigation, route }: RootScreenProps<Paths.Program>) {
+function ProgramUnit({ navigation, route }: RootScreenProps<Paths.Program>) {
   const program: Program = route.params || Program;
   const { items: subscriptionsState } = useAppSelector(state => state.subscriptions);
   const dispatch = useAppDispatch();
@@ -181,7 +181,7 @@ function Program({ navigation, route }: RootScreenProps<Paths.Program>) {
   );
 }
 
-export default Program;
+export default ProgramUnit;
 
 const styles = StyleSheet.create({
   container: {

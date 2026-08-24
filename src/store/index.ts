@@ -11,7 +11,7 @@ import {
   REHYDRATE,
 } from 'redux-persist';
 
-import { MMKV } from "react-native-mmkv"
+import { createMMKV } from "react-native-mmkv"
 import type { Storage } from 'redux-persist'
 
 import documentsReducer from './documentsSlice';
@@ -20,7 +20,7 @@ import accessibilityReducer from './accessibilitySlice';
 import AppReducer from './app';
 import subscriptionsReducer from './subscriptionSlice';
 
-export const storage = new MMKV()
+export const storage = createMMKV()
 
 export const reduxStorage: Storage = {
   getItem: (key) => {
@@ -28,7 +28,7 @@ export const reduxStorage: Storage = {
     return Promise.resolve(value)
   },
   removeItem: (key) => {
-    storage.delete(key)
+    storage.remove(key)
     return Promise.resolve()
   },
   setItem: (key, value) => {

@@ -1,112 +1,103 @@
 import { translate } from '@/hooks/language/useI18n';
-import { logger } from '@/services/logger';
-import { PALETTE } from '@/theme/colors';
+import { PALETTEDARK, PALETTELIGHT } from '@/theme/tokens/colors';
 import { isRTL } from '@/utils/constants';
 import type { ApiResponse } from 'apisauce';
 import type React from 'react';
-import { useTranslation } from 'react-i18next';
-import type { StyleProp} from 'react-native';
-import { Linking, ViewStyle } from 'react-native';
-import type { MessageType} from 'react-native-flash-message';
+import { Linking } from 'react-native';
+import type { MessageType } from 'react-native-flash-message';
 import { showMessage } from 'react-native-flash-message';
+import { storage } from '@/store';
 
-export const getErrorMessage = e => {
+export const getErrorMessage = (e: unknown): string | null => {
   if (typeof e === 'string') {
     return e;
   }
-  return e?.data?.message || e?.data?.error || null;
+  const obj = e as { data?: { message?: string; error?: string } };
+  return obj.data?.message || obj.data?.error || null;
 };
 
-export const getErrorsText = (errors = {}) => {
+export const getErrorsText = (errors: Record<string, unknown> = {}) => {
   const errorsKeys = Object.keys(errors);
   if (errorsKeys.length) {
     let text = '';
     errorsKeys.forEach(key => {
-      if (Array.isArray(errors[key]) && errors[key].length) {
-        text += errors[key] + ' ';
-      } else if (typeof errors[key] === 'string') {
-        text += errors[key] + ' ';
+      const val = errors[key];
+      if (Array.isArray(val) && val.length) {
+        text += val.join(' ') + ' ';
+      } else if (typeof val === 'string') {
+        text += val + ' ';
       }
     });
     return text;
   }
   return null;
 };
+
 interface Message {
   description?: string;
   duration?: number;
   message?: string;
   ref?: React.RefObject<unknown>;
-  type: MessageType; //'danger' | 'info' | 'success' | 'url' | 'warning';
+  type: MessageType;
+  url?: string;
+}
+
+const HEADER_HEIGHT = 50;
+
+function getActivePalette() {
+  const savedTheme = storage.getString('theme');
+  return savedTheme === 'dark' ? PALETTEDARK : PALETTELIGHT;
+}
+
+type Palette = ReturnType<typeof getActivePalette>;
+
+function getStyle(type: MessageType, colors: Palette) {
+  const base = {
+    minHeight: HEADER_HEIGHT,
+    backgroundColor: colors.INFO,
+    color: colors.WHITE,
+    flexDirection: 'row' as const,
+    paddingHorizontal: 20,
+  };
+
+  switch (type) {
+    case 'danger':
+      return { ...base, backgroundColor: colors.ERROR };
+    case 'info':
+      return { ...base, backgroundColor: colors.INFO };
+    case 'success':
+      return { ...base, backgroundColor: colors.SUCCESS };
+    case 'warning':
+      return { ...base, backgroundColor: colors.WARNING };
+    default:
+      return base;
+  }
 }
 
 export default function showFlashMessage(params: Message) {
   const { message = '', description = undefined, type = 'info', duration = 8000, ref } = params;
-  const HEADER_HEIGHT = 50;
-  const defaultStyle = {
-    minHeight: HEADER_HEIGHT,
-    backgroundColor: PALETTE.INFO,
-    color: PALETTE.WHITE,
-    flexDirection: 'row',
-    paddingHorizontal: 20,
-  };
+  const colors = getActivePalette();
+  const style = getStyle(type, colors);
 
-  function getStyle(): StyleProp<unknown> {
-    switch (type) {
-      case 'danger':
-        return {
-          ...defaultStyle,
-          backgroundColor: PALETTE.ERROR,
-          color: PALETTE.WHITE,
-          flexDirection: 'row',
-          paddingHorizontal: 20,
-        };
-      case 'info':
-        return {
-          ...defaultStyle,
-          backgroundColor: PALETTE.INFO,
-          color: PALETTE.WHITE,
-          flexDirection: 'row',
-          paddingHorizontal: 20,
-        };
-      case 'success':
-        return {
-          ...defaultStyle,
-          backgroundColor: PALETTE.SUCCESS,
-          color: PALETTE.WHITE,
-          flexDirection: 'row',
-          paddingHorizontal: 20,
-        };
-      case 'warning':
-        return {
-          ...defaultStyle,
-          backgroundColor: PALETTE.WARNING,
-          color: PALETTE.WHITE,
-          flexDirection: 'row',
-          paddingHorizontal: 20,
-        };
-      default:
-        return defaultStyle;
-    }
-  }
-  const navigateURL = () => {
+  function navigateURL() {
     if (params?.url) {
       try {
-        Linking.openURL(params?.url);
+        Linking.openURL(params.url);
       } catch {}
     }
-  };
+  }
   if (message) {
     if (ref?.current) {
+      // @ts-ignore - flash-message types don't include showMessage on ref
       ref.current.showMessage({
         message,
         description,
         type,
         icon: 'auto',
         duration: 3000,
-        style: getStyle(),
-        backgroundColor: getStyle().backgroundColor,
-        color: getStyle().color,
+        style,
+        backgroundColor: style.backgroundColor,
+        color: style.color,
         textStyle: {
           writingDirection: isRTL ? 'rtl' : 'auto',
           paddingRight: 20,
@@ -123,9 +114,9 @@ export default function showFlashMessage(params: Message) {
         type,
         icon: 'auto',
         duration,
-        style: getStyle(),
-        backgroundColor: getStyle().backgroundColor,
-        color: getStyle().color,
+        style,
+        backgroundColor: style.backgroundColor,
+        color: style.color,
         textStyle: {
           writingDirection: isRTL ? 'rtl' : 'auto',
           paddingRight: 20,
@@ -153,13 +144,13 @@ export function handleWarningMessage(message?: string, ref?: React.RefObject<unk
 }
 
 export function handleErrorMessage(e?: ApiResponse<unknown> | object | string, ref?: React.RefObject<unknown>) {
-  if (typeof e === 'object' && e?.status && (e?.status >= 500 || e?.status === 401 || e?.data?.message === 'Unauthenticated.')) {
+  if (typeof e === 'object' && e !== null && 'status' in e && typeof e.status === 'number' && e.status >= 500) {
     const message = translate('common:something_went_wrong');
     const description = '';
     showFlashMessage({ message, description, type: 'danger', ref });
   } else {
     const message = getErrorMessage(e) || translate('common:something_went_wrong');
-    const description = getErrorsText(e?.data?.errors);
-    showFlashMessage({ message, description, type: 'danger', ref });
+    const desc = getErrorsText((e as { data?: { errors?: Record<string, unknown> } })?.data?.errors);
+    showFlashMessage({ message, description: desc ?? undefined, type: 'danger', ref });
   }
 }

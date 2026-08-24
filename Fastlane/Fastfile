@@ -1,3 +1,5 @@
+require 'json'
+
 import './APPCONST'
 
 # Fastlane update
@@ -6,7 +8,11 @@ update_fastlane
 ###################### SETUP ######################
 dir = File.expand_path('..', Dir.pwd).freeze
 
-APP_VERSION_NAME = "1.0".freeze
+# app.json (expo.version) is the single source of truth for the app version
+# name on both platforms — see CLAUDE.md §0.3. Previously this was a second,
+# independently-drifting literal here that disagreed with the native project.
+app_json = JSON.parse(File.read(File.join(dir, 'app.json')))
+APP_VERSION_NAME = app_json['expo']['version'].freeze
 XCODE_PROJECT_PATH = "ios/#{PROJECT_NAME}.xcodeproj".freeze
 XCODE_WORKSPACE_PATH = "ios/#{PROJECT_NAME}.xcworkspace".freeze
 RELEASE_SCHEME_NAME = "#{PROJECT_NAME}".freeze
@@ -33,13 +39,12 @@ platform :android do
 		project_dir: "./android/"
 	)
 
-	# internalVersionCode = google_play_track_version_codes(
-	# 	track: 'internal',
-	# 	json_key: "fastlane/gplayKey.json",
-	# 	package_name: AND_APP_SPECIFIER,
-	# )
-	internalVersionCode=5
-	
+	internalVersionCode = google_play_track_version_codes(
+		track: 'internal',
+		json_key: "fastlane/gplayKey.json",
+		package_name: AND_APP_SPECIFIER,
+	)
+
 	print "### Increasing Android \n"
 	nextVersionCode = internalVersionCode.max + 1
 	android_set_version_code(version_code: nextVersionCode, gradle_file: "android/app/build.gradle")
@@ -69,15 +74,7 @@ platform :android do
 	  	rollout: "1",
 	)
 	
-	# Upload to huawei appgallery connect
-	huawei_appgallery_connect(
-		client_id: "1417378279693751232",
-		client_secret: "1321B1C3FFEEBB52EB6C57BF7C8F99E4B53908CEE47169E23A2D36BAA2198861",
-		app_id: HUAWEI_APP_ID, #app id from APPCONST file
-		apk_path: "android/app/build/outputs/bundle/release/app-release.aab", #path to the apk/aab file
-		is_aab: true,
-		submit_for_review: false,
-	)
+
 
 	sentry_config = property_file_read(file: "./android/sentry.properties")
 	# sentry_upload_dsym(
@@ -108,9 +105,6 @@ platform :ios do
 			use_bundle_exec: false,
 			repo_update: true,
 		)
-		
-
-  	yarn(command: "patch-package")
 
 
 		api_key = app_store_connect_api_key(

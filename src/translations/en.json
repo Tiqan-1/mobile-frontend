@@ -46,7 +46,8 @@
     "navigation": {
       "Programs": "Programs",
       "Main": "My Subscriptions",
-      "TodayLessons": "Today Lessons"
+      "TodayLessons": "Today Lessons",
+      "Menu": "Menu"
     },
     "Programs": {
       "remainig": "remainig",

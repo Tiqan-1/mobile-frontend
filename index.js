@@ -2,8 +2,13 @@
  * @format
  */
 
-import { AppRegistry } from 'react-native';
+import { registerRootComponent } from 'expo';
 import App from './src/App';
-import { name as appName } from './app.json';
+import StorybookUIRoot from './.rnstorybook';
+import { STORYBOOK_ENABLED } from './src/config';
 
-AppRegistry.registerComponent(appName, () => App);
+// When the flag is off, metro.config.js's withStorybook(..., { enabled: false })
+// resolves './.rnstorybook' to a tiny stub and empties every storybook/@storybook
+// import — this static import stays cheap either way, so no dynamic require is
+// needed (see .agents/T2c.md's Decisions log for how that was verified).
+registerRootComponent(STORYBOOK_ENABLED ? StorybookUIRoot : App);

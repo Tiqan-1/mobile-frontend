@@ -1,37 +1,23 @@
 import Student from '@/assets/svg-app/student.svg';
 import { useI18n } from '@/hooks';
-import LibraryScreen from '@/screens/LibraryScreen';
 import MainScreen from '@/screens/MainScreen';
 import Menu from '@/screens/Menu';
 import Programs from '@/screens/Programs';
 import TodayLessons from '@/screens/TodayLessons';
-import { PALETTE } from '@/theme/colors';
+import { useTheme } from '@/theme';
 import typography, { fonts } from '@/theme/typography';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { useNavigation } from '@react-navigation/native';
 import Book from 'assets/svg-app/book.svg';
 import Bookm from 'assets/svg-app/bookm.svg';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Paths } from './paths';
 
 const Tab = createBottomTabNavigator();
 
-// Placeholder component for the Accessibility tab
-const AccessibilityTab = () => {
-  const navigation = useNavigation();
-
-  React.useEffect(() => {
-    // Navigate to the AccessibilitySettings screen when this tab is selected
-    navigation.navigate(Paths.AccessibilitySettings);
-  }, [navigation]);
-
-  return null;
-};
-
 const BottomTabNavigation = () => {
   const { translate } = useI18n();
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
+  const { colors } = useTheme();
 
   const TAB_SCREEN_OPTIONS = {
     drawerPosition: 'right',
@@ -50,8 +36,8 @@ const BottomTabNavigation = () => {
       ...typography['superSmallText'],
       fontFamily: fonts.regular.fontFamily,
     },
-    tabBarInactiveTintColor: PALETTE.BLACK,
-    tabBarActiveTintColor: PALETTE.PRIMARY_COLOR,
+    tabBarInactiveTintColor: colors.BLACK,
+    tabBarActiveTintColor: colors.PRIMARY_COLOR,
   };
 
   return (
@@ -65,7 +51,7 @@ const BottomTabNavigation = () => {
         },
       }}>
       <Tab.Screen
-        component={MainScreen}
+        component={MainScreen as any}
         name={Paths.Main}
         options={{
           tabBarLabel: t('navigation.Main'),
@@ -74,7 +60,7 @@ const BottomTabNavigation = () => {
         }}
       />
       <Tab.Screen
-        component={TodayLessons}
+        component={TodayLessons as any}
         name={Paths.TodayLessons}
         options={{
           tabBarLabel: t('navigation.TodayLessons'),
@@ -84,7 +70,7 @@ const BottomTabNavigation = () => {
         }}
       />
       <Tab.Screen
-        component={Programs}
+        component={Programs as any}
         name={Paths.Programs}
         options={{
           tabBarLabel: t('navigation.Programs'),
@@ -113,11 +99,11 @@ const BottomTabNavigation = () => {
         }}
       /> */}
       <Tab.Screen
-        component={Menu}
+        component={Menu as any}
         name={Paths.Menu}
         options={{
-          tabBarLabel: t('القائمة'),
-          tabBarIcon: ({ color, size }) => <Student style={{ color: color }} fill={color} height={size} width={size} />,
+          tabBarLabel: t('navigation.Menu'),
+          tabBarIcon: ({ focused, color, size }) => <Student fill={color} height={size} width={size} />,
           tabBarAccessibilityLabel: 'Menu tab',
         }}
       />

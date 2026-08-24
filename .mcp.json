@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "maestro": { "command": "maestro", "args": ["mcp"] },
+    "mobile": { "command": "npx", "args": ["-y", "@mobilenext/mobile-mcp@latest"] },
+    "metro": { "command": "npx", "args": ["-y", "metro-mcp"] },
+    "xcodebuild": { "command": "npx", "args": ["-y", "xcodebuildmcp@latest", "mcp"] }
+  }
+}

@@ -1,6 +1,6 @@
 import CircleStatus from '@/components/atoms/CircleStatus';
 import { SmallTitle, Text } from '@/components/atoms/Text';
-import { VideoModal } from '@/components/organisms/VideoModal';
+import { FocusPlayer } from '@/components/organisms/FocusPlayer';
 import { SafeScreen } from '@/components/templates';
 import { useAppSelector } from '@/hooks/useAppDispatch';
 import { Paths } from '@/navigation/paths';
@@ -177,7 +177,7 @@ function TodayLessons({ navigation }: RootScreenProps<Paths.TodayLessons>) {
             />
           )}
         </View>
-        <VideoModal selectedVideo={selectedVideo} onClose={() => setSelectedVideo(null)} />
+        <FocusPlayer lesson={selectedVideo} onClose={() => setSelectedVideo(null)} />
       </View>
     </SafeScreen>
   );

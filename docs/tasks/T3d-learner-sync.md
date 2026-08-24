@@ -1,5 +1,32 @@
 # T3d — Learner side and progress sync
 
+> **Before you start:** read [`CLAUDE.md` §0](../../CLAUDE.md) — the working agreement. In short: **don't commit or push unless asked in this session**; never hand-edit `android/`/`ios/` (they're generated — `app.json` + config plugins instead); install with `npx expo install`, not `yarn add`; stay inside your `Owns` list and report anything outside it rather than fixing it; keep changes surgical (§0.8).
+>
+> **Keep the Status & checkpoints block below current as you work** — it lives in this file, not in a central tracker. Set the status when you start, tick each checkpoint only once you've *verified* it, and update it again when you stop. If you stop mid-brief, name the exact checkpoint you stopped at.
+
+---
+
+## Status & checkpoints
+
+| | |
+|---|---|
+| **Status** | ⚪ not started |
+| **Owner** | — |
+| **Branch** | — |
+| **Last updated** | 2026-08-17 |
+
+**Legend:** ⚪ not started · 🔵 in progress · ⏸️ blocked · ✅ done · 🟣 superseded
+
+Tick a box only when you have **verified** it, not when you've written the code. Add a checkpoint if this brief turns out to need one — don't silently widen the one you're on. This brief is `✅ done` only when every box is ticked **and** the Acceptance criteria below pass.
+
+- [ ] `TodayLessons` surfaces personal curricula alongside org programs
+- [ ] Progress telemetry on lesson open / close / finish
+- [ ] PDF read position bridged from the Redux `documents` slice
+- [ ] Sync worker with an offline queue
+- [ ] End-to-end on two simulators: parent authors → learner consumes → parent sees completion
+
+---
+
 **Depends on:** T3b, T3a. **Parallel-safe with:** T3c.
 
 ## Goal
@@ -47,7 +74,7 @@ Rules:
 - **`watchedSec` is monotonic.** Re-watching accumulates; scrubbing backwards doesn't decrement.
 - `completedPct` from `watchedSec / durationSec`. For a trimmed YouTube lesson, the denominator is `endSec - startSec`, **not** the full video — getting this wrong makes every trimmed lesson look incomplete.
 - `backgroundedCount` increments on `AppState` change to `background`/`inactive` *while a lesson is playing*. Ignore transitions outside playback.
-- Also capture PDF lessons — `PDFViewerScreen` already tracks pages via `useProgress`. Bridge it to the same shape rather than inventing a second progress model.
+- Also capture PDF lessons. `PDFViewerScreen` tracks read position by dispatching `setCurrentPage` to the Redux `documents` slice (**not** via any database — WatermelonDB was removed as dead code). Bridge that into the same progress shape rather than inventing a second model.
 
 Write locally first, always. The app must work fully offline.
 
@@ -55,7 +82,7 @@ Write locally first, always. The app must work fully offline.
 
 ## Part 3 — Sync worker
 
-`POST /api/progress/sync` with a batch of `LessonProgress`, using the `synced_at` column that has existed in the schema since day one and never been used.
+`POST /api/progress/sync` with a batch of `LessonProgress`, tracking a `syncedAt` marker per entry in whatever local storage T3b chose.
 
 - **Batch, don't chatter.** Flush on app background, on lesson completion, and periodically — not on every progress tick.
 - **Idempotent.** The contract specifies last-write-wins per `lessonId` with `watchedSec` taking the max. Resends must be safe.

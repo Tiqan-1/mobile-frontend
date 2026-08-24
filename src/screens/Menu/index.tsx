@@ -12,9 +12,9 @@ import { resetSubscriptions } from '@/store/subscriptionSlice';
 import { useTheme } from '@/theme';
 import { CommonActions } from '@react-navigation/native';
 import _ from 'lodash';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ActivityIndicator, Alert,  Pressable, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, Alert, Pressable, StyleSheet, View } from 'react-native';
 import Button from '@/components/atoms/Button';
 
 interface MenuElementProps {
@@ -30,12 +30,15 @@ function MenuElement({ title }: MenuElementProps) {
   const activateD = __DEV__
     ? ['SWIPE_UP']
     : ['SWIPE_UP', 'SWIPE_UP', 'SWIPE_UP', 'SWIPE_DOWN', 'SWIPE_DOWN', 'SWIPE_UP', 'SWIPE_UP', 'SWIPE_DOWN'];
-  if (_.isEqual(Swipe, activateD)) {
-    console.log('Activated');
-    setAdmin('Activated');
-    dispatch(setisSUAuth(true));
-    setSwipe([]);
-  }
+  useEffect(() => {
+    if (_.isEqual(Swipe, activateD)) {
+      console.log('Activated');
+      setAdmin('Activated');
+      dispatch(setisSUAuth(true));
+      setSwipe([]);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [Swipe]);
   // const { t, i18n } = useTranslation();
   // const [apiState, setapiState] = useState<APISTATE>(initStateAPIState);
   return (
@@ -84,32 +87,28 @@ function Menu({ navigation }: RootScreenProps<Paths.Menu>) {
   };
 
   const handleDeleteAccount = () => {
-    Alert.alert(
-      'حذف الحساب',
-      'هل أنت متأكد من حذف حسابك؟ سيتم حذف جميع بياناتك بشكل نهائي.',
-      [
-        {
-          text: 'إلغاء',
-          style: 'cancel',
-          isPreferred: true,
+    Alert.alert('حذف الحساب', 'هل أنت متأكد من حذف حسابك؟ سيتم حذف جميع بياناتك بشكل نهائي.', [
+      {
+        text: 'إلغاء',
+        style: 'cancel',
+        isPreferred: true,
+      },
+      {
+        text: 'حذف',
+        style: 'destructive',
+        onPress: async () => {
+          setIsDeleting(true);
+          try {
+            await DELETE('/api/students', {});
+            handleSuccessMessage('تم حذف الحساب بنجاح');
+            await logOut();
+          } catch (error) {
+            handleErrorMessage(error as object);
+            setIsDeleting(false);
+          }
         },
-        {
-          text: 'حذف',
-          style: 'destructive',
-          onPress: async () => {
-            setIsDeleting(true);
-            try {
-              await DELETE('/api/students', {});
-              handleSuccessMessage('تم حذف الحساب بنجاح');
-              await logOut();
-            } catch (error) {
-              handleErrorMessage(error as object);
-              setIsDeleting(false);
-            }
-          },
-        },
-      ],
-    );
+      },
+    ]);
   };
 
   return (
