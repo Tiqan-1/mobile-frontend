@@ -21,7 +21,9 @@
     "android": {
       "package": "com.binaa",
       "versionCode": 5,
-      "permissions": ["android.permission.INTERNET"]
+      "permissions": [
+        "android.permission.INTERNET"
+      ]
     },
     "plugins": [
       "expo-system-ui",
@@ -47,7 +49,11 @@
       ],
       "expo-localization",
       "expo-image",
-      ["expo-updates", null]
+      [
+        "expo-updates",
+        null
+      ],
+      "expo-video"
     ],
     "updates": {
       "checkAutomatically": "NEVER"
