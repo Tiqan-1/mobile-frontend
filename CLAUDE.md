@@ -407,8 +407,8 @@ type LessonSource =
 The point of this feature is that a child never needs to open the YouTube app.
 
 1. **Never call `Linking.openURL()` on a lesson URL.** Not from the player, not from a menu, not behind a long-press. *(The current `VideoModal` has exactly such a button; `FocusPlayer` removes it.)*
-2. `kind: 'hosted'` plays through `react-native-video`. Prefer it whenever it's available.
-3. `kind: 'youtube'` plays through `react-native-youtube-iframe` pointed at **`youtube-nocookie.com`**, with `WebView` `onShouldStartLoadWithRequest` rejecting every navigation outside the embed origin, plus `setSupportMultipleWindows={false}` and `allowsFullscreenVideo={false}`.
+2. `kind: 'hosted'` plays through **`expo-video`** — chosen over `react-native-video` in [T3a](docs/tasks/T3a-focus-player.md): first-party under Expo CNG (SDK 57), config plugin ships in-box, no manual native wiring, versioned with the SDK so it can't drift.
+3. `kind: 'youtube'` plays through `react-native-youtube-iframe` pointed at **`youtube-nocookie.com`**, with `WebView` `onShouldStartLoadWithRequest` rejecting every navigation outside the embed origin, plus `setSupportMultipleWindows={false}` and `allowsFullscreenVideo={false}`. **The library itself (2.4.1, latest) never sets this** — YouTube's IFrame Player API `host` option is a hardcoded omission in its `PlayerScripts.js`, not something `playerVars`/`baseUrlOverride`/`origin` can reach. Patched via `patch-package` (`patches/react-native-youtube-iframe+2.4.1.patch`) to add `host: 'https://www.youtube-nocookie.com'` to its `new YT.Player(...)` call. `patch-package` was removed from this repo in T0 for being unused; T3a reintroduced it, scoped to this one library.
 4. Do **not** rely on `modestbranding` — YouTube deprecated it in Aug 2023 and it is a no-op. `rel=0` no longer hides related videos either; it only restricts them to the same channel. The navigation interception is what actually works.
 5. Never extract or proxy YouTube streams. It violates their ToS. Re-hosting is only for content the user has rights to.
 
