@@ -16,6 +16,7 @@ module.exports = {
     // Turbo Module, which doesn't exist under Jest — see the mock file.
     '^react-native-mmkv$': '<rootDir>/__mocks__/react-native-mmkv.ts',
     '^expo-updates$': '<rootDir>/__mocks__/expo-updates.ts',
+    '^expo-keep-awake$': '<rootDir>/__mocks__/expo-keep-awake.ts',
   },
   setupFiles: [
     // react-native-gesture-handler's own mock — every screen tree pulls it
@@ -30,6 +31,6 @@ module.exports = {
   // too, e.g. @reduxjs/toolkit -> immer's ESM build, which crashed the
   // suite outright before this (see docs/tasks/T0-hygiene.md).
   transformIgnorePatterns: [
-    'node_modules/(?!((jest-)?react-native|@react-native(-community)?|expo(nent)?|@expo(nent)?/.*|expo-modules-core|@expo-google-fonts/.*|react-navigation|@react-navigation/.*|react-native-.*|@reduxjs/toolkit|immer|@sentry/react-native|@tanstack/react-query|redux-persist|react-redux|expo-image|expo-updates)/)',
+    'node_modules/(?!((jest-)?react-native|@react-native(-community)?|expo(nent)?|@expo(nent)?/.*|expo-modules-core|@expo-google-fonts/.*|react-navigation|@react-navigation/.*|react-native-.*|@reduxjs/toolkit|immer|@sentry/react-native|@tanstack/react-query|redux-persist|react-redux|expo-image|expo-updates|expo-keep-awake)/)',
   ],
 };

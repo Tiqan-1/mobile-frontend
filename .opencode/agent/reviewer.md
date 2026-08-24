@@ -1,7 +1,7 @@
 ---
 description: Independent read-only review of a diff against its spec for Mobadra, plus a project-specific audit pass. Returns PASS or CHANGES_REQUESTED with numbered findings.
 mode: primary
-model: hcnsec/MiniMax-M3
+model: routerplex/MiniMax-M3
 temperature: 0.1
 # Default is blanket-deny: the reviewer reports its verdict as text and the
 # lead pastes it into the state file. That's slower but has no enforcement
@@ -76,14 +76,34 @@ diff broke that it did not intend to touch.
 
 ### Pass B — project-specific audit
 
-Read this project's own guidance/security docs for what actually matters
-here (examples of the kind of thing to look for, not a fixed checklist):
-process-lifecycle assumptions, permission/capability minimisation, untrusted
-input reaching a sink it shouldn't, storage races, and anything the project
-has been burned by before. If the diff uses a platform API or pattern you
-are not certain is safe here, **verify it — do not assume in either
-direction.** Say explicitly what you checked and how. "Probably fine" is not
-a review.
+Read `CLAUDE.md` for the full detail; the checks below are the ones that
+have actually caught real bugs in this pipeline so far, not a complete list
+— still look for whatever else the diff's own shape suggests (process
+lifecycle, untrusted input reaching a sink, storage races):
+
+- **`import { PALETTE } from '@/theme/colors'`** anywhere in the diff —
+  automatic finding. It's a mutable module var; only `useTheme()` re-renders
+  correctly on theme change.
+- **A module-scope `StyleSheet.create()` closing over theme values** (same
+  stale-capture bug as above, different shape).
+- **`Linking.openURL()` on anything that could be a lesson/video URL** —
+  automatic `critical` finding, no exceptions, per `CLAUDE.md` §7.
+- **A new library used against an API you haven't verified in
+  `node_modules/<pkg>/**/*.d.ts` or its actual source** — don't trust the
+  diff author's usage as proof it's correct; a wrong-but-plausible API call
+  against a similar-shaped library (e.g. assuming `expo-video` works like
+  `react-native-video`) type-checks fine right up until it's the one file
+  nothing else imports, and `tsc` silently excludes it from the check.
+- **This is Expo CNG** — any edit under `android/`/`ios/` is an automatic
+  finding (those are generated, gitignored, absent from a fresh checkout);
+  a native capability should route through `app.json`/a config plugin
+  instead.
+- **`yarn add`/`npm install` for a native module** instead of `npx expo
+  install` — SDK-version drift risk, flag it.
+
+If the diff uses a platform API or pattern you are not certain is safe
+here, **verify it — do not assume in either direction.** Say explicitly what
+you checked and how. "Probably fine" is not a review.
 
 Also always check: any new dependency, permission, or capability the spec's
 *New permissions required* table doesn't list is an **automatic

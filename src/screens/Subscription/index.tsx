@@ -4,7 +4,7 @@ import Student from '@/assets/svg-app/student.svg';
 import Video from '@/assets/svg-app/video.svg';
 import CircleStatus from '@/components/atoms/CircleStatus';
 import { SmallText, SmallTitle, Text, Title } from '@/components/atoms/Text';
-import { VideoModal } from '@/components/organisms/VideoModal';
+import { FocusPlayer } from '@/components/organisms/FocusPlayer';
 import { SafeScreen } from '@/components/templates';
 import { Paths } from '@/navigation/paths';
 import type { RootScreenProps } from '@/navigation/types';
@@ -108,7 +108,7 @@ function Subscription({ navigation, route }: RootScreenProps<Paths.Subscription>
             </View>
           )}
         />
-        <VideoModal selectedVideo={selectedVideo} onClose={() => setSelectedVideo(null)} />
+        <FocusPlayer lesson={selectedVideo} onClose={() => setSelectedVideo(null)} />
       </View>
     </SafeScreen>
   );

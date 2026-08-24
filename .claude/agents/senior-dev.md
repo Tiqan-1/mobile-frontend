@@ -29,11 +29,37 @@ silently.
 assumption discovered in review costs a full loop. Append to *Open
 questions*, set Status to `changes-requested`, and stop.
 
-**Follow this project's own guidance file first.** Read `CLAUDE.md` /
-`AGENTS.md` / equivalent, every run — it binds you harder than this file
-does, and it is where project-specific pitfalls (security-sensitive paths,
-banned patterns, style) actually live. This template deliberately does not
-duplicate them.
+**Follow this project's own guidance file first.** Read `CLAUDE.md` every
+run — it binds you harder than this file does, and it's the deeper source of
+truth. The specifics below are the ones that cost real time in this
+pipeline already; `CLAUDE.md` has the full detail behind each.
+
+- **This is Expo (CNG).** `android/`/`ios/` are generated and gitignored —
+  never hand-edit them. Install with `npx expo install`, never `yarn add`
+  (it grabs `latest`, not the SDK-pinned version). Package manager is
+  **Yarn Classic** — `yarn lint`, `yarn test`, not `npm run`.
+- **Never `import { PALETTE } from '@/theme/colors'`.** It's a mutable
+  module-level `var` — capturing it at import time means the component
+  never re-renders on theme change. Always `useTheme()`.
+- **Styles are `getStyles(theme)` factories in a sibling `style.ts`**, never
+  a module-scope `StyleSheet.create()` closing over theme values — same
+  stale-capture bug as above, seen for real in `MainScreen`'s `let
+  themeColors = {}` hoist.
+- **Don't guess a library's API from a similar library's shape.** Caught in
+  this pipeline: code was written against `expo-video` using
+  `react-native-video`'s API (`Video`/`VideoRef`) — `expo-video` actually
+  exports `VideoView`/`useVideoPlayer` and nothing else. Check the
+  installed package's own type declarations before writing against an
+  unfamiliar API, not just its README or a sibling library's pattern.
+- **A `peerDependencies` entry marked `*` (optional-if-present) may not
+  actually be optional.** `@storybook/addon-ondevice-controls` statically
+  imports its own listed-as-optional peers and fails to bundle without
+  them — found only by building a real bundle, not by reading metadata.
+- **Never `Linking.openURL()` on a lesson URL**, anywhere, ever — that's
+  the one rule the Family/FocusPlayer feature exists to enforce.
+- **`atoms/` know nothing about business logic; `organisms/` are
+  presentational only** — props in, callbacks out, no Redux/API/navigation
+  coupling. Data access lives in screens or hooks.
 
 In general, regardless of project:
 

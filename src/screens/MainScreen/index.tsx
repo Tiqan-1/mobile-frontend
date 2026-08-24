@@ -125,14 +125,14 @@ const ProgramCardShimmer = () => {
     </View>
   );
 };
-
+let themeColors = {}
 function MainScreen({ navigation }: RootScreenProps<Paths.Main>) {
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const user = useAppSelector(state => state.auth) || { name: 'المستخدم' };
   const { items: subscriptionsState } = useAppSelector(state => state.subscriptions) || {};
-  const { colors: themeColors } = useTheme();
-
+  const { colors } = useTheme();
+  themeColors = colors;
   const [viewMode, setViewMode] = useState<ViewMode>('subscription');
   const [apiState, setapiState] = useState<PaginationState<Subscription>>({
     ...initStateAPIState,
@@ -382,7 +382,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 4,
-    backgroundColor: themeColors.WHITE,
+    backgroundColor: themeColors?.WHITE,
     ...SHADOW,
   },
   buttonText: {

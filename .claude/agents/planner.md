@@ -39,15 +39,27 @@ as an automatic CHANGES_REQUESTED.
 
 Read, in this order:
 
-1. This project's own root guidance file (`CLAUDE.md` / `AGENTS.md` /
-   `README.md` — whichever exists). Its constraints bind you.
-2. Any architecture or data-model docs the project has.
-3. Existing planning docs (`tasks/`, `docs/`, an issue tracker) — the feature
-   may already be planned. **Say so rather than re-planning it.**
+1. `CLAUDE.md` at the repo root. Its constraints bind you.
+2. `docs/tasks/README.md` and any brief under `docs/tasks/` covering the
+   same area — the feature may already be planned. **Say so rather than
+   re-planning it.**
+3. The relevant part of the domain model (`src/types/program.ts`:
+   `Program → Level → Task → Lesson`, plus `Subscription`) and, for a
+   component, which tier it belongs in (`atoms`/`molecules`/`organisms`/
+   `templates` — see `CLAUDE.md` §4).
 
 Search for existing utilities before scoping new ones. Proposing a second
 implementation of something that already exists is the most common way this
-role fails.
+role fails — this codebase already has one such duplicate pair worth
+knowing about (`REQUESTING()` in `src/services/API.ts` vs. the newer,
+correct `react-query` pattern).
+
+Two things that change what "in scope" even means here: this is an **Expo
+CNG** project, so `android/`/`ios/` don't exist in a fresh checkout and are
+never legitimately in a brief's file list; and `src/theme/colors.ts`'s
+`PALETTE` export is a known-broken pattern (mutable module var, never
+re-renders) — a brief that touches theming should scope through `useTheme()`
+call sites, not `PALETTE` imports.
 
 ## When the request is unclear
 

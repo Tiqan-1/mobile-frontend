@@ -21,7 +21,9 @@
     "android": {
       "package": "com.binaa",
       "versionCode": 5,
-      "permissions": ["android.permission.INTERNET"]
+      "permissions": [
+        "android.permission.INTERNET"
+      ]
     },
     "plugins": [
       "expo-system-ui",
@@ -48,7 +50,8 @@
       "expo-localization",
       "expo-image",
       ["expo-updates", null],
-      "@react-native-community/datetimepicker"
+      "@react-native-community/datetimepicker",
+      "expo-video"
     ],
     "updates": {
       "checkAutomatically": "NEVER"
